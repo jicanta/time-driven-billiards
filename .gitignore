@@ -1,0 +1,31 @@
+# C++
+build/
+*.o
+
+# Python
+__pycache__/
+.venv/
+.ruff_cache/
+
+# Datos y figuras generadas
+data/*
+!data/.gitkeep
+
+# LaTeX
+report/build/
+report/.check/
+report/*.pdf
+report/*.log
+report/*.aux
+report/*.out
+report/*.toc
+report/*.synctex.gz
+report/*.fls
+report/*.fdb_latexmk
+
+# Videos para subir a YouTube
+youtube/*.mp4
+
+# Entregables generados
+SdS_TP4_*.zip
+SdS_TP4_*.pdf

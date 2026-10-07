@@ -1,0 +1,271 @@
+# TP4 — Dinámica Molecular Regida por el Paso Temporal: Billar Circular
+
+Simulación de Sistemas — ITBA. Integración numérica de las ecuaciones de
+Newton con paso temporal fijo, para dos sistemas: un oscilador puntual
+amortiguado con solución analítica (sistema 1, para medir el error de los
+esquemas de integración) y un billar circular de partículas que interactúan
+por contacto mediante un resorte lineal (sistema 2).
+
+## Sistemas
+
+**Sistema 1 — oscilador amortiguado.** `m r̈ = −k r − γ ṙ` con `m = 70 kg`,
+`k = 10⁴ N/m`, `γ = 100 kg/s`, `r(0) = A = 1 m`, `v(0) = −A γ/(2m)` y
+`tf = 5 s`. La solución es `r(t) = A e^(−γt/2m) cos(ωt)` con
+`ω = √(k/m − γ²/4m²) = 11,9309 rad/s`. Se integra con **Beeman**, **Verlet
+original**, **Velocity Verlet** y **Euler predictor-corrector**, y se compara
+el error cuadrático medio contra la solución exacta.
+
+**Sistema 2 — billar circular.**
+
+- Dominio circular de radio `R = 0,51 m`, pared fija e indeformable. Su área,
+  `πR² = 0,8171 m²`, es prácticamente la de la mesa del TP3 (`0,816 m²`): a
+  igual `N`, la misma densidad.
+- Dos obstáculos circulares fijos de radio `r`, con centros en `(−xo, 0)` y
+  `(+xo, 0)`, con `xo` entre `r` (se tocan en el centro) y `R − r` (tocan la
+  pared).
+- `N` partículas de radio `r = 0,0175 m` y masa `m = 0,025 kg`, con
+  `|v0| = 1 m/s` y direcciones uniformes en `[0, 2π)`.
+- Interacción sólo por contacto: resorte lineal normal de constante
+  `k = 10⁴ N/m`, sin fricción ni disipación. El sistema es conservativo.
+- Una partícula *fresca* pasa a *usada* al tocar por primera vez cualquiera de
+  los dos obstáculos. `Fu(t)` es la fracción de usadas, `t90` y `t100` los
+  instantes en que llega a 0,9 y a 1.
+
+## Estructura
+
+```
+tp-4/
+├── Makefile            # todo el flujo desde la raíz: build, oscilador, energia, bench, obstaculos, velocidades, mapa, animaciones, entrega
+├── README.md           # este documento
+├── PLAN.md             # plan de trabajo: ítems, modelo, decisiones y dudas a los docentes
+├── FEEDBACK.md         # devoluciones de la cátedra (TP2 y borrador del TP3) aplicadas al TP4
+├── requirements.txt    # matplotlib, numpy
+├── docs/               # enunciado, Teórica 0 y 4, y la bibliografía de la cátedra (Gear, Heermann)
+├── engine/             # C++17: motor regido por el paso temporal (va en el zip de entrega con animate.py y common.py)
+├── visualization/      # Python: post-procesamiento (observables), figuras y animaciones
+├── report/             # presentacion.tex (borrador beamer 16:9, no se entrega); build/ ignorado
+├── youtube/            # titulos.md con título y descripción de cada video (los .mp4 no se versionan)
+├── figuras-slides/     # figuras de la presentación numeradas por diapositiva
+└── data/               # salidas de simulación y figuras (ignoradas por git)
+    ├── oscilador/      #   sistema 1: una trayectoria por esquema y por dt
+    ├── energia/        #   ítem 2.1.a: N = 300 sin obstáculos, un barrido de dt con cuadros
+    ├── energia_densa/  #   ítem 2.1.a: la misma verificación a N = 700 con obstáculos
+    ├── bench/          #   ítem 2.1.b: tiempos contra N (y los del TP3, en la misma computadora)
+    ├── explore/2.2/    #   ítem 2.2: barrido de xo con N = 100 y N = 20
+    ├── velocidades/    #   ítem 2.3: N = 100 sin obstáculos, cuadros hasta el estacionario
+    ├── mapa/           #   ítem 2.4.b: barrido (xo, N)
+    ├── runs/           #   corridas con cuadros para las animaciones y la validación
+    └── figures/, figuras_diapositivas/   # figuras por ítem, en estilo de revisión y de diapositiva
+```
+
+## Flujo
+
+```bash
+pip install -r requirements.txt
+make build                 # engine/build/billar
+make check                 # validación: deriva de energía, solapamientos y escapes (visualization/check.py)
+make oscilador             # sistema 1: los 4 esquemas y los 9 dt
+make oscilador-figuras     # ECM vs dt (la única figura del sistema 1) y la trayectoria
+make energia               # ítem 2.1.a: N = 300 sin obstáculos, barrido de dt con cuadros
+make energia-figuras       # energía vs t (completa y ampliada) y deriva vs dt
+make energia-densa         # verifica el dt elegido en el caso más denso (N = 700 con obstáculos)
+make bench                 # ítem 2.1.b: tiempos contra N (máquina descargada)
+make bench-tp3             # los mismos tiempos con el motor del TP3, en esta computadora
+make bench-figuras         # tiempo de ejecución vs N de los dos paradigmas
+make obstaculos            # ítem 2.2: barrido de xo con N = 100 y N = 20
+make obstaculos-figuras    # ⟨t90⟩ vs xo y Fu(t) de los xo típicos
+make velocidades           # ítem 2.3: N = 100 sin obstáculos, cuadros hasta el estacionario
+make velocidades-figuras   # f(v) por instante, ajuste de Maxwell-Boltzmann y E(kT)
+make densidad-figuras      # ítem 2.4.a: ⟨t90⟩ y ⟨t100⟩ vs densidad (usa las corridas del 2.1.b)
+make mapa                  # ítem 2.4.b: barrido (xo, N)
+make mapa-figuras          # mapa de calor de ⟨t90⟩ en el plano (xo, N)
+make animations            # corridas características, videos y cuadro fijo de cada una
+make youtube               # copia los videos con nombres legibles en youtube/
+make figuras-diapositivas  # todas las figuras de las diapositivas (data/figuras_diapositivas/)
+make figuras-slides        # figuras de la presentación numeradas por diapositiva (figuras-slides/)
+make documentos            # report/presentacion.tex → report/build/presentacion.pdf (borrador beamer)
+make entrega               # SdS_TP4_2026Q2G10S2_Codigo.zip (motor + animate.py y common.py), < 100 KB
+```
+
+## Motor
+
+Dinámica molecular regida por el paso temporal con el **esquema de Verlet
+original** (Teórica 4, diapositivas 13 a 15):
+
+```
+r(t + dt) = 2 r(t) − r(t − dt) + dt² F(t) / m
+v(t)      = [r(t + dt) − r(t − dt)] / (2 dt)
+```
+
+La posición anterior del primer paso se estima con Euler evaluado en `−dt`
+(diapositiva 14). La velocidad de un paso necesita `r(t + dt)`, así que el
+motor mantiene **tres posiciones consecutivas** por partícula: el estado que
+se guarda lleva siempre `r(t)` y `v(t)` del mismo instante, no la velocidad
+retrasada un paso. La fuerza del sistema 2 depende sólo de las posiciones, así
+que Verlet es explícito.
+
+```bash
+cd engine && make
+./build/billar simulate --n 100 --xo 0.0175 --dt 5e-5 --tmax 20 --save-every 667 --seed 7 --dir ../data/runs/centro
+./build/billar simulate --n 100 --xo sin --dt 5e-5 --tmax 10 --save-every 200 --dir ../data/runs/validacion
+./build/billar oscillator --dts 5e-3,2e-3,1e-3,5e-4,2e-4,1e-4,5e-5,2e-5,1e-5 --tf 5 --dir ../data/oscilador
+./build/billar bench --ns 5,10,20,30,50,100,200,300,400,500,600,700 --tf 30 --dt 5e-5 --repeats 10 --placement hexagonal --dir ../data/bench/hexagonal
+./build/billar explore --ns 100,20 --xos 0.0175,0.20,0.4925 --dts 5e-5 --seeds 15 --seed 7 --tmax 100 --until-all-used --dir ../data/explore/2.2
+```
+
+Parámetros del sistema por defecto: los del enunciado (`--radio 0.51
+--r 0.0175 --m 0.025 --v0 1 --k 1e4`). `--xo sin` deja el dominio vacío.
+
+`--placement` elige cómo se genera la condición inicial: `random` (la del
+enunciado: adición secuencial al azar con rechazo de solapamientos) o
+`hexagonal` (centros sobre una red triangular con el mayor paso que aloja `N`
+sitios dentro del círculo, descartando los que tocan un obstáculo y eligiendo
+`N` al azar). Las direcciones son uniformes en `[0, 2π)` en ambos casos. La
+aleatoria se traba cerca de `N = 450` (fracción de área 0,53, el límite del
+empaquetamiento al azar), igual que en el TP3 porque el área es la misma; la
+hexagonal llega a 700 (82 % del área ocupada), que es el tope del barrido.
+
+El motor **no calcula ningún observable**: ni el error del oscilador, ni la
+energía, ni `Fu`, ni `t90`, ni `f(v)`. Escribe estados y conversiones; todo lo
+demás sale de esos archivos, en `visualization/`. Lo único que decide es el
+cambio de color de una partícula, que es parte del estado.
+
+### Salida
+
+`simulate` y `explore` escriben, en instantes `t = n dt2`:
+
+- `static.txt` — parámetros, un `clave valor` por línea, y una línea
+  `obstacle xk yk Rk` por obstáculo.
+- `dynamic.txt` — por cuadro: una línea con `t` y luego `N` líneas
+  `x y vx vy estado` (`0` fresca, `1` usada). Un cuadro cada
+  `dt2 = save_every · dt`.
+- `events.txt` — una línea por conversión: `t uso i k` (instante, partícula y
+  obstáculo que la convirtió). De acá salen `Fu(t)`, `t90` y `t100` en
+  post-proceso (`common.used_fraction`, `common.conversion_time`).
+
+`oscillator` escribe una carpeta por esquema y, dentro, un archivo por `dt`
+con la trayectoria completa (`t x v`, **una línea por paso de integración**) y
+un `index.txt` con los parámetros. El ECM se calcula de esos archivos, sobre
+todos los pasos, como pide el enunciado.
+
+`bench` no escribe cuadros (acuerdo con la cátedra: la escritura no cuenta en
+el tiempo de ejecución) y cronometra por separado la generación de la
+condición inicial y el bucle de integración: una línea `N seed pasos t_final
+ms_generacion ms_simulacion descartada` por realización en `tiempos.txt`. Por
+cada `N` corre `--repeats` + `--warmup` realizaciones (10 + 1 por defecto): la
+primera de un proceso tarda más por memoria y cachés frías, así que se escribe
+igual pero marcada con `descartada = 1` y queda fuera del promedio y del
+desvío. Las conversiones de cada realización se acumulan en memoria y se
+vuelcan al terminar la corrida, para que el ítem 2.4.a pueda usar estas mismas
+corridas.
+
+`explore` corre el producto de `--ns`, `--xos` y `--dts` con `--seeds`
+semillas consecutivas desde `--seed` y escribe por corrida
+`<dir>/<caso>/s<semilla>/{static.txt, events.txt}`, más un `index.txt` con una
+línea `caso N xo dt semilla carpeta` por corrida, volcada en cuanto la corrida
+termina (así un barrido interrumpido deja un índice consistente con lo que
+alcanzó a correr). Un barrido largo se puede partir en varios procesos, uno
+por subcarpeta (es lo que hace `make mapa`, un proceso por `N`): el
+post-procesamiento junta los `index.txt` de las subcarpetas y antepone el
+nombre de cada una al del caso, de modo que el resultado es el mismo que
+correrlo de una sola vez. Sin cuadros salvo que se pida
+`--save-every k` (en pasos) o `--dt2 s` (en segundos, que es lo que hace falta
+cuando el barrido es sobre `dt` y las curvas tienen que compartir el eje).
+Con `--until-all-used` la corrida termina apenas se convierten todas las
+partículas.
+
+### Costo por paso
+
+La interacción alcanza a `2r = 0,035 m`, así que el motor usa el **método de
+la celda de índice**: una grilla de `29 × 29` celdas sobre el cuadrado
+`[−R, R]²` (lado de celda `0,0352 m ≥ 2r`) y, por partícula, sólo las 9 celdas
+vecinas. El costo de un paso es `O(N)` en vez de `O(N²)`, que es lo que
+permite llegar a `N = 700` con `dt = 5·10⁻⁵ s` y `tf = 30 s` (600 000 pasos).
+
+## Ítem 1: esquemas de integración y ECM
+
+La fuerza del oscilador **depende de la velocidad**, y cada esquema de la
+Teórica 4 la trata de una manera distinta; esa diferencia es el resultado del
+ítem. Las fórmulas están en `PLAN.md` §2.1. Dos puntos de implementación:
+
+- **Verlet original**: la velocidad es la diferencia centrada
+  (diapositiva 15), así que al meterla en la fuerza la ecuación del paso queda
+  implícita en `r(t+dt)`; para esta fuerza es lineal y se despeja de forma
+  exacta. Con la posición anterior de Euler en `−dt`, la diferencia centrada
+  devuelve exactamente `v(0)`.
+- **Velocity Verlet** y **Beeman** usan las variantes que la propia teórica da
+  para fuerzas que dependen de `v` (paso intermedio a medio paso,
+  diapositiva 17, y predictor-corrector, diapositiva 20).
+
+El barrido va de `dt = 5·10⁻³` a `10⁻⁵ s` con espaciado 1-2-5 (nueve valores,
+tres décadas). Por debajo de `10⁻⁵` el archivo de trayectorias de un solo `dt`
+pasa los 200 MB de texto y los esquemas de segundo orden ya están en el ruido
+de redondeo del doble.
+
+## Ítem 2.1.a: elección del paso temporal
+
+El choque de dos partículas con un resorte lineal dura media oscilación del
+sistema masa-resorte, `τ = π √(μ/k)`: 3,51 ms entre dos partículas
+(`μ = m/2`) y 4,97 ms contra un obstáculo o la pared (`μ = m`). El paso tiene
+que resolver ese choque.
+
+El observable escalar que resume cada curva `E(t)` es la **deriva relativa
+máxima**, `D(dt) = maxₜ |E(t) − E(0)| / E(0)`: una sola cifra por corrida. Se
+elige el `dt` más largo con `D ≤ 10⁻³`, porque es el que da el menor tiempo de
+ejecución con el error aceptado.
+
+## Ítem 2.3: distribución de velocidades
+
+La distribución de un instante junta los `|v|` de las `N` partículas de todas
+las realizaciones en ese cuadro; la estacionaria junta además todos los cuadros
+con `t ≥ 10 s` (promedio temporal, que para un estado estacionario es el mismo
+promedio de ensamble) y así tiene estadística suficiente para el ajuste.
+
+La estacionaria se ajusta con Maxwell-Boltzmann en dos dimensiones,
+`f(v) = (m v / kT) exp(−m v²/2kT)`, con `kT` como único parámetro libre y por
+el método de la Teórica 0: se recorre `kT` en una grilla y se toma el mínimo
+del error cuadrático medio `E(kT)`, que va en su propia figura con el mínimo
+marcado. El valor ajustado se compara con `m ⟨v²⟩/2`, que para este sistema
+vale `m v0²/2 = 0,0125 J`.
+
+## Post-procesamiento
+
+| Script | Ítem | Qué hace |
+|---|---|---|
+| `common.py` | — | lectura de las corridas, observables (energía, `Fu`, `t90`, ECM, ajuste de `kT`), estilos `informe`/`diapositiva` y `save()` con coma decimal en los ejes |
+| `oscillator.py` | 1.1, 1.2 | ECM contra `dt` de los cuatro esquemas, en doble logarítmica y con el exponente de `ECM = c dtᵖ` ajustado en log-log; `--trayectoria dt` agrega la figura de posición contra tiempo |
+| `energy.py` | 2.1.a | `E(t)` por `dt` (figura completa y ampliación sobre los pasos estables) y deriva relativa máxima contra `dt`, con el `dt` elegido marcado |
+| `bench.py` | 2.1.b | tiempo de ejecución contra `N` con el desvío entre las 10 realizaciones, una serie por archivo de tiempos, ajuste `t = c Nᵃ` y ejes doble logarítmicos |
+| `explore.py` | 2.2 | `t90` de cada corrida desde el registro de conversiones, `resumen.csv` con `⟨t90⟩ ± σ`, cuántas realizaciones llegan y `Fu(tmax)`; figura `⟨t90⟩` contra `xo` con una curva por `N`; `--fraccion 1` hace lo mismo con `t100` |
+| `conversion.py` | 2.2 | `Fu(t)` como escalón en cada conversión para una o más corridas, con la marca de `t90`; `--realizaciones` las dibuja del mismo color con `⟨t90⟩ ± σ` |
+| `speeds.py` | 2.3 | `f(v)` en varios instantes y la estacionaria, ajuste de Maxwell-Boltzmann por el mínimo de `E(kT)` y comparación con `m ⟨v²⟩/2` |
+| `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad desde las corridas del 2.1.b, con el `N` en el eje de arriba |
+| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`, con el óptimo de cada `N` marcado |
+| `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
+| `check.py` | — | validación desde los estados guardados: deriva de energía, solapamiento máximo con partículas, obstáculos y pared, y escape fuera del dominio |
+
+Todas las figuras llevan los ejes en palabras con la unidad **en una sola
+línea** (`common.fit_axis_labels()` achica el nombre del eje hasta que entre),
+coma decimal y la leyenda adentro sin tapar datos; los observables van al eje
+con su símbolo (`⟨t90⟩ (s)`, `f(v) (s/m)`), no con la frase entera.
+
+## Presentación
+
+`report/presentacion.tex` es el borrador beamer 16:9 y sigue
+`Formato_Presentaciones.pdf`, las devoluciones de la cátedra recogidas en
+`FEEDBACK.md` y el esquema que funcionó en el TP3: sin diapositiva de
+contenido, sólo separadores de sección; UML del motor sin archivos ni
+post-proceso; tabla de parámetros separada en **fijos y variables**, angosta
+para que el esquema del dominio sea grande; una diapositiva define la
+**conversión** y los observables. El **sistema 1 ocupa una sola diapositiva**,
+con la figura de ECM contra `dt` de los cuatro esquemas y nada más, como pide
+el enunciado. Resultados va un bloque por ítem, cada diapositiva con **el
+gráfico grande más dos o tres viñetas** con lo que se lee en él, y las
+conclusiones son cuatro renglones con cifras que estén en las figuras
+mostradas. La última diapositiva es la **declaración de uso de agentes de IA**
+(ítem 2.5).
+
+El zip de código que se entrega es el **motor de simulación** (`engine/`) más
+**el código con el que se hacen las animaciones** a partir de las salidas
+primarias (`visualization/animate.py` y `common.py`, del que depende), como
+pidió la cátedra en el TP3.
