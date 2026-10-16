@@ -1,0 +1,23 @@
+\begin{tikzpicture}[
+    clase/.style={rectangle split, rectangle split parts=2, draw=azul!60,
+                  fill=grisclaro, rounded corners=1pt, align=left,
+                  font=\scriptsize, text width=3.1cm, inner sep=3pt},
+    flecha/.style={-{Latex[length=4pt]}, azul!70}]
+    \node[clase] (sim) {\textbf{Simulation}
+        \nodepart{second} \texttt{step()}\\ \texttt{particles()}\\ \texttt{conversions()}};
+    \node[clase, left=0.8cm of sim] (bil) {\textbf{Billiard\-Parameters}
+        \nodepart{second} \texttt{R, r, m, v0, k}\\ \texttt{xo, N, placement}};
+    \node[clase, right=0.8cm of sim] (for) {\textbf{Forces}
+        \nodepart{second} \texttt{computeForces()}};
+    \node[clase, below=0.7cm of bil] (par) {\textbf{Particle}
+        \nodepart{second} \texttt{previous, position}\\ \texttt{next, velocity}\\ \texttt{force, fresh}};
+    \node[clase, below=0.7cm of sim] (obs) {\textbf{Obstacle}
+        \nodepart{second} \texttt{center, radius}};
+    \node[clase, below=0.7cm of for] (gri) {\textbf{Grid}
+        \nodepart{second} \texttt{rebuild()}\\ \texttt{forEachNeighbourPair()}};
+    \draw[flecha] (bil) -- (sim);
+    \draw[flecha] (sim) -- (for);
+    \draw[flecha] (sim) -- (par);
+    \draw[flecha] (sim) -- (obs);
+    \draw[flecha] (for) -- (gri);
+\end{tikzpicture}%

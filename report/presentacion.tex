@@ -45,17 +45,11 @@
 \usetikzlibrary{arrows.meta,positioning,fit,backgrounds,calc,shapes.multipart}
 
 % ---------------------------------------------------------
-% Tema (el mismo del TP3)
+% Tema (el mismo del TP3). Colores y atajos en comun.tex, compartidos con los
+% esquemas TikZ de figuras/ (make slides-images los renderiza tambien a PNG).
 % ---------------------------------------------------------
 
-\definecolor{azul}{RGB}{23,66,110}
-\definecolor{acento}{RGB}{197,90,17}
-\definecolor{gris}{RGB}{110,118,128}
-\definecolor{grisclaro}{RGB}{236,238,241}
-\definecolor{fresca}{RGB}{31,95,191}
-\definecolor{usada}{RGB}{214,39,40}
-\definecolor{obstaculo}{RGB}{26,26,26}
-\definecolor{pared}{RGB}{85,85,85}
+\input{comun.tex}
 
 \usetheme{default}
 \usecolortheme{default}
@@ -89,23 +83,6 @@
 % ---------------------------------------------------------
 % Atajos
 % ---------------------------------------------------------
-
-\newcommand{\tnov}{\ensuremath{t_{90}}}
-\newcommand{\mtnov}{\ensuremath{\langle t_{90}\rangle}}
-\newcommand{\tcien}{\ensuremath{t_{100}}}
-\newcommand{\mtcien}{\ensuremath{\langle t_{100}\rangle}}
-\newcommand{\Fu}{\ensuremath{F_u}}
-\newcommand{\Nu}{\ensuremath{N_u}}
-\newcommand{\dt}{\ensuremath{\Delta t}}
-\newcommand{\dtd}{\ensuremath{\Delta t_2}}
-\newcommand{\vr}{\ensuremath{\mathbf{r}}}
-\newcommand{\vv}{\ensuremath{\mathbf{v}}}
-\newcommand{\vF}{\ensuremath{\mathbf{F}}}
-\newcommand{\va}{\ensuremath{\mathbf{a}}}
-\newcommand{\nhat}{\ensuremath{\hat{\mathbf{n}}}}
-\newcommand{\ehat}{\ensuremath{\hat{\mathbf{e}}}}
-\newcommand{\cita}[1]{{\scriptsize\color{gris}(#1)}}
-\newcommand{\rotulo}[1]{{\color{azul}\bfseries #1}}
 
 % Link a la animacion, debajo del cuadro fijo. En la version en vivo esta
 % diapositiva se proyecta con el video embebido y sin link (D12 del TP2).
@@ -224,23 +201,7 @@
         \end{column}\hfill
         \begin{column}{0.47\textwidth}
             \centering
-            \begin{tikzpicture}[scale=6.0]
-                \draw[pared,line width=1.2pt] (0,0) circle (0.51);
-                \fill[obstaculo] (-0.0175,0) circle (0.0175);
-                \fill[obstaculo] ( 0.0175,0) circle (0.0175);
-                \foreach \x/\y/\a in {-0.30/0.22/20, 0.18/0.34/250, 0.33/-0.19/120,
-                                      -0.22/-0.31/70, 0.05/-0.40/160, -0.40/-0.05/300,
-                                      0.40/0.12/200, -0.10/0.42/330}{
-                    \fill[fresca] (\x,\y) circle (0.0175);
-                    \draw[fresca,-{Stealth[length=1.6mm]},semithick] (\x,\y) -- ++({0.055*cos(\a)},{0.055*sin(\a)});}
-                \foreach \x/\y/\a in {0.12/0.08/40, -0.16/0.05/210, 0.26/-0.33/100}{
-                    \fill[usada] (\x,\y) circle (0.0175);
-                    \draw[usada,-{Stealth[length=1.6mm]},semithick] (\x,\y) -- ++({0.055*cos(\a)},{0.055*sin(\a)});}
-                \draw[azul,-{Latex[length=3pt]}] (0,0) -- (35:0.51)
-                    node[midway,above,sloped,font=\scriptsize,text=azul] {$R$};
-                \draw[acento,{Latex[length=3pt]}-{Latex[length=3pt]}] (0,-0.075) -- (0.0175,-0.075)
-                    node[below,font=\scriptsize,text=acento,xshift=4pt] {$x_o$};
-            \end{tikzpicture}\\[0.4em]
+            \input{figuras/sistema.tikz}\\[0.4em]
             {\footnotesize\color{gris}
              \textcolor{fresca}{$\bullet$} fresca \quad
              \textcolor{usada}{$\bullet$} usada \quad
@@ -278,22 +239,7 @@
         \end{column}\hfill
         \begin{column}{0.40\textwidth}
             \centering
-            \begin{tikzpicture}[scale=3.9]
-                \draw[pared,line width=1.3pt] (-0.05,0.02) arc (236:304:1.55);
-                \fill[fresca] (0.78,0.36) circle (0.30);
-                \draw[gris,dashed,semithick] (0.78,0.96) circle (0.30);
-                \fill[gris!60] (0.78,0.96) circle (0.012);
-                \fill[white] (0.78,0.36) circle (0.012);
-                \draw[azul,-{Latex[length=4pt]},semithick] (0.78,0.36) -- (0.78,0.90);
-                \node[right,font=\scriptsize,text=azul] at (0.80,0.80) {$\nhat$};
-                \node[font=\scriptsize,text=gris] at (0.78,1.06) {$\vr_{\text{img}}$};
-                \node[font=\scriptsize,text=white,below] at (0.78,0.34) {$\vr_i$};
-                \fill[acento] (0.78,0.66) circle (0.022);
-                \node[right,font=\scriptsize,text=acento] at (0.83,0.64) {$C$};
-                \draw[acento,{Latex[length=3pt]}-{Latex[length=3pt]},semithick] (0.52,0.66) -- (0.52,0.78);
-                \node[left,font=\scriptsize,text=acento] at (0.52,0.72) {$\xi_{iw}$};
-                \node[font=\scriptsize,text=pared,below right] at (1.22,0.30) {pared};
-            \end{tikzpicture}\\[0.3em]
+            \input{figuras/modelo-pared-imagen.tikz}\\[0.3em]
             {\footnotesize\color{gris} esquema no a escala}
         \end{column}
     \end{columns}
@@ -357,29 +303,7 @@
     \centering
     \vspace{-0.2em}
     \resizebox{0.96\textwidth}{!}{%
-    \begin{tikzpicture}[
-        clase/.style={rectangle split, rectangle split parts=2, draw=azul!60,
-                      fill=grisclaro, rounded corners=1pt, align=left,
-                      font=\scriptsize, text width=3.1cm, inner sep=3pt},
-        flecha/.style={-{Latex[length=4pt]}, azul!70}]
-        \node[clase] (sim) {\textbf{Simulation}
-            \nodepart{second} \texttt{step()}\\ \texttt{particles()}\\ \texttt{conversions()}};
-        \node[clase, left=0.8cm of sim] (bil) {\textbf{Billiard\-Parameters}
-            \nodepart{second} \texttt{R, r, m, v0, k}\\ \texttt{xo, N, placement}};
-        \node[clase, right=0.8cm of sim] (for) {\textbf{Forces}
-            \nodepart{second} \texttt{computeForces()}};
-        \node[clase, below=0.7cm of bil] (par) {\textbf{Particle}
-            \nodepart{second} \texttt{previous, position}\\ \texttt{next, velocity}\\ \texttt{force, fresh}};
-        \node[clase, below=0.7cm of sim] (obs) {\textbf{Obstacle}
-            \nodepart{second} \texttt{center, radius}};
-        \node[clase, below=0.7cm of for] (gri) {\textbf{Grid}
-            \nodepart{second} \texttt{rebuild()}\\ \texttt{forEachNeighbourPair()}};
-        \draw[flecha] (bil) -- (sim);
-        \draw[flecha] (sim) -- (for);
-        \draw[flecha] (sim) -- (par);
-        \draw[flecha] (sim) -- (obs);
-        \draw[flecha] (for) -- (gri);
-    \end{tikzpicture}}\\[0.6em]
+    \input{figuras/motor-uml.tikz}}\\[0.6em]
     \begin{minipage}{0.92\textwidth}
         \footnotesize\sloppy
         \begin{itemize}\setlength{\itemsep}{0.35em}
@@ -424,19 +348,7 @@
         \end{column}\hfill
         \begin{column}{0.51\textwidth}
             \centering
-            \begin{tikzpicture}[scale=5.5]
-                \draw[pared,line width=1.1pt] (0,0) circle (0.51);
-                \fill[obstaculo] (-0.25,0) circle (0.0175);
-                \fill[obstaculo] ( 0.25,0) circle (0.0175);
-                \draw[azul,-{Latex[length=3pt]}] (0,0) -- (120:0.51)
-                    node[midway,above,sloped,font=\tiny,text=azul] {$R$};
-                \draw[acento,{Latex[length=3pt]}-{Latex[length=3pt]}] (0,-0.06) -- (0.25,-0.06);
-                \node[below,font=\tiny,text=acento] at (0.125,-0.06) {$x_o$};
-                \draw[acento,{Latex[length=3pt]}-{Latex[length=3pt]}] (0.25,0.0175) -- (0.2675,0.0175);
-                \node[above right,font=\tiny,text=acento] at (0.2675,0.02) {$r$};
-                \fill[fresca] (-0.10,0.30) circle (0.0175);
-                \fill[usada] (0.33,-0.22) circle (0.0175);
-            \end{tikzpicture}\\[0.3em]
+            \input{figuras/parametros-dominio.tikz}\\[0.3em]
             {\footnotesize\color{gris} $\pi R^2 = \SI{0.817}{\meter\squared}$:
              la misma área que la mesa del TP3, misma densidad a igual $N$.}
         \end{column}

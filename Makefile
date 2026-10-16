@@ -22,6 +22,7 @@
 #   make youtube        copia los videos con nombres legibles en youtube/
 #   make figuras-diapositivas  todas las figuras de las diapositivas (data/figuras_diapositivas)
 #   make slides-images      copia las figuras de la presentacion numeradas por diapositiva
+#   make slides-images-tikz renderiza a PNG los esquemas TikZ de las diapositivas (report/figuras)
 #   make documentos     compila report/presentacion.tex (la presentación, lee slides-images/)
 #   make entrega        SdS_TP4_2026Q2G10S2_Codigo.zip (< 100 KB) y ..._Presentación.pdf (la beamer)
 #   make todo           oscilador + energia(+densa) + bench + obstaculos + velocidades + mapa
@@ -136,7 +137,7 @@ ZIP         := $(ENTREGA)_Codigo.zip
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
         densidad-figuras mapa mapa-figuras check una-particula animations youtube figuras-diapositivas \
-        slides-images documentos entrega clean-figures
+        slides-images slides-images-tikz documentos entrega clean-figures
 
 all: todo
 
@@ -373,7 +374,22 @@ slides-images:
 	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-26-E-vs-kT.png
 	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(REPEATS).png                  $(FIGS)/slide-27-t90-t100-vs-densidad.png
 	cp $(SLIDES)/2.4_densidad/mapa_t90_xo_N.png                                     $(FIGS)/slide-28-mapa-t90-xo-N.png
+	$(MAKE) slides-images-tikz
 	@ls $(FIGS) | wc -l
+
+# Los esquemas TikZ de las diapositivas de introduccion e implementacion
+# (report/figuras/*.tikz, los mismos que \input presentacion.tex) renderizados
+# sueltos a PNG con la misma tipografia y colores, numerados por diapositiva.
+TIKZ_FIGS := 02-sistema 03-modelo-pared-imagen 06-motor-uml 08-parametros-dominio
+slides-images-tikz:
+	mkdir -p $(DOCS)/figuras $(FIGS)
+	for f in $(TIKZ_FIGS); do \
+	    n=$${f#*-}; \
+	    printf '\\def\\figura{%s}\\input{render.tex}\n' "$$n" > report/figuras/_$$n.tex; \
+	    $(TEXC) report/figuras/_$$n.tex --outdir $(DOCS)/figuras; \
+	    pdftoppm -r 600 -png -singlefile $(DOCS)/figuras/_$$n.pdf $(FIGS)/slide-$$f; \
+	    rm -f report/figuras/_$$n.tex; \
+	done
 
 # --------------------------------------------------------------------------
 # Entrega

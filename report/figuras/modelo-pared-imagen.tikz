@@ -1,0 +1,16 @@
+\begin{tikzpicture}[scale=3.9]
+    \draw[pared,line width=1.3pt] (-0.05,0.02) arc (236:304:1.55);
+    \fill[fresca] (0.78,0.36) circle (0.30);
+    \draw[gris,dashed,semithick] (0.78,0.96) circle (0.30);
+    \fill[gris!60] (0.78,0.96) circle (0.012);
+    \fill[white] (0.78,0.36) circle (0.012);
+    \draw[azul,-{Latex[length=4pt]},semithick] (0.78,0.36) -- (0.78,0.90);
+    \node[right,font=\scriptsize,text=azul] at (0.80,0.80) {$\nhat$};
+    \node[font=\scriptsize,text=gris] at (0.78,1.06) {$\vr_{\text{img}}$};
+    \node[font=\scriptsize,text=white,below] at (0.78,0.34) {$\vr_i$};
+    \fill[acento] (0.78,0.66) circle (0.022);
+    \node[right,font=\scriptsize,text=acento] at (0.83,0.64) {$C$};
+    \draw[acento,{Latex[length=3pt]}-{Latex[length=3pt]},semithick] (0.52,0.66) -- (0.52,0.78);
+    \node[left,font=\scriptsize,text=acento] at (0.52,0.72) {$\xi_{iw}$};
+    \node[font=\scriptsize,text=pared,below right] at (1.22,0.30) {pared};
+\end{tikzpicture}%

@@ -43,9 +43,9 @@ tp-4/
 ├── docs/               # enunciado, Teórica 0 y 4, y la bibliografía de la cátedra (Gear, Heermann)
 ├── engine/             # C++17: motor regido por el paso temporal (va en el zip de entrega con animate.py y common.py)
 ├── visualization/      # Python: post-procesamiento (observables), figuras y animaciones
-├── report/             # presentacion.tex (beamer 16:9, la presentación que se entrega); build/ ignorado
+├── report/             # presentacion.tex (beamer 16:9, la presentación que se entrega), comun.tex, figuras/*.tikz y guion.md; build/ ignorado
 ├── youtube/            # titulos.md con título y descripción de cada video (los .mp4 no se versionan)
-├── slides-images/      # figuras de la presentación numeradas por diapositiva (las lee presentacion.tex)
+├── slides-images/      # todas las imágenes de la presentación numeradas por diapositiva: figuras (las lee presentacion.tex) y esquemas TikZ renderizados
 └── data/               # salidas de simulación y figuras (ignoradas por git)
     ├── oscilador/      #   sistema 1: una trayectoria por esquema y por dt
     ├── energia/        #   ítem 2.1.a: N = 300 sin obstáculos, un barrido de dt con cuadros
@@ -83,7 +83,8 @@ make mapa-figuras          # mapa de calor de ⟨t90⟩ en el plano (xo, N)
 make animations            # corridas características, videos y cuadro fijo de cada una
 make youtube               # copia los videos con nombres legibles en youtube/
 make figuras-diapositivas  # todas las figuras de las diapositivas (data/figuras_diapositivas/)
-make slides-images         # figuras de la presentación numeradas por diapositiva (slides-images/, versionadas)
+make slides-images         # todas las imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
+make slides-images-tikz    # sólo los esquemas TikZ de las diapositivas (report/figuras/*.tikz) renderizados a PNG
 make documentos            # report/presentacion.tex → report/build/presentacion.pdf (lee slides-images/)
 make entrega               # SdS_TP4_2026Q2G10S2_Codigo.zip (motor + animate.py y common.py, < 100 KB) y SdS_TP4_2026Q2G10S2_Presentación.pdf
 ```
@@ -266,6 +267,14 @@ gráfico grande más dos o tres viñetas** con lo que se lee en él, y las
 conclusiones son cuatro renglones con cifras que estén en las figuras
 mostradas. La última diapositiva es la **declaración de uso de agentes de IA**
 (ítem 2.5).
+
+Los esquemas de las diapositivas de introducción e implementación (sistema,
+pared como partícula imagen, UML del motor y dominio) están en
+`report/figuras/*.tikz`; `presentacion.tex` los lee con `\input` y
+`make slides-images-tikz` los renderiza sueltos a PNG en `slides-images/`,
+con la misma tipografía y colores (`report/comun.tex`), así que en
+`slides-images/` está **toda** imagen que aparece en la presentación.
+`report/guion.md` tiene dos o tres puntos para decir en cada diapositiva.
 
 El zip de código que se entrega es el **motor de simulación** (`engine/`) más
 **el código con el que se hacen las animaciones** a partir de las salidas
