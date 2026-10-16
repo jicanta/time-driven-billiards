@@ -129,6 +129,7 @@ def main() -> None:
               label=f"mínimo en $k_BT$ = {common.decimal(1000 * thermal, 2)} mJ")
     axes.set_xlabel("energía térmica $k_B T$ (mJ)")
     axes.set_ylabel(common.AXIS_FIT_ERROR)
+    common.headroom(axes, 0.22)
     axes.legend(loc="upper center")
     error_figure = out_dir / f"E_vs_kT_N{count}_M{runs}.png"
     common.save(figure, error_figure)

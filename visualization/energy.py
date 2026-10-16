@@ -20,6 +20,12 @@ porque es el que da el menor tiempo de ejecucion con el error aceptado.
 
     python3 visualization/energy.py
     python3 visualization/energy.py --estilo diapositiva --figures data/figuras_diapositivas
+
+La figura de la energia tiene dos paneles con el mismo eje de tiempos: toda la
+escala (donde se ve que el paso mas largo explota) y la ampliacion sobre los
+pasos estables, como las dos vistas de la Teorica 4 (diapositiva 38). La de la
+deriva lleva el ajuste de la ley de potencia D = c dt^a sobre los pasos
+estables, con el exponente en la leyenda.
 """
 
 from __future__ import annotations
@@ -89,36 +95,51 @@ def main() -> None:
     count = rows[0]["N"]
     write_csv(rows, arguments.energia / "resumen.csv")
 
-    # Dos vistas de la misma curva, como en la Teorica 4 (diapositiva 38): la
-    # primera con toda la escala, donde se ve que el paso mas largo explota, y
-    # la segunda ampliada sobre los pasos que si conservan la energia, donde
-    # se ordenan de mayor a menor dt.
-    figures = []
-    for detail in (False, True):
-        shown = [row for row in rows if not detail or row["deriva"] <= arguments.estable]
-        figure, axes = plt.subplots()
-        for row, color in zip(shown, COLORS[len(rows) - len(shown):]):
-            axes.plot(row["t"], row["E"], color=color,
-                      label=f"$\\Delta t = {common.scientific(row['dt'])}$ s")
+    # Dos vistas de la misma curva, como en la Teorica 4 (diapositiva 38), en
+    # una sola figura: arriba toda la escala, donde se ve que el paso mas largo
+    # explota; abajo la ampliacion sobre los pasos que si conservan la energia,
+    # donde se ordenan de mayor a menor dt. Comparten el eje de tiempos.
+    stable_rows = [row for row in rows if row["deriva"] <= arguments.estable]
+    width, height = plt.rcParams["figure.figsize"]
+    figure, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(width, 1.55 * height),
+                                         gridspec_kw={"height_ratios": [1.0, 1.0],
+                                                      "hspace": 0.08})
+    for row, color in zip(rows, COLORS):
+        label = f"$\\Delta t = {common.scientific(row['dt'])}$ s"
+        top.plot(row["t"], row["E"], color=color, label=label)
+        if row in stable_rows:
+            bottom.plot(row["t"], row["E"], color=color, label=label)
+    for axes in (top, bottom):
         axes.axhline(rows[0]["E0"], color="#111111", linestyle="--", linewidth=1.2,
-                     label=f"$E_0$ = {common.decimal(rows[0]['E0'], 2)} J")
-        axes.set_xlabel(common.AXIS_TIME)
+                     label=f"$E_0$ = {common.decimal(rows[0]['E0'], 2)} J" if axes is top else None)
         axes.set_ylabel(common.AXIS_ENERGY)
-        common.headroom(axes, 0.34 if detail else 0.26)
-        axes.legend(loc="upper left", ncol=2)
-        suffix = "_detalle" if detail else ""
-        out = out_dir / f"energia_vs_t_N{count}{suffix}.png"
-        common.save(figure, out)
-        plt.close(figure)
-        figures.append(out)
-    energy_figure, detail_figure = figures
+    bottom.set_xlabel(common.AXIS_TIME)
+    common.headroom(top, 0.30)
+    top.legend(loc="upper left", ncol=2)
+    # La ampliacion muestra lo que la escala completa aplasta: el margen de
+    # arriba es el 15 % de la deriva mas grande entre los pasos estables.
+    span = max(row["E"].max() for row in stable_rows) - rows[0]["E0"]
+    bottom.set_ylim(rows[0]["E0"] - 0.12 * span, rows[0]["E0"] + 1.15 * span)
+    bottom.text(0.985, 0.95, "ampliación", transform=bottom.transAxes, ha="right", va="top",
+                color="#555555", fontsize=plt.rcParams["legend.fontsize"])
+    energy_figure = out_dir / f"energia_vs_t_N{count}.png"
+    common.save(figure, energy_figure)
+    plt.close(figure)
 
     steps = np.array([row["dt"] for row in rows])
     drift = np.array([row["deriva"] for row in rows])
     chosen = float(steps[drift <= arguments.cota].max()) if (drift <= arguments.cota).any() else None
 
+    stable = drift <= arguments.estable
+    exponent, intercept = np.polyfit(np.log(steps[stable]), np.log(drift[stable]), 1)
+
     figure, axes = plt.subplots()
-    axes.plot(steps, drift, color=common.FRESH, marker="o", linestyle="-")
+    axes.plot(steps, drift, color=common.FRESH, marker="o", linestyle="none", markersize=8,
+              label="deriva medida")
+    line = np.geomspace(steps[stable].min(), steps[stable].max(), 100)
+    axes.plot(line, np.exp(intercept) * line ** exponent, color=common.FRESH, linestyle="--",
+              linewidth=1.6,
+              label=f"ajuste $c\\,\\Delta t^{{a}}$, $a$ = {common.decimal(exponent, 1)}")
     axes.axhline(arguments.cota, color=common.USED, linestyle="--", linewidth=1.4,
                  label=f"cota {common.decimal(arguments.cota)}")
     if chosen is not None:
@@ -130,13 +151,13 @@ def main() -> None:
     axes.set_yscale("log")
     axes.set_xlabel(common.AXIS_STEP)
     axes.set_ylabel(common.AXIS_DRIFT)
-    axes.legend(loc="lower right")
+    # Los puntos suben en diagonal: la esquina superior izquierda queda libre.
+    common.headroom(axes, 0.36)
+    axes.legend(loc="upper left")
     drift_figure = out_dir / f"deriva_vs_dt_N{count}.png"
     common.save(figure, drift_figure)
     plt.close(figure)
 
-    stable = drift <= arguments.estable
-    exponent, _ = np.polyfit(np.log(steps[stable]), np.log(drift[stable]), 1)
     offset = rows[0]["xo"]
     where = "sin obstáculos" if offset < 0 else f"xo = {offset:g} m"
     print(f"N = {count}, {where}, E0 = {rows[0]['E0']:.6g} J")
@@ -148,7 +169,6 @@ def main() -> None:
     print(f"dt elegido (deriva ≤ {arguments.cota:g}): {chosen:g} s" if chosen
           else "ningún dt del barrido queda por debajo de la cota")
     print(energy_figure)
-    print(detail_figure)
     print(drift_figure)
     print(arguments.energia / "resumen.csv")
 

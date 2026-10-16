@@ -254,9 +254,9 @@ tp-4/
 ├── docs/               # enunciado, Teórica 0 y 4, y la bibliografía de la cátedra
 ├── engine/             # C++17: motor regido por el paso temporal (va en el zip)
 ├── visualization/      # Python: post-procesamiento, figuras y animaciones
-├── report/             # presentacion.tex (borrador beamer 16:9); build/ ignorado
+├── report/             # presentacion.tex (beamer 16:9, la presentación que se entrega); build/ ignorado
 ├── youtube/            # titulos.md (los .mp4 no se versionan)
-├── figuras-slides/     # figuras de la presentación numeradas por diapositiva
+├── slides-images/      # figuras de la presentación numeradas por diapositiva (las lee presentacion.tex)
 └── data/               # salidas de simulación y figuras (ignoradas por git)
 ```
 

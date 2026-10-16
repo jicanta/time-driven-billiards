@@ -4,7 +4,7 @@
 #   make oscilador      sistema 1: integra el oscilador con los 4 esquemas y todos los dt
 #   make oscilador-figuras  ECM vs dt (la unica figura del sistema 1) y la trayectoria
 #   make energia        item 2.1.a: N = 300 sin obstaculos, un barrido de dt con cuadros
-#   make energia-figuras    energia vs t (completa y ampliada) y deriva vs dt
+#   make energia-figuras    energia vs t (completa y ampliada, dos paneles) y deriva vs dt
 #   make energia-densa  verifica el dt elegido en el caso mas denso (N = 700 con obstaculos)
 #   make bench          item 2.1.b: tiempos contra N (maquina descargada)
 #   make bench-tp3      los mismos tiempos con el motor del TP3 (dirigido por eventos)
@@ -20,9 +20,9 @@
 #   make animations     corridas caracteristicas, videos y cuadro fijo de cada una
 #   make youtube        copia los videos con nombres legibles en youtube/
 #   make figuras-diapositivas  todas las figuras de las diapositivas (data/figuras_diapositivas)
-#   make figuras-slides     copia las figuras de la presentacion numeradas por diapositiva
-#   make documentos     compila report/presentacion.tex (borrador beamer)
-#   make entrega        SdS_TP4_2026Q2G10S2_Codigo.zip (< 100 KB)
+#   make slides-images      copia las figuras de la presentacion numeradas por diapositiva
+#   make documentos     compila report/presentacion.tex (la presentación, lee slides-images/)
+#   make entrega        SdS_TP4_2026Q2G10S2_Codigo.zip (< 100 KB) y ..._Presentación.pdf (la beamer)
 #   make todo           oscilador + energia(+densa) + bench + obstaculos + velocidades + mapa
 #
 # Las variables se pueden pisar: make bench NS=100,200 REPEATS=5
@@ -118,13 +118,14 @@ SLIDES_ANIM := $(SLIDES)/animaciones
 YOUTUBE     := youtube
 N_ANIM      ?= 100
 TMAX_ANIM   ?= 20
-# dt2 = 667 dt = 0,03335 s: a 30 cuadros por segundo el video corre en tiempo real.
-SAVE_ANIM   ?= 667
-FPS         ?= 30
+# dt2 = 800 dt = 0,04 s: a 25 cuadros por segundo el video corre en tiempo real y
+# el cuadro fijo de t = 10 s es exactamente el cuadro 250.
+SAVE_ANIM   ?= 800
+FPS         ?= 25
 CUADRO      ?= 10
 TEXC        ?= tectonic -X compile
 DOCS        := report/build
-FIGS        := figuras-slides
+FIGS        := slides-images
 GRUPO       ?= 10
 COMISION    ?= S2
 ENTREGA     := SdS_TP4_2026Q2G$(GRUPO)$(COMISION)
@@ -134,7 +135,7 @@ ZIP         := $(ENTREGA)_Codigo.zip
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
         densidad-figuras mapa mapa-figuras check animations youtube figuras-diapositivas \
-        figuras-slides documentos entrega clean-figures
+        slides-images documentos entrega clean-figures
 
 all: todo
 
@@ -335,12 +336,12 @@ clean-figures:
 	rm -rf $(FIGURES) $(SLIDES)
 
 # Copia de las figuras de la presentacion numeradas por diapositiva
-# (figuras-slides/, se versiona): el numero es el del pie de la diapositiva.
-figuras-slides:
+# (slides-images/, se versiona y es de donde las lee report/presentacion.tex):
+# el numero es el del pie de la diapositiva.
+slides-images:
 	rm -rf $(FIGS) && mkdir -p $(FIGS)
 	cp $(SLIDES)/1_oscilador/ECM_vs_dt.png                                          $(FIGS)/slide-12-ECM-vs-dt.png
 	cp $(SLIDES)/2.1_paso_y_tiempos/energia_vs_t_N$(N_ENERGIA).png                  $(FIGS)/slide-13-energia-vs-t.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/energia_vs_t_N$(N_ENERGIA)_detalle.png          $(FIGS)/slide-13b-energia-vs-t-detalle.png
 	cp $(SLIDES)/2.1_paso_y_tiempos/deriva_vs_dt_N$(N_ENERGIA).png                  $(FIGS)/slide-14-deriva-vs-dt.png
 	cp $(SLIDES)/animaciones/cuadro_centro_t$(CUADRO).png                           $(FIGS)/slide-15-animacion-centro.png
 	cp $(SLIDES)/2.1_paso_y_tiempos/tiempo_total_vs_N_paradigmas_M$(REPEATS)_log.png $(FIGS)/slide-16-tiempo-ejecucion-vs-N.png
@@ -362,9 +363,9 @@ figuras-slides:
 # Entrega
 # --------------------------------------------------------------------------
 
-# Presentacion (b): borrador beamer con un cuadro fijo por animacion y el link
-# explicito debajo. tectonic baja los paquetes que falten; con otro motor:
-# make documentos TEXC="latexmk -pdf -outdir"
+# Presentacion (b), la que se entrega: beamer con un cuadro fijo por animacion y el link explicito
+# debajo; las figuras las lee de slides-images/ (make slides-images). tectonic
+# baja los paquetes que falten; con otro motor: make documentos TEXC="latexmk -pdf -outdir"
 documentos:
 	mkdir -p $(DOCS)
 	$(TEXC) report/presentacion.tex --outdir $(DOCS)
@@ -380,4 +381,8 @@ entrega:
 	    visualization/animate.py visualization/common.py
 	@echo "$(ZIP)  ($$(du -h $(ZIP) | cut -f1))"
 	@[ $$(stat -c%s $(ZIP)) -lt 102400 ] || echo "  ATENCIÓN: el zip supera los 100 KB"
-	@[ -f "$(ENTREGA)_Presentación.pdf" ] || echo "  falta $(ENTREGA)_Presentación.pdf (exportar de Google Slides)"
+	@if [ -f $(DOCS)/presentacion.pdf ]; then \
+	    cp $(DOCS)/presentacion.pdf "$(ENTREGA)_Presentación.pdf"; \
+	    echo "$(ENTREGA)_Presentación.pdf  ($$(du -h "$(ENTREGA)_Presentación.pdf" | cut -f1))"; \
+	    grep -q PENDIENTE report/presentacion.tex && echo "  ATENCIÓN: quedan links PENDIENTE a YouTube en report/presentacion.tex" || true; \
+	else echo "  falta $(DOCS)/presentacion.pdf (make documentos)"; fi

@@ -43,9 +43,9 @@ tp-4/
 ├── docs/               # enunciado, Teórica 0 y 4, y la bibliografía de la cátedra (Gear, Heermann)
 ├── engine/             # C++17: motor regido por el paso temporal (va en el zip de entrega con animate.py y common.py)
 ├── visualization/      # Python: post-procesamiento (observables), figuras y animaciones
-├── report/             # presentacion.tex (borrador beamer 16:9, no se entrega); build/ ignorado
+├── report/             # presentacion.tex (beamer 16:9, la presentación que se entrega); build/ ignorado
 ├── youtube/            # titulos.md con título y descripción de cada video (los .mp4 no se versionan)
-├── figuras-slides/     # figuras de la presentación numeradas por diapositiva
+├── slides-images/      # figuras de la presentación numeradas por diapositiva (las lee presentacion.tex)
 └── data/               # salidas de simulación y figuras (ignoradas por git)
     ├── oscilador/      #   sistema 1: una trayectoria por esquema y por dt
     ├── energia/        #   ítem 2.1.a: N = 300 sin obstáculos, un barrido de dt con cuadros
@@ -67,7 +67,7 @@ make check                 # validación: deriva de energía, solapamientos y es
 make oscilador             # sistema 1: los 4 esquemas y los 9 dt
 make oscilador-figuras     # ECM vs dt (la única figura del sistema 1) y la trayectoria
 make energia               # ítem 2.1.a: N = 300 sin obstáculos, barrido de dt con cuadros
-make energia-figuras       # energía vs t (completa y ampliada) y deriva vs dt
+make energia-figuras       # energía vs t (dos paneles: completa y ampliada) y deriva vs dt con su ajuste
 make energia-densa         # verifica el dt elegido en el caso más denso (N = 700 con obstáculos)
 make bench                 # ítem 2.1.b: tiempos contra N (máquina descargada)
 make bench-tp3             # los mismos tiempos con el motor del TP3, en esta computadora
@@ -82,9 +82,9 @@ make mapa-figuras          # mapa de calor de ⟨t90⟩ en el plano (xo, N)
 make animations            # corridas características, videos y cuadro fijo de cada una
 make youtube               # copia los videos con nombres legibles en youtube/
 make figuras-diapositivas  # todas las figuras de las diapositivas (data/figuras_diapositivas/)
-make figuras-slides        # figuras de la presentación numeradas por diapositiva (figuras-slides/)
-make documentos            # report/presentacion.tex → report/build/presentacion.pdf (borrador beamer)
-make entrega               # SdS_TP4_2026Q2G10S2_Codigo.zip (motor + animate.py y common.py), < 100 KB
+make slides-images         # figuras de la presentación numeradas por diapositiva (slides-images/, versionadas)
+make documentos            # report/presentacion.tex → report/build/presentacion.pdf (lee slides-images/)
+make entrega               # SdS_TP4_2026Q2G10S2_Codigo.zip (motor + animate.py y common.py, < 100 KB) y SdS_TP4_2026Q2G10S2_Presentación.pdf
 ```
 
 ## Motor
@@ -106,7 +106,7 @@ que Verlet es explícito.
 
 ```bash
 cd engine && make
-./build/billar simulate --n 100 --xo 0.0175 --dt 5e-5 --tmax 20 --save-every 667 --seed 7 --dir ../data/runs/centro
+./build/billar simulate --n 100 --xo 0.0175 --dt 5e-5 --tmax 20 --save-every 800 --seed 7 --dir ../data/runs/centro
 ./build/billar simulate --n 100 --xo sin --dt 5e-5 --tmax 10 --save-every 200 --dir ../data/runs/validacion
 ./build/billar oscillator --dts 5e-3,2e-3,1e-3,5e-4,2e-4,1e-4,5e-5,2e-5,1e-5 --tf 5 --dir ../data/oscilador
 ./build/billar bench --ns 5,10,20,30,50,100,200,300,400,500,600,700 --tf 30 --dt 5e-5 --repeats 10 --placement hexagonal --dir ../data/bench/hexagonal
@@ -251,7 +251,7 @@ con su símbolo (`⟨t90⟩ (s)`, `f(v) (s/m)`), no con la frase entera.
 
 ## Presentación
 
-`report/presentacion.tex` es el borrador beamer 16:9 y sigue
+`report/presentacion.tex` es la presentación en beamer 16:9 (la que se entrega) y sigue
 `Formato_Presentaciones.pdf`, las devoluciones de la cátedra recogidas en
 `FEEDBACK.md` y el esquema que funcionó en el TP3: sin diapositiva de
 contenido, sólo separadores de sección; UML del motor sin archivos ni

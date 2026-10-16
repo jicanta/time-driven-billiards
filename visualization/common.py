@@ -72,7 +72,7 @@ AXIS_SPEED = "módulo de la velocidad $v$ (m/s)"
 AXIS_PDF = "densidad de probabilidad $f(v)$ (s/m)"
 AXIS_DENSITY = "densidad $\\rho$ (partículas/m$^2$)"
 AXIS_KT = "energía térmica $k_B T$ (J)"
-AXIS_FIT_ERROR = "error cuadrático medio $E(k_B T)$ (s$^2$/m$^2$)"
+AXIS_FIT_ERROR = "error cuadrático medio $E$ (s$^2$/m$^2$)"
 
 SCHEME_LABEL = {
     "beeman": "Beeman",
