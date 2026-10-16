@@ -48,7 +48,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 ## 8. Parámetros — `slide-08-parametros-dominio.png`
 
 - La tabla va en tres bloques. **Fijos**, lo que no se toca en todo el trabajo: R = 0,51 m, r = 0,0175 m, m = 0,025 kg, v0 = 1 m/s y k = 10⁴ N/m.
-- **Variables**, lo que se barre: N de 5 a 700, y xo de r (obstáculos en contacto entre sí) a R − r (en contacto con la pared).
+- **Variables**, lo que se barre: N de 5 a 700, la densidad ρ = N/πR² que le corresponde (de 6 a 857 partículas por m², es el mismo barrido contado por unidad de área, y es el parámetro con el que el ítem 2.4 pide los resultados), y xo de r (obstáculos en contacto entre sí) a R − r (en contacto con la pared).
 - **Simulación**, lo que fija la integración y no el sistema: Δt = 5·10⁻⁵ s, que se elige en Resultados por conservación de la energía, más Δt₂ y t_f, que van por caso y están en la diapositiva siguiente.
 - πR² = 0,817 m², la misma área que la mesa del TP3: igual densidad a igual N.
 
@@ -155,6 +155,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 27. Efecto de la densidad — `slide-27-t90-t100-vs-densidad.png`
 
+- El eje de abajo es la densidad ρ = N/πR², que es como lo pide el enunciado, y el de arriba el N que le corresponde; ρ quedó definida en la diapositiva de parámetros.
 - ⟨t90⟩ ≈ 21 s de N = 10 a 50 y 23,7 s en N = 100; desde N = 200 ninguna realización llega a 0,9 en 30 s.
 - Sí hay densidad óptima: Fu(tf) es máxima en N = 30–50 (0,97). Sin choques cada partícula conserva su momento angular y no llega al centro (con N = 1 convierte sólo el 13 %); con muchas, el camino libre se achica.
 - A N = 700, el 82 % del área, se convierte el 1 %.

@@ -329,7 +329,7 @@
 
 \begin{frame}{Parámetros}
     \begin{columns}[c,onlytextwidth]
-        \begin{column}{0.37\textwidth}
+        \begin{column}{0.42\textwidth}
             \footnotesize
             \begin{tabular}{@{}l@{\hspace{1.0em}}l@{}}
                 \toprule
@@ -340,23 +340,25 @@
                 $m$     & \SI{0.025}{\kilogram}\\
                 $v_0$   & \SI{1}{\meter\per\second}\\
                 $k$     & \SI{1e4}{\newton\per\meter}\\
-                \addlinespace[0.3em]
+                \addlinespace[0.15em]
                 \multicolumn{2}{@{}l}{\rotulo{Variables}}\\
                 \midrule
                 $N$     & $5 \ldots 700$\\
+                $\rho$  & $6 \ldots \SI{857}{\per\meter\squared}$\\
                 $x_o$   & $r \ldots R - r$\\
-                \addlinespace[0.3em]
+                \addlinespace[0.15em]
                 \multicolumn{2}{@{}l}{\rotulo{Simulación}}\\
                 \midrule
                 $\dt$   & \SI{5e-5}{\second}\\
                 $\dtd$  & $0{,}01 \ldots \SI{0.05}{\second}$\\
                 $t_f$   & $5 \ldots \SI{100}{\second}$\\
                 \bottomrule
-            \end{tabular}\\[0.5em]
-            {\scriptsize\color{gris}\sloppy $\dt$ se elige en Resultados por
-             conservación de la energía (ítem 2.1.a); $\dtd$ y $t_f$ van por caso.}
+            \end{tabular}\\[0.25em]
+            {\scriptsize\color{gris}\sloppy $\rho = N/\pi R^2$: la densidad
+             (ítem 2.4). $\dt$ sale de la conservación de la energía (ítem 2.1.a);
+             $\dtd$ y $t_f$ van por caso.}
         \end{column}\hfill
-        \begin{column}{0.60\textwidth}
+        \begin{column}{0.55\textwidth}
             \centering
             \input{figuras/parametros-dominio.tikz}\\[0.3em]
             {\footnotesize\color{gris} $\pi R^2 = \SI{0.817}{\meter\squared}$:
