@@ -82,6 +82,7 @@ make mapa                  # ítem 2.4.b: barrido (xo, N)
 make mapa-figuras          # mapa de calor de ⟨t90⟩ en el plano (xo, N)
 make animations            # corridas características, videos y cuadro fijo de cada una
 make youtube               # copia los videos con nombres legibles en youtube/
+make oscilador-sin-amortiguamiento  # control: con gamma = 0 Beeman y Verlet dan la misma constante
 make figuras-diapositivas  # todas las figuras de las diapositivas (data/figuras_diapositivas/)
 make slides-images         # todas las imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
 make slides-images-tikz    # sólo los esquemas TikZ de las diapositivas (report/figuras/*.tikz) renderizados a PNG
@@ -203,6 +204,17 @@ El barrido va de `dt = 5·10⁻³` a `10⁻⁵ s` con espaciado 1-2-5 (nueve val
 tres décadas). Por debajo de `10⁻⁵` el archivo de trayectorias de un solo `dt`
 pasa los 200 MB de texto y los esquemas de segundo orden ya están en el ruido
 de redondeo del doble.
+
+La figura tiene **dos paneles**. Arriba, el ECM de los cuatro esquemas: ahí se
+lee el orden de cada uno, pero Beeman y Verlet original se superponen. Abajo,
+la ampliación sobre esos dos: dividir el ECM por `dt⁴` saca la pendiente que
+comparten y deja la constante del error, y entonces se ve que no son iguales
+(`380` contra `330 m²/s⁴`, un 15 % más de ECM para Verlet con el mismo paso).
+La diferencia sale entera de que la fuerza depende de la velocidad, que es lo
+único en lo que los esquemas difieren: `make oscilador-sin-amortiguamiento`
+rehace el barrido con `gamma = 0` y las dos constantes coinciden. Los `dt` en
+los que la medición ya es ruido de redondeo y no error del esquema quedan
+fuera de la figura y del ajuste; el script los lista al correr.
 
 ## Ítem 2.1.a: elección del paso temporal
 

@@ -326,7 +326,15 @@ es el cambio de color de una partícula, que es parte del estado.
   200 MB de texto y los esquemas de segundo orden ya están en el ruido de
   redondeo del doble.
 - Figura: ECM contra `dt` en doble logarítmica, con el exponente `p` de
-  `ECM = c dtᵖ` ajustado por cuadrados mínimos en log-log en la leyenda.
+  `ECM = c dtᵖ` ajustado por cuadrados mínimos en log-log en la leyenda. Va en
+  **dos paneles**: arriba los cuatro esquemas y abajo la ampliación sobre
+  Beeman y Verlet original, que arriba se superponen. La ampliación grafica
+  `ECM/dt⁴`, que saca la pendiente común y deja la constante del error: `330`
+  contra `380 m²/s⁴`, un 15 % más de ECM para Verlet con el mismo paso. La
+  diferencia sale de que la fuerza depende de la velocidad y se verifica con
+  `make oscilador-sin-amortiguamiento` (`gamma = 0`: las constantes coinciden).
+- Los `dt` en los que la medición ya es ruido de redondeo del doble y no error
+  del esquema quedan fuera de la figura y del ajuste.
 - **Es la única diapositiva del sistema 1** (lo pide el enunciado).
 
 ### Ítem 2.1.a — Elección del paso temporal

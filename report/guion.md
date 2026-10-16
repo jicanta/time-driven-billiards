@@ -47,8 +47,9 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 8. Parámetros — `slide-08-parametros-dominio.png`
 
-- Fijos: R = 0,51 m, r = 0,0175 m, m = 0,025 kg, v0 = 1 m/s, k = 10⁴ N/m; Δt = 5·10⁻⁵ s se elige en Resultados por conservación de la energía.
-- Variables: N de 5 a 700 y xo de r (obstáculos en contacto entre sí) a R − r (en contacto con la pared).
+- La tabla va en tres bloques. **Fijos**, lo que no se toca en todo el trabajo: R = 0,51 m, r = 0,0175 m, m = 0,025 kg, v0 = 1 m/s y k = 10⁴ N/m.
+- **Variables**, lo que se barre: N de 5 a 700, y xo de r (obstáculos en contacto entre sí) a R − r (en contacto con la pared).
+- **Simulación**, lo que fija la integración y no el sistema: Δt = 5·10⁻⁵ s, que se elige en Resultados por conservación de la energía, más Δt₂ y t_f, que van por caso y están en la diapositiva siguiente.
 - πR² = 0,817 m², la misma área que la mesa del TP3: igual densidad a igual N.
 
 ## 9. Observables
@@ -69,8 +70,10 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 12. Sistema 1: error cuadrático medio contra el paso — `slide-12-ECM-vs-dt.png`
 
-- Beeman y Verlet original se superponen con ECM ∝ Δt⁴, o sea error de segundo orden; el punto de Verlet en Δt = 10⁻⁵ s no está porque ahí el ECM ya es el ruido de redondeo del doble, no el error del esquema.
-- Velocity Verlet y Euler p-c van como Δt², un orden menos: evalúan a(t + Δt) con una velocidad que difiere de v(t + Δt) en O(Δt).
+- Panel de arriba: Beeman y Verlet original van los dos como ECM ∝ Δt⁴, o sea error de segundo orden, y en diez órdenes de magnitud se superponen. Velocity Verlet y Euler p-c van como Δt², un orden menos, por cómo evalúan a(t + Δt) (ya se explicó en la diapositiva de integración).
+- Panel de abajo: dividir por Δt⁴ saca la pendiente que comparten y deja la constante del error. Ahí se ve que no son iguales: Verlet queda en 380 y Beeman en 330, un 15 % más de ECM con el mismo paso.
+- Esa diferencia es toda de la fuerza que depende de la velocidad. Con γ = 0 las dos constantes dan 21000 y 21019, iguales dentro del redondeo (`make oscilador-sin-amortiguamiento`).
+- El punto de Verlet en Δt = 10⁻⁵ s no está: ahí su ECM es ruido de redondeo del doble y no el error del esquema. La ampliación además arranca en 5·10⁻⁵ s, porque en 2·10⁻⁵ el redondeo ya corre la medición un 20 %.
 - A Δt = 10⁻⁴ s hay ocho órdenes entre Beeman y Euler p-c: Beeman es el mejor para este sistema.
 
 ## 13. Energía total contra el tiempo — `slide-13-energia-vs-t.png`

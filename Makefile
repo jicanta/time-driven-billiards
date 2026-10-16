@@ -3,6 +3,7 @@
 #   make build          compila el motor (engine/build/billar)
 #   make oscilador      sistema 1: integra el oscilador con los 4 esquemas y todos los dt
 #   make oscilador-figuras  ECM vs dt (la unica figura del sistema 1) y la trayectoria
+#   make oscilador-sin-amortiguamiento  control: con gamma = 0 Beeman y Verlet dan la misma constante
 #   make energia        item 2.1.a: N = 300 sin obstaculos, un barrido de dt con cuadros
 #   make energia-figuras    energia vs t (completa y ampliada, dos paneles) y deriva vs dt
 #   make energia-densa  verifica el dt elegido en el caso mas denso (N = 700 con obstaculos)
@@ -59,6 +60,10 @@ SLIDES   := data/figuras_diapositivas
 DTS_OSC  ?= 5e-3,2e-3,1e-3,5e-4,2e-4,1e-4,5e-5,2e-5,1e-5
 TF_OSC   ?= 5
 OSC      := data/oscilador
+# Control sin amortiguamiento (make oscilador-sin-amortiguamiento): cuatro dt
+# alcanzan para comparar las constantes del error de los dos esquemas.
+DTS_OSC0 ?= 5e-3,1e-3,2e-4,5e-5
+OSC0     := data/oscilador_gamma0
 
 # --- item 2.1 --------------------------------------------------------------
 DTS_ENERGIA ?= 1e-3,5e-4,2e-4,1e-4,5e-5,2e-5,1e-5
@@ -133,7 +138,8 @@ COMISION    ?= S2
 ENTREGA     := SdS_TP4_2026Q2G$(GRUPO)$(COMISION)
 ZIP         := $(ENTREGA)_Codigo.zip
 
-.PHONY: all todo build oscilador oscilador-figuras energia energia-figuras energia-densa \
+.PHONY: all todo build oscilador oscilador-figuras oscilador-sin-amortiguamiento \
+        energia energia-figuras energia-densa \
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
         densidad-figuras mapa mapa-figuras check una-particula animations youtube figuras-diapositivas \
@@ -160,6 +166,18 @@ oscilador: build
 oscilador-figuras:
 	$(PY) visualization/oscillator.py --trayectoria 1e-3
 	$(PY) visualization/oscillator.py --figures $(SLIDES) --estilo diapositiva
+
+# Por que Beeman le gana a Verlet original (diapositiva 12). Los dos son de
+# cuarto orden en el ECM y en la escala completa se superponen; la ampliacion
+# muestra que Verlet mide un 15 % mas de ECM con el mismo paso. Lo unico en lo
+# que difieren es con que velocidad evaluan a(t+dt), y eso solo importa si la
+# fuerza depende de la velocidad: con gamma = 0 la fuerza es -k r y las dos
+# constantes del error ECM/dt^4 tienen que coincidir. Barrido corto, alcanza
+# con comparar las dos constantes.
+oscilador-sin-amortiguamiento: build
+	$(BILLAR) oscillator --methods verlet,beeman --dts $(DTS_OSC0) --tf $(TF_OSC) \
+	    --gamma 0 --dir $(OSC0)
+	$(PY) visualization/oscillator.py --oscilador $(OSC0) --figures $(OSC0)/figuras
 
 # --------------------------------------------------------------------------
 # Item 2.1.a: eleccion del paso temporal

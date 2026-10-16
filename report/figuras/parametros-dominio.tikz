@@ -1,4 +1,4 @@
-\begin{tikzpicture}[scale=5.5]
+\begin{tikzpicture}[scale=6.2]
     \draw[pared,line width=1.1pt] (0,0) circle (0.51);
     \fill[obstaculo] (-0.25,0) circle (0.0175);
     \fill[obstaculo] ( 0.25,0) circle (0.0175);

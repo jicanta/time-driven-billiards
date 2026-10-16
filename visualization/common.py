@@ -59,6 +59,7 @@ def folder(item: str, root: Path = FIGURES) -> Path:
 AXIS_TIME = "tiempo $t$ (s)"
 AXIS_STEP = "paso de integración $\\Delta t$ (s)"
 AXIS_ECM = "ECM (m$^2$)"
+AXIS_ECM_CONSTANT = "ECM / $\\Delta t^4$ (m$^2$/s$^4$)"
 AXIS_POSITION = "posición $r$ (m)"
 AXIS_ENERGY = "energía total $E$ (J)"
 AXIS_DRIFT = "$\\max_t |E(t) - E_0| / E_0$"

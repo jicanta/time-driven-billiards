@@ -6,8 +6,9 @@
 %   * sin diapositiva de contenido ni caratulas de bloque: solo separadores
 %   * poco detalle al inicio; cada concepto se explica UNA vez donde hace falta
 %   * lo importante ocupa la pantalla: figura grande, texto minimo, sin huecos
-%   * tabla de parametros separada en fijos y variables, angosta para que el
-%     esquema del dominio sea grande
+%   * tabla de parametros en tres bloques (fijos, variables y simulacion),
+%     como la del TP3: simbolo y valor, angosta para que el esquema del
+%     dominio sea grande
 %   * UML solo del motor de simulacion
 %   * nombres de eje en una sola linea, con la unidad y coma decimal; leyenda
 %     adentro sin tapar datos
@@ -19,7 +20,10 @@
 %   * conclusiones como punteo corto, solo con cifras de las figuras mostradas
 % y el enunciado del TP4:
 %   * el sistema 1 ocupa UNA sola diapositiva, con la figura de ECM vs dt de
-%     los cuatro esquemas y nada mas (sin animaciones ni introduccion)
+%     los cuatro esquemas y nada mas (sin animaciones ni introduccion). La
+%     figura lleva dos paneles, como la de la energia: arriba los cuatro
+%     esquemas y abajo la ampliacion sobre los dos de cuarto orden, que en la
+%     escala completa se superponen
 %   * diapositiva final con la declaracion de uso de agentes de IA (item 2.5)
 %
 % Las figuras se leen de slides-images/ (make slides-images), numeradas con la
@@ -104,17 +108,19 @@
         \end{column}
     \end{columns}}
 
-% Variante con la columna de vinetas mas ancha.
-\newcommand{\figbulw}[2]{%
+% Variante con la columna de vinetas mas ancha. El separador entre vinetas es
+% opcional: la del sistema 1 lleva tres vinetas mas la linea de condiciones y
+% necesita apretarlas.
+\newcommand{\figbulw}[3][0.5em]{%
     \vspace{-0.2em}
     \begin{columns}[c,onlytextwidth]
         \begin{column}{0.55\textwidth}
             \centering
-            \includegraphics[width=\linewidth,height=0.86\textheight,keepaspectratio]{#1}
+            \includegraphics[width=\linewidth,height=0.86\textheight,keepaspectratio]{#2}
         \end{column}\hfill
         \begin{column}{0.43\textwidth}
-            \begin{itemize}\setlength{\itemsep}{0.5em}
-                #2
+            \begin{itemize}\setlength{\itemsep}{#1}
+                #3
             \end{itemize}
         \end{column}
     \end{columns}}
@@ -323,30 +329,34 @@
 
 \begin{frame}{Parámetros}
     \begin{columns}[c,onlytextwidth]
-        \begin{column}{0.46\textwidth}
+        \begin{column}{0.37\textwidth}
             \footnotesize
-            \begin{tabular}{@{}ll@{}}
+            \begin{tabular}{@{}l@{\hspace{1.0em}}l@{}}
                 \toprule
                 \multicolumn{2}{@{}l}{\rotulo{Fijos}}\\
                 \midrule
-                Radio del dominio & $R = \SI{0.51}{\meter}$\\
-                Radio de partícula y obstáculo & $r = \SI{0.0175}{\meter}$\\
-                Masa & $m = \SI{0.025}{\kilogram}$\\
-                Rapidez inicial & $v_0 = \SI{1}{\meter\per\second}$\\
-                Constante del resorte & $k = \SI{1e4}{\newton\per\meter}$\\
-                Paso de integración & $\dt = \SI{5e-5}{\second}$\\
-                \midrule
+                $R$     & \SI{0.51}{\meter}\\
+                $r$     & \SI{0.0175}{\meter}\\
+                $m$     & \SI{0.025}{\kilogram}\\
+                $v_0$   & \SI{1}{\meter\per\second}\\
+                $k$     & \SI{1e4}{\newton\per\meter}\\
+                \addlinespace[0.3em]
                 \multicolumn{2}{@{}l}{\rotulo{Variables}}\\
                 \midrule
-                Número de partículas & $N = 5 \ldots 700$\\
-                Posición de los obstáculos & $x_o = r \ldots R - r$\\
+                $N$     & $5 \ldots 700$\\
+                $x_o$   & $r \ldots R - r$\\
+                \addlinespace[0.3em]
+                \multicolumn{2}{@{}l}{\rotulo{Simulación}}\\
+                \midrule
+                $\dt$   & \SI{5e-5}{\second}\\
+                $\dtd$  & $0{,}01 \ldots \SI{0.05}{\second}$\\
+                $t_f$   & $5 \ldots \SI{100}{\second}$\\
                 \bottomrule
-            \end{tabular}\\[0.6em]
-            {\scriptsize\color{gris}\sloppy $\dt$ se elige en Resultados por conservación
-             de la energía (ítem 2.1.a); $x_o$ va de obstáculos en contacto entre sí a
-             obstáculos en contacto con la pared.}
+            \end{tabular}\\[0.5em]
+            {\scriptsize\color{gris}\sloppy $\dt$ se elige en Resultados por
+             conservación de la energía (ítem 2.1.a); $\dtd$ y $t_f$ van por caso.}
         \end{column}\hfill
-        \begin{column}{0.51\textwidth}
+        \begin{column}{0.60\textwidth}
             \centering
             \input{figuras/parametros-dominio.tikz}\\[0.3em]
             {\footnotesize\color{gris} $\pi R^2 = \SI{0.817}{\meter\squared}$:
@@ -413,16 +423,15 @@
 % =========================================================
 
 \begin{frame}{Sistema 1: error cuadrático medio contra el paso}
-    \figbul{slide-12-ECM-vs-dt.png}{%
-        \item \textbf{Beeman} y \textbf{Verlet original}: ECM $\propto \dt^{4}$, o
-              sea error $\propto \dt^{2}$, y se superponen. Verlet no llega a
-              $\SI{1e-5}{\second}$: ahí su ECM ya es ruido de redondeo.
-        \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$,
-              un orden menos: evalúan $\va(t{+}\dt)$ con una velocidad que difiere de
-              $\vv(t{+}\dt)$ en $O(\dt)$.
-        \item A $\dt = \SI{1e-4}{\second}$ hay ocho órdenes entre \alert{Beeman} y
-              Euler p-c: Beeman es el mejor para este sistema.
-        \cond{$m = \SI{70}{\kilogram}$, $k = \SI{1e4}{\newton\per\meter}$, $\gamma = \SI{100}{\kilogram\per\second}$, $A = \SI{1}{\meter}$, $t_f = \SI{5}{\second}$}
+    \figbulw[0.2em]{slide-12-ECM-vs-dt.png}{%
+        \item \textbf{Beeman} y \textbf{Verlet original}: ECM $\propto \dt^{4}$, o sea
+              error $\propto \dt^{2}$. Se superponen, pero Verlet mide
+              \alert{15\,\% más} (ampliación).
+        \item Es por la fuerza que depende de $\vv$: con $\gamma = 0$ las dos
+              constantes coinciden. \textbf{Beeman} es el mejor.
+        \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$, un
+              orden menos. A $\dt = \SI{1e-4}{\second}$, ocho órdenes hasta Beeman.
+        \cond{$m = \SI{70}{\kilogram}$, $k = \SI{1e4}{\newton\per\meter}$, $\gamma = \SI{100}{\kilogram\per\second}$, $A = \SI{1}{\meter}$, $t_f = \SI{5}{\second}$; sin el $\dt = \SI{1e-5}{\second}$ de Verlet (redondeo)}
     }
 \end{frame}
 

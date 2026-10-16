@@ -37,6 +37,10 @@ import numpy as np
 
 import common
 
+# Los dos esquemas que comparten la pendiente dt^4 y que por eso se superponen
+# en el panel de arriba: son los que lleva la ampliacion.
+FOURTH_ORDER = ("beeman", "verlet")
+
 
 def summarize(root: Path) -> tuple[dict, dict]:
     """(parametros, {esquema: {'dt': [...], 'ecm': [...], 'pasos': [...]}})."""
@@ -69,6 +73,21 @@ def converging(errors: np.ndarray) -> np.ndarray:
         if not keep[index + 1] or errors[index] >= errors[index + 1]:
             keep[index] = False
     return keep
+
+
+def flat(constants: np.ndarray, tolerance: float = 0.10) -> np.ndarray:
+    """Mascara de los dt en los que ECM/dt^4 se mantiene en su valor tipico.
+
+    Dividir el ECM por dt^4 saca la pendiente comun a los dos esquemas de
+    cuarto orden y deja la constante del error, que es lo unico que los
+    separa. La constante es plana mientras la medicion sea el error del
+    esquema; cuando el redondeo del doble empieza a correrla, el punto se va.
+    Pasa antes de llegar al piso: en dt = 2e-5 s el ECM de Verlet original ya
+    queda un 20 % por debajo de su ley de potencia (se verifico recalculando
+    la trayectoria en precision extendida), una distorsion del orden de la
+    diferencia que se quiere mostrar. Se descartan los dt que se apartan mas
+    de `tolerance` de la mediana."""
+    return np.abs(constants / np.median(constants) - 1.0) <= tolerance
 
 
 def write_csv(schemes: dict, path: Path) -> None:
@@ -117,9 +136,19 @@ def main() -> None:
     out_dir = common.folder("1", arguments.figures)
     write_csv(schemes, arguments.oscilador / "ecm.csv")
 
-    figure, axes = plt.subplots()
+    # Dos paneles con el mismo eje de pasos, como la energia contra el tiempo:
+    # arriba los cuatro esquemas, donde se lee el orden de cada uno; abajo la
+    # ampliacion sobre los dos de cuarto orden, que arriba se superponen. En
+    # diez ordenes de magnitud una diferencia del 15 % no se ve: dividir por
+    # dt^4 saca la pendiente que comparten y deja a la vista la constante del
+    # error, que es lo unico que los distingue.
+    width, height = plt.rcParams["figure.figsize"]
+    figure, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(width, 1.55 * height),
+                                         gridspec_kw={"height_ratios": [1.0, 0.68],
+                                                      "hspace": 0.10})
     exponents = {}
     saturated = {}
+    constants = {}
     for name in common.SCHEMES:
         if name not in schemes:
             continue
@@ -131,15 +160,36 @@ def main() -> None:
         color, marker = common.SCHEME_STYLE[name]
         exponent, intercept = np.polyfit(np.log(steps[keep]), np.log(errors[keep]), 1)
         exponents[name] = exponent
-        axes.plot(steps[keep], errors[keep], color=color, marker=marker,
-                  linestyle="--" if name == "verlet" else "-",
-                  label=f"{common.SCHEME_LABEL[name]} ($p$ = {common.decimal(exponent, 1)})")
-    axes.set_xscale("log")
-    axes.set_yscale("log")
-    axes.set_xlabel(common.AXIS_STEP)
-    axes.set_ylabel(common.AXIS_ECM)
-    common.headroom(axes, 0.44)
-    axes.legend(loc="upper left")
+        top.plot(steps[keep], errors[keep], color=color, marker=marker,
+                 linestyle="--" if name == "verlet" else "-",
+                 label=f"{common.SCHEME_LABEL[name]} ($p$ = {common.decimal(exponent, 1)})")
+        if name not in FOURTH_ORDER:
+            continue
+        constant = errors[keep] / steps[keep] ** 4
+        flat_mask = flat(constant)
+        constants[name] = (steps[keep][flat_mask], constant[flat_mask])
+        bottom.plot(steps[keep][flat_mask], constant[flat_mask], color=color, marker=marker,
+                    linestyle="--" if name == "verlet" else "-",
+                    label=common.SCHEME_LABEL[name])
+    top.set_xscale("log")
+    top.set_yscale("log")
+    top.set_ylabel(common.AXIS_ECM)
+    common.headroom(top, 0.44)
+    top.legend(loc="upper left")
+    bottom.set_xlabel(common.AXIS_STEP)
+    bottom.set_ylabel(common.AXIS_ECM_CONSTANT)
+    # La ampliacion vive en un rango estrecho (las dos constantes difieren un
+    # 15 %), asi que el limite se fija a mano: las dos rectas separadas, lugar
+    # arriba para el rotulo y lugar a la izquierda para la leyenda, donde
+    # Verlet original todavia no empieza.
+    low = min(constant.min() for _, constant in constants.values())
+    high = max(constant.max() for _, constant in constants.values())
+    span = high - low
+    bottom.set_ylim(low - 0.25 * span, high + 0.50 * span)
+    bottom.legend(loc="center left")
+    bottom.text(0.985, 0.95, "ampliación: los dos de cuarto orden",
+                transform=bottom.transAxes, ha="right", va="top", color="#555555",
+                fontsize=plt.rcParams["legend.fontsize"])
     out = out_dir / "ECM_vs_dt.png"
     common.save(figure, out)
     plt.close(figure)
@@ -158,6 +208,13 @@ def main() -> None:
     print("ajuste ECM = c dt^p (cuadrados mínimos en log-log, sin los dt que ya están en el "
           "piso de redondeo): " +
           ", ".join(f"{common.SCHEME_LABEL[n]} p = {p:.2f}" for n, p in exponents.items()))
+    if len(constants) == 2:
+        (_, one), (_, other) = (constants[n] for n in FOURTH_ORDER)
+        print(f"constante del error ECM/dt^4 (m²/s⁴): "
+              + ", ".join(f"{common.SCHEME_LABEL[n]} = {np.median(c):.0f}"
+                          for n, (_, c) in constants.items())
+              + f"; Verlet original mide {np.median(other) / np.median(one) - 1:+.0%} "
+                f"de ECM respecto de Beeman con el mismo paso")
     for name, steps in saturated.items():
         if steps:
             print(f"  {common.SCHEME_LABEL[name]}: el ECM deja de bajar en dt ≤ "
