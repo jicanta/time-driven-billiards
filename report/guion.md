@@ -69,7 +69,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 12. Sistema 1: error cuadrático medio contra el paso — `slide-12-ECM-vs-dt.png`
 
-- Beeman y Verlet original se superponen con ECM ∝ Δt⁴ (error de segundo orden); Verlet toca el piso de redondeo en Δt ≤ 2·10⁻⁵ s.
+- Beeman y Verlet original se superponen con ECM ∝ Δt⁴, o sea error de segundo orden; el punto de Verlet en Δt = 10⁻⁵ s no está porque ahí el ECM ya es el ruido de redondeo del doble, no el error del esquema.
 - Velocity Verlet y Euler p-c van como Δt², un orden menos: evalúan a(t + Δt) con una velocidad que difiere de v(t + Δt) en O(Δt).
 - A Δt = 10⁻⁴ s hay ocho órdenes entre Beeman y Euler p-c: Beeman es el mejor para este sistema.
 

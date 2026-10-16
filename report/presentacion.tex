@@ -415,8 +415,8 @@
 \begin{frame}{Sistema 1: error cuadrático medio contra el paso}
     \figbul{slide-12-ECM-vs-dt.png}{%
         \item \textbf{Beeman} y \textbf{Verlet original}: ECM $\propto \dt^{4}$, o
-              sea error $\propto \dt^{2}$, y se superponen; Verlet toca el piso de
-              redondeo en $\dt \le \SI{2e-5}{\second}$.
+              sea error $\propto \dt^{2}$, y se superponen. Verlet no llega a
+              $\SI{1e-5}{\second}$: ahí su ECM ya es ruido de redondeo.
         \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$,
               un orden menos: evalúan $\va(t{+}\dt)$ con una velocidad que difiere de
               $\vv(t{+}\dt)$ en $O(\dt)$.

@@ -12,6 +12,11 @@ cada esquema se le ajusta una ley de potencia ECM = c dt^p por cuadrados
 minimos en log-log; el exponente va en la leyenda, porque es el que dice el
 orden del esquema (ECM ~ dt^p con error ~ dt^(p/2)).
 
+Los dt en los que el ECM ya dejo de bajar no se grafican: ahi el error del
+esquema quedo por debajo del ruido de redondeo del doble, asi que el punto
+mide la precision de la aritmetica y no el orden del esquema. Con el barrido
+de este trabajo es uno solo, Verlet original en dt = 1e-5 s.
+
     python3 visualization/oscillator.py
     python3 visualization/oscillator.py --estilo diapositiva --figures data/figuras_diapositivas
     python3 visualization/oscillator.py --trayectoria 1e-3
@@ -55,8 +60,9 @@ def converging(errors: np.ndarray) -> np.ndarray:
     Con los dt más chicos el error de truncamiento cae por debajo del ruido de
     redondeo del doble y el ECM deja de bajar (en Verlet original incluso
     vuelve a subir: la recurrencia resta dos numeros casi iguales). Esos
-    puntos quedan fuera del ajuste de la ley de potencia, porque ahi ya no se
-    mide el orden del esquema; en la figura van con simbolo hueco. `errors`
+    puntos no miden el orden del esquema sino la precision de la aritmetica,
+    asi que quedan fuera del ajuste de la ley de potencia Y fuera de la
+    figura; el listado que imprime este script dice cuales son. `errors`
     viene ordenado por dt creciente."""
     keep = np.ones(len(errors), dtype=bool)
     for index in range(len(errors) - 2, -1, -1):
@@ -114,7 +120,6 @@ def main() -> None:
     figure, axes = plt.subplots()
     exponents = {}
     saturated = {}
-    floor_labelled = False
     for name in common.SCHEMES:
         if name not in schemes:
             continue
@@ -126,14 +131,9 @@ def main() -> None:
         color, marker = common.SCHEME_STYLE[name]
         exponent, intercept = np.polyfit(np.log(steps[keep]), np.log(errors[keep]), 1)
         exponents[name] = exponent
-        axes.plot(steps, errors, color=color, marker=marker,
+        axes.plot(steps[keep], errors[keep], color=color, marker=marker,
                   linestyle="--" if name == "verlet" else "-",
                   label=f"{common.SCHEME_LABEL[name]} ($p$ = {common.decimal(exponent, 1)})")
-        if not keep.all():
-            axes.plot(steps[~keep], errors[~keep], marker=marker, linestyle="none",
-                      color=color, markerfacecolor="white", zorder=5,
-                      label=None if floor_labelled else "piso de redondeo")
-            floor_labelled = True
     axes.set_xscale("log")
     axes.set_yscale("log")
     axes.set_xlabel(common.AXIS_STEP)
@@ -161,7 +161,8 @@ def main() -> None:
     for name, steps in saturated.items():
         if steps:
             print(f"  {common.SCHEME_LABEL[name]}: el ECM deja de bajar en dt ≤ "
-                  f"{max(steps):.0e} s ({len(steps)} punto(s) fuera del ajuste)")
+                  f"{max(steps):.0e} s ({len(steps)} punto(s) fuera de la figura "
+                  f"y del ajuste)")
     wins = {name: sum(1 for k in range(len(series["ecm"]))
                       if all(series["ecm"][k] <= other["ecm"][k] for other in schemes.values()))
             for name, series in schemes.items()}
