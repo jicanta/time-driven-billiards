@@ -116,10 +116,12 @@ def main() -> None:
     bottom.set_xlabel(common.AXIS_TIME)
     common.headroom(top, 0.30)
     top.legend(loc="upper left", ncol=2)
-    # La ampliacion muestra lo que la escala completa aplasta: el margen de
-    # arriba es el 15 % de la deriva mas grande entre los pasos estables.
-    span = max(row["E"].max() for row in stable_rows) - rows[0]["E0"]
-    bottom.set_ylim(rows[0]["E0"] - 0.12 * span, rows[0]["E0"] + 1.15 * span)
+    # La ampliacion muestra lo que la escala completa aplasta: el rango es el
+    # de los pasos estables (la deriva puede ser hacia arriba o hacia abajo),
+    # con un margen arriba para el rotulo.
+    low = min(row["E"].min() for row in stable_rows)
+    high = max(row["E"].max() for row in stable_rows)
+    bottom.set_ylim(low - 0.08 * (high - low), high + 0.18 * (high - low))
     bottom.text(0.985, 0.95, "ampliación", transform=bottom.transAxes, ha="right", va="top",
                 color="#555555", fontsize=plt.rcParams["legend.fontsize"])
     energy_figure = out_dir / f"energia_vs_t_N{count}.png"

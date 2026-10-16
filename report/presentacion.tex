@@ -518,12 +518,12 @@
     \figbul{slide-13-energia-vs-t.png}{%
         \item $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$: el sistema es
               conservativo y se mide cuánto se aparta.
-        \item Con $\dt = \SI{1e-3}{\second}$ explota hasta \SI{52}{\joule}: el choque
+        \item Con $\dt = \SI{1e-3}{\second}$ explota hasta \SI{45}{\joule}: el choque
               dura $\tau = \pi\sqrt{\mu/k} = \SI{3.5}{\milli\second}$ y entran sólo
               tres pasos.
-        \item Ampliación: cada paso más corto deriva menos; de
-              $\dt = \SI{1e-4}{\second}$ en adelante no se distinguen de $E_0$ en esta
-              escala.
+        \item Ampliación: $\SI{5e-4}{\second}$ deriva un \SI{2.6}{\percent} y
+              $\SI{2e-4}{\second}$ un \SI{0.6}{\percent} (hacia abajo); de
+              $\SI{1e-4}{\second}$ en adelante no se distinguen de $E_0$.
         \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$, $\dtd = \SI{0.01}{\second}$}
     }
 \end{frame}
@@ -531,10 +531,10 @@
 \begin{frame}{Elección del paso: deriva relativa máxima}
     \figbul{slide-14-deriva-vs-dt.png}{%
         \item Observable escalar: la deriva relativa máxima $D(\dt)$. Sobre los
-              pasos estables ajusta $D \propto \dt^{2,2}$: el segundo orden de Verlet.
+              pasos estables ajusta $D \propto \dt^{2,0}$: el segundo orden de Verlet.
         \item Criterio: el $\dt$ \textbf{más largo} con $D \leq 10^{-3}$, el de menor
               costo con el error aceptado.
-        \item \alert{$\dt = \SI{5e-5}{\second}$}: $D = 2{,}0\cdot10^{-4}$, y
+        \item \alert{$\dt = \SI{5e-5}{\second}$}: $D = 3{,}8\cdot10^{-4}$, y
               $2{,}6\cdot10^{-4}$ en el caso más exigente, $N = 700$ con obstáculos.
         \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$}
     }
@@ -672,9 +672,9 @@
         \item $\mtnov \approx \SI{21}{\second}$ de $N = 10$ a $50$ y \SI{23.7}{\second}
               en $N = 100$; desde $N = 200$ ninguna llega a $0{,}9$ en \SI{30}{\second}.
         \item \alert{Sí hay densidad óptima}: $\Fu(t_f)$ es máxima en $N = 30$--$50$
-              ($0{,}97$). Con pocas partículas casi no hay choques y cada una conserva
-              su momento angular: no llega al centro. Con muchas, el camino libre se
-              achica.
+              ($0{,}97$). Sin choques cada partícula conserva su momento angular y no
+              llega al centro: con $N = 1$ sólo convierte el \SI{13}{\percent} (300
+              realizaciones). Con muchas, el camino libre se achica.
         \item A $N = 700$ (\SI{82}{\percent} del área) se convierte el \SI{1}{\percent}.
         \cond{ítem 2.1.b: $x_o = r$, $t_f = \SI{30}{\second}$, 10 realizaciones}
     }
@@ -702,7 +702,7 @@
         \item Beeman y Verlet original: $\mathrm{ECM} \propto \dt^{4}$; Velocity Verlet
               y Euler p-c: $\propto \dt^{2}$. Beeman es el mejor para el oscilador.
         \item Por conservación de la energía, $\dt = \SI{5e-5}{\second}$: deriva
-              $2{,}0\cdot10^{-4}$ a $N = 300$ y $2{,}6\cdot10^{-4}$ a $N = 700$.
+              $3{,}8\cdot10^{-4}$ a $N = 300$ y $2{,}6\cdot10^{-4}$ a $N = 700$.
         \item El paso temporal escala como $N^{0,91}$ y los eventos como $N^{3,52}$:
               se cruzan cerca de $N = 490$.
         \item Hay un $x_o$ \alert{óptimo} en $0{,}2$--$\SI{0.3}{\meter}$:

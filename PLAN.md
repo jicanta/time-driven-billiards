@@ -375,6 +375,18 @@ es el cambio de color de una partícula, que es parte del estado.
 
 ### Ítem 2.4 — Efecto de la densidad
 
+- Por qué hay densidad óptima: la fuerza de la pared es radial (partícula
+  imagen sobre la normal), así que una partícula que no choca con otras
+  conserva su momento angular respecto del centro y nunca se acerca más que
+  su radio cáustico `b = |L|/|v|`; con los obstáculos en contacto se convierte
+  si y sólo si `b < 3r`. **Probado** con `make una-particula` (`N = 1`, 300
+  realizaciones, `tmax = 60 s`): se convierten 40 de 300 (13 %), exactamente
+  las 40 con `b < 3r`, contra el 13,6 % que predice la distribución de `b`
+  para posiciones uniformes y direcciones isótropas; `L` se conserva a
+  `6·10⁻¹¹` relativo en 20 s con 21 rebotes. A densidad alta el camino libre
+  se achica y el blanco queda rodeado: por eso `Fu(tf)` es máxima en
+  `N = 30–50`.
+
 - (a) De las corridas del 2.1.b, como pide el enunciado: `⟨t90⟩` y `⟨t100⟩`
   contra `ρ = N/(πR²)`, con el `N` correspondiente en el eje de arriba. Con
   los obstáculos en contacto y `tf = 30 s` fijos, por encima de cierta
@@ -424,15 +436,23 @@ Se cambian si los profesores indican otra cosa.
    diapositivas 17 y 20 dan explícitamente cómo tratar la dependencia con la
    velocidad (paso intermedio a medio paso y predictor-corrector); se usan tal
    cual. Que eso le cueste un orden a Velocity Verlet es parte del resultado,
-   no un error de implementación.
+   no un error de implementación. **Verificado** con una implementación
+   independiente en Python del oscilador: evaluando `a(t+dt)` con la velocidad
+   de medio paso el ECM escala como `dt^2,04`; si en cambio se evalúa con la
+   velocidad predicha por Euler, `v(t) + a(t) dt`, escala como `dt^4,00` y
+   el ECM coincide con el de Beeman (5,9·10⁻⁹ contra 5,3·10⁻⁹ en
+   `dt = 2·10⁻³ s`). La pérdida de orden es del predictor de medio paso, cuyo
+   error respecto de `v(t+dt)` es `O(dt)`, no de un error de código.
 4. **`dt = 5·10⁻⁵ s` para todo el sistema 2**, elegido en el ítem 2.1.a con la
-   cota de deriva de 0,1 %: da `D = 2,0·10⁻⁴` a `N = 300` sin obstáculos y
+   cota de deriva de 0,1 %: da `D = 3,8·10⁻⁴` a `N = 300` sin obstáculos y
    `2,6·10⁻⁴` a `N = 700` con los obstáculos en contacto (`make energia-densa`),
    con un solapamiento máximo del 26 % de `r` y ninguna partícula fuera del
    dominio (`visualization/check.py`).
 5. **Condición inicial.** La del enunciado (adición secuencial al azar con
    rechazo) hasta `N = 400`; por encima de `N ≈ 450` la fracción de área pasa
-   el límite del empaquetamiento al azar y no entra, así que el barrido de
+   el límite del empaquetamiento al azar y no entra (verificado: con
+   `--placement random` la partícula 446 no encuentra lugar tras 10⁶ intentos,
+   sea `N = 450`, `470` o `500`; `N = 430` entra en 0,05 s), así que el barrido de
    `N` del 2.1.b usa una **red triangular** con el mayor paso que aloja `N`
    sitios, igual que en el TP3 y con la misma distribución uniforme de
    direcciones. La figura de apoyo muestra las dos condiciones iniciales para

@@ -17,6 +17,7 @@
 #   make mapa           item 2.4.b (opcional): barrido (xo, N)
 #   make mapa-figuras       mapa de calor de <t90> en el plano (xo, N)
 #   make check          corrida de validacion: energia, solapamientos y escapes
+#   make una-particula  N = 1: sin choques solo se convierte si el parametro de impacto es < 3r (item 2.4.a)
 #   make animations     corridas caracteristicas, videos y cuadro fijo de cada una
 #   make youtube        copia los videos con nombres legibles en youtube/
 #   make figuras-diapositivas  todas las figuras de las diapositivas (data/figuras_diapositivas)
@@ -134,7 +135,7 @@ ZIP         := $(ENTREGA)_Codigo.zip
 .PHONY: all todo build oscilador oscilador-figuras energia energia-figuras energia-densa \
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
-        densidad-figuras mapa mapa-figuras check animations youtube figuras-diapositivas \
+        densidad-figuras mapa mapa-figuras check una-particula animations youtube figuras-diapositivas \
         slides-images documentos entrega clean-figures
 
 all: todo
@@ -286,6 +287,21 @@ mapa: build
 mapa-figuras:
 	$(PY) visualization/heatmap.py
 	$(PY) visualization/heatmap.py --figures $(SLIDES) --estilo diapositiva
+
+# --------------------------------------------------------------------------
+# Una sola particula (prueba de la explicacion del item 2.4.a)
+# --------------------------------------------------------------------------
+
+# Sin choques, la particula conserva el momento angular respecto del centro
+# (la fuerza de la pared es radial) y solo se convierte si su parametro de
+# impacto es menor que 3r. Se guarda un solo cuadro (el de t = 0) por corrida.
+SEEDS_UNA   ?= 200
+TMAX_UNA    ?= 60
+UNA         := data/una_particula
+una-particula: build
+	$(BILLAR) explore --ns 1 --xos $(XO_CENTRO_V) --dts $(DT) --seeds $(SEEDS_UNA) \
+	    --seed 1000 --tmax $(TMAX_UNA) --save-every 100000000 --until-all-used --dir $(UNA)
+	$(PY) visualization/single.py --una $(UNA)
 
 # --------------------------------------------------------------------------
 # Validacion

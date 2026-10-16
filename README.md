@@ -64,6 +64,7 @@ tp-4/
 pip install -r requirements.txt
 make build                 # engine/build/billar
 make check                 # validación: deriva de energía, solapamientos y escapes (visualization/check.py)
+make una-particula         # N = 1: sin choques sólo se convierte si el parámetro de impacto es < 3r (ítem 2.4.a)
 make oscilador             # sistema 1: los 4 esquemas y los 9 dt
 make oscilador-figuras     # ECM vs dt (la única figura del sistema 1) y la trayectoria
 make energia               # ítem 2.1.a: N = 300 sin obstáculos, barrido de dt con cuadros
@@ -242,6 +243,7 @@ vale `m v0²/2 = 0,0125 J`.
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad desde las corridas del 2.1.b, con el `N` en el eje de arriba |
 | `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`, con el óptimo de cada `N` marcado |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
+| `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |
 | `check.py` | — | validación desde los estados guardados: deriva de energía, solapamiento máximo con partículas, obstáculos y pared, y escape fuera del dominio |
 
 Todas las figuras llevan los ejes en palabras con la unidad **en una sola
