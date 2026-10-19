@@ -19,6 +19,7 @@
 #   make velocidades-figuras  f(v) por instante, ajuste de Maxwell-Boltzmann y E(kT)
 #   make densidad-figuras   item 2.4.a: <t90> y <t100> vs densidad (usa las corridas de 2.1.b)
 #   make mapa           item 2.4.b: barrido (xo, N) (el enunciado lo da como opcional; se hace)
+#                           9 densidades x 16 posiciones x 20 realizaciones, en paralelo
 #   make mapa-figuras       mapa de calor de <t90> en el plano (xo, N)
 #   make check          corrida de validacion: energia, solapamientos y escapes
 #   make una-particula  N = 1: sin choques solo se convierte si el parametro de impacto es < 3r (item 2.4.a)
@@ -119,9 +120,18 @@ ESTACIONARIO ?= 10
 VELOCIDADES := data/velocidades
 
 # --- item 2.4.b ------------------------------------------------------------
-NS_MAPA     ?= 20,50,100,200,300
-XOS_MAPA    ?= 0.0175,0.1000,0.2000,0.3000,0.4000,0.4925
-SEEDS_MAPA  ?= 6
+# El item no pone techo al barrido, asi que el mapa se hace con la resolucion
+# que hace falta para contestarlo: 9 densidades y 16 posiciones, mas juntas
+# entre 0,05 y 0,30 m, que es donde esta el minimo y donde se decide si se
+# corre con N. 20 realizaciones por punto: con 6 el error de la media era de
+# hasta 3 s sobre 12 y el minimo de cada fila saltaba de columna por ruido.
+NS_MAPA     ?= 10,20,30,50,70,100,150,200,300
+XOS_MAPA    ?= 0.0175,0.0500,0.0750,0.1000,0.1250,0.1500,0.1750,0.2000,0.2250,0.2500,0.2750,0.3000,0.3500,0.4000,0.4500,0.4925
+SEEDS_MAPA  ?= 20
+# Procesos simultaneos del barrido del mapa. Son 144 celdas y 2880 corridas:
+# en serie no termina mas, y aca no se cronometra nada (los tiempos de
+# ejecucion son los del item 2.1.b), asi que la maquina puede estar cargada.
+JOBS_MAPA   ?= 7
 MAPA        := data/mapa
 
 # --- animaciones y entrega -------------------------------------------------
@@ -311,15 +321,25 @@ densidad-figuras:
 	$(PY) visualization/density.py
 	$(PY) visualization/density.py --figures $(SLIDES) --estilo diapositiva
 
-# Un proceso por N, en paralelo: el barrido completo tarda cerca de una hora
-# en serie y los N grandes son los caros. heatmap.py junta los index.txt de
-# todas las subcarpetas.
+# Un proceso por celda (N, xo) y los N grandes primero, que son los caros: el
+# barrido son 2880 corridas y en serie no termina mas. heatmap.py junta los
+# index.txt de todas las subcarpetas, asi que partirlo asi se lee igual que si
+# hubiera salido de una sola corrida.
+#
+# --until-fraction 0.9 corta cada corrida apenas Fu llega a 0,9, que es lo
+# unico que mide el mapa: esperar de t90 a t100 cuesta el triple de computo (a
+# N = 300, 29 s contra 98 s de tiempo simulado) y no cambia la figura. Por eso
+# este barrido NO sirve para el mapa de <t100>: para ese hay que correrlo sin
+# --until-fraction (make mapa SEEDS_MAPA=6, o va a tardar horas).
 mapa: build
 	rm -rf $(MAPA)
+	@mkdir -p $(MAPA)
 	@for n in $(subst $(COMMA), ,$(NS_MAPA)); do \
-	    $(BILLAR) explore --ns $$n --xos $(XOS_MAPA) --dts $(DT) --seeds $(SEEDS_MAPA) \
-	        --seed $(SEED0) --tmax $(TMAX) --until-all-used --dir $(MAPA)/n$$n & \
-	done; wait
+	    for x in $(subst $(COMMA), ,$(XOS_MAPA)); do printf '%s %s\n' "$$n" "$$x"; done; \
+	done | sort -k1,1nr | xargs -P $(JOBS_MAPA) -n 2 sh -c \
+	    '$(BILLAR) explore --ns $$0 --xos $$1 --dts $(DT) --seeds $(SEEDS_MAPA) \
+	        --seed $(SEED0) --tmax $(TMAX) --until-all-used --until-fraction 0.9 \
+	        --dir $(MAPA)/n$$0_xo$$1 > /dev/null'
 
 mapa-figuras:
 	$(PY) visualization/heatmap.py

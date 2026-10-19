@@ -143,18 +143,28 @@ Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
 > distinguen. El barrido completo está en la figura de la deriva, que es la
 > que elige el paso. ¿Está bien mostrar sólo los tres?
 
-### B5. El mapa de calor no resuelve si el óptimo depende de `N`
+### B5. El mapa de calor: cómo decimos dónde está el óptimo — RESUELTO, no hace falta preguntarlo
 
-> En el 2.4.b el barrido tiene 6 valores de `x_o` y 6 realizaciones por punto.
-> Con eso, el mínimo de cada fila **no se distingue de sus vecinos**: a
-> `N = 50` son compatibles dentro del error desde `x_o = 0,1` hasta `0,4`, y
-> sólo a `N = 300` el mínimo queda solo (en `0,2`). O sea que podemos afirmar
-> que el óptimo está en la banda `0,2`–`0,3 m` para las cinco densidades, pero
-> no podemos decir si se corre con `N` o es constante. ¿Alcanza con reportarlo
-> así, o esperan más realizaciones / más valores de `x_o` para resolverlo?
+Era una pregunta cuando el barrido tenía 6 posiciones y 6 realizaciones y el
+mínimo de cada fila no se distinguía de sus vecinos. Se corrió de nuevo con
+**16 posiciones × 9 densidades × 20 realizaciones** (2880 corridas, cortando
+cada una en `Fu = 0,9`, que es lo único que mide el mapa) y ahora sí se
+resuelve:
 
-**Por eso sacamos** la marca sobre la celda más baja de cada fila: hacía
-parecer que el óptimo saltaba entre 0,2 y 0,3 cuando eso es ruido.
+- El fondo del valle es ancho: entre `x_o = 0,15` y `0,30 m`, `⟨t90⟩` queda
+  dentro del 20 % del mínimo de su fila, en las nueve densidades.
+- Ajustando una parábola a cada fila **sobre el mismo tramo** (`0,10`–`0,40 m`)
+  y tomando el vértice: `0,236 ± 0,002 m` promediando las nueve densidades, y
+  el corrimiento con la densidad es `−0,012 ± 0,008 m` por década de `N`,
+  compatible con cero. **El óptimo no se corre con `N`.**
+- La única fila que se aparta es `N = 10` (`0,350 ± 0,031 m`, a 3,7 σ), y tiene
+  explicación física: sin choques la conversión la decide el parámetro de
+  impacto, que es el mismo argumento del ítem 2.4.a.
+
+Sigue sin marcarse ninguna celda sobre el mapa: el mínimo se lee por la escala
+de colores, y el número fino sale del ajuste, no de la celda más baja (cuál de
+las del fondo sale la más baja es azar: a `N = 50` cae en `0,175 m` y a
+`N = 150` en `0,275 m`, con el mismo vértice dentro del error).
 
 ### B6. La explicación de la densidad óptima, ¿necesita figura propia?
 

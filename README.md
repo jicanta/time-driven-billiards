@@ -173,14 +173,17 @@ semillas consecutivas desde `--seed` y escribe por corrida
 línea `caso N xo dt semilla carpeta` por corrida, volcada en cuanto la corrida
 termina (así un barrido interrumpido deja un índice consistente con lo que
 alcanzó a correr). Un barrido largo se puede partir en varios procesos, uno
-por subcarpeta (es lo que hace `make mapa`, un proceso por `N`): el
+por subcarpeta (es lo que hace `make mapa`, un proceso por celda `(N, xo)`): el
 post-procesamiento junta los `index.txt` de las subcarpetas y antepone el
 nombre de cada una al del caso, de modo que el resultado es el mismo que
 correrlo de una sola vez. Sin cuadros salvo que se pida
 `--save-every k` (en pasos) o `--dt2 s` (en segundos, que es lo que hace falta
 cuando el barrido es sobre `dt` y las curvas tienen que compartir el eje).
 Con `--until-all-used` la corrida termina apenas se convierten todas las
-partículas.
+partículas, y `--until-fraction f` baja ese corte a la fracción que se va a
+medir: el mapa del ítem 2.4.b sólo lee `t90`, y seguir hasta que se convierten
+todas cuesta el triple de cómputo (a `N = 300`, `t90 ≈ 29 s` contra
+`t100 ≈ 98 s`) sin cambiar nada de lo que se grafica.
 
 ### Costo por paso
 
@@ -333,7 +336,7 @@ vale `m v0²/2 = 0,0125 J`.
 | `conversion.py` | 2.2 | `--casos`: `Fu(t)` promedio de varios `xo` en una misma figura, con banda de `± σ` entre realizaciones y `⟨t90⟩ ± σ` marcado sobre la línea de `0,9` (es la figura que pide el ítem); `--runs` dibuja corridas sueltas como escalón, para mirar una configuración de cerca |
 | `speeds.py` | 2.3 | `f(v)` en varios instantes y la estacionaria, ajuste de Maxwell-Boltzmann por el mínimo de `E(kT)` y comparación con `m ⟨v²⟩/2` |
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad desde las corridas del 2.1.b, con el `N` en el eje de arriba |
-| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`; la celda más baja de cada fila **no** se marca (con 6 realizaciones casi nunca se distingue de sus vecinas), y por consola van el error de la media y qué celdas son compatibles con el mínimo |
+| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`: eje `x` con la posición real de los obstáculos, una fila por `N` y escala de colores logarítmica (⟨t90⟩ crece más con `N` que con `xo`; en escala lineal el color lo gobierna la fila y adentro de cada una queda todo del mismo tono). Ningún símbolo encima: el mínimo se lee por color, y por consola salen el vértice de la parábola ajustada a la panza de cada fila (el `xo` óptimo con su error), qué celdas son compatibles con el mínimo y cuánto castiga la peor posición |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
 | `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |
 | `halfstep.py` | 1.1 | prueba de la decisión de Velocity Verlet: verifica contra el motor y mide el orden que da cada una de las 4 maneras de evaluar `a(t+dt)` |

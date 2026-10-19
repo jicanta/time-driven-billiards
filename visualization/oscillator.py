@@ -9,15 +9,19 @@ la suma de las diferencias al cuadrado contra la solucion analitica sobre
 TODOS los pasos temporales, normalizada por el numero total de pasos. La
 figura va en doble logaritmica (el ECM abarca diez ordenes de magnitud) y a
 cada esquema se le ajusta una ley de potencia ECM = c dt^p por cuadrados
-minimos en log-log; el exponente va en la leyenda, porque es el que dice el
-orden del esquema (ECM ~ dt^p con error ~ dt^(p/2)).
+minimos en log-log. La leyenda nombra los cuatro esquemas y nada mas: el
+exponente del ajuste no va ahi (el enunciado pide la figura de ECM vs dt "ni
+ninguna otra informacion", y una letra suelta no se entiende sin explicarla).
+Sale por consola, esta en la diapositiva escrito como pendiente y se dice en
+la charla.
 
-Los dt en los que el ECM ya dejo de bajar se dibujan con simbolo hueco y
-quedan fuera del ajuste: ahi el error del esquema quedo por debajo del ruido
-de redondeo del doble, asi que el punto mide la precision de la aritmetica y
-no el orden del esquema. Con el barrido de este trabajo es uno solo, Verlet
-original en dt = 1e-5 s, y es justamente el paso en el que Verlet se separa
-de Beeman en la figura.
+Todos los dt medidos se dibujan iguales, con el simbolo lleno de su esquema:
+son todos mediciones y ninguno vale menos que los otros. Lo que si cambia es
+el ajuste: los dt en los que el ECM ya dejo de bajar quedan afuera, porque
+ahi el error del esquema cayo por debajo del ruido de redondeo del doble y el
+punto mide la precision de la aritmetica y no el orden del esquema. Con el
+barrido de este trabajo es uno solo, Verlet original en dt = 1e-5 s, y es
+justamente el paso en el que Verlet se separa de Beeman en la figura.
 
     python3 visualization/oscillator.py
     python3 visualization/oscillator.py --estilo diapositiva --figures data/figuras_diapositivas
@@ -36,7 +40,6 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.lines import Line2D
 
 import common
 
@@ -68,9 +71,9 @@ def converging(errors: np.ndarray) -> np.ndarray:
     redondeo del doble y el ECM deja de bajar (en Verlet original incluso
     vuelve a subir: la recurrencia resta dos numeros casi iguales). Esos
     puntos no miden el orden del esquema sino la precision de la aritmetica,
-    asi que quedan fuera del ajuste de la ley de potencia, pero SI se
-    dibujan, con simbolo hueco: son mediciones y el paso en el que aparecen
-    es parte del resultado (es donde Verlet original se separa de Beeman).
+    asi que quedan fuera del ajuste de la ley de potencia, pero se dibujan
+    como todos los demas: son mediciones y el paso en el que aparecen es
+    parte del resultado (es donde Verlet original se separa de Beeman).
     `errors` viene ordenado por dt creciente."""
     keep = np.ones(len(errors), dtype=bool)
     for index in range(len(errors) - 2, -1, -1):
@@ -164,14 +167,15 @@ def main() -> None:
         color, marker = common.SCHEME_STYLE[name]
         exponent, _ = np.polyfit(np.log(steps[keep]), np.log(errors[keep]), 1)
         exponents[name] = exponent
-        axes.plot(steps[keep], errors[keep], color=color, marker=marker,
+        # Se dibujan TODOS los dt medidos, con el mismo simbolo lleno: el que
+        # queda fuera del ajuste (Verlet original en dt = 1e-5 s, donde el ECM
+        # ya toco el piso de redondeo) es un punto mas de su serie. Que no
+        # entre en el ajuste es cosa del ajuste, no del dato, y distinguirlo
+        # en la figura obliga a explicar un simbolo extra en una diapositiva
+        # en la que el enunciado no quiere nada de mas.
+        axes.plot(steps, errors, color=color, marker=marker,
                   linestyle="--" if name == "verlet" else "-",
-                  label=f"{common.SCHEME_LABEL[name]} ($p$ = {common.decimal(exponent, 1)})")
-        # Los dt saturados se dibujan huecos: son mediciones y marcan donde
-        # el esquema toca el piso de redondeo, pero no entran en el ajuste.
-        if (~keep).any():
-            axes.plot(steps[~keep], errors[~keep], color=color, marker=marker,
-                      linestyle="none", markerfacecolor="white", zorder=5)
+                  label=common.SCHEME_LABEL[name])
         if name not in FOURTH_ORDER:
             continue
         constant = errors[keep] / steps[keep] ** 4
@@ -183,13 +187,8 @@ def main() -> None:
     axes.set_xlabel(common.AXIS_STEP)
     axes.set_ylabel(common.AXIS_ECM)
     # Los puntos suben en diagonal: la esquina superior izquierda queda libre.
-    common.headroom(axes, 0.52)
-    handles, labels = axes.get_legend_handles_labels()
-    if any(dropped for dropped in saturated.values()):
-        handles.append(Line2D([], [], marker="o", color="#777777", linestyle="none",
-                              markerfacecolor="white"))
-        labels.append("piso de redondeo (fuera del ajuste)")
-    axes.legend(handles, labels, loc="upper left")
+    common.headroom(axes, 0.45)
+    axes.legend(loc="upper left")
     out = out_dir / "ECM_vs_dt.png"
     common.save(figure, out)
     plt.close(figure)
@@ -245,8 +244,8 @@ def main() -> None:
     for name, dropped in saturated.items():
         if dropped:
             print(f"  {common.SCHEME_LABEL[name]}: el ECM deja de bajar en dt ≤ "
-                  f"{max(dropped):.0e} s ({len(dropped)} punto(s) dibujados huecos, "
-                  f"fuera del ajuste)")
+                  f"{max(dropped):.0e} s ({len(dropped)} punto(s) dibujados como todos "
+                  f"los demás, fuera del ajuste)")
     for name, dropped in outside_zoom.items():
         if dropped:
             print(f"  {common.SCHEME_LABEL[name]}: fuera de la ampliación en dt ≤ "

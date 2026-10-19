@@ -5,15 +5,31 @@ Lee data/mapa/ (un barrido de `billar explore` sobre el producto de --xos y
 sobre las realizaciones. Las celdas donde alguna realizacion no llega a la
 fraccion pedida antes de tmax quedan en blanco y se informan por consola.
 
-La respuesta del item (si la posicion que minimiza ⟨t90⟩ depende o no de la
-densidad) se lee de la banda oscura, no de una marca sobre la celda mas baja:
-con 6 realizaciones por punto el minimo de cada fila casi nunca se distingue
-de sus vecinas, asi que marcarlo haria parecer que salta entre 0,2 y 0,3
-cuando eso es ruido. El listado por consola da el error de la media de cada
-minimo y que celdas son compatibles con el.
+La figura tiene que contestar dos cosas: cual es el xo optimo y si ese optimo
+se corre con la densidad. Por eso:
+
+* El eje x es la posicion real de los obstaculos (no un eje categorico): las
+  celdas tienen el ancho del intervalo que representan, asi que una fila se
+  lee como la curva ⟨t90⟩(xo) que es, y dos filas se comparan mirando donde
+  cae la banda baja de cada una.
+* La escala de colores es logaritmica. ⟨t90⟩ crece mucho mas con N que con
+  xo (de punta a punta del mapa es un factor 6, dentro de una fila hasta 2,7):
+  en escala lineal el color lo gobierna la fila y adentro de cada fila queda
+  todo del mismo tono. En logaritmica una fila se lleva casi un tercio de la
+  barra de color y el minimo de cada densidad se ve.
+* El minimo NO se marca con un simbolo. Se lee por color, que es lo que pide
+  el item ("se representa ⟨t90⟩ en la escala de colores"), y la cuenta fina
+  va por consola: a cada fila se le ajusta una parabola sobre el mismo tramo
+  de xo y sale el vertice con su error, que es el numero con el que se
+  contesta si el optimo depende de N.
+
+El barrido que escribe `make mapa` corta cada corrida apenas Fu llega a 0,9
+(--until-fraction 0.9: esperar a que se conviertan todas cuesta el triple de
+computo y el mapa no lo usa), asi que sobre esos datos --fraccion no puede
+pasar de 0,9. Para el mapa de ⟨t100⟩ hay que correr el barrido sin ese corte.
 
     python3 visualization/heatmap.py
-    python3 visualization/heatmap.py --fraccion 1 --estilo diapositiva --figures data/figuras_diapositivas
+    python3 visualization/heatmap.py --estilo diapositiva --figures data/figuras_diapositivas
 """
 
 from __future__ import annotations
@@ -24,8 +40,29 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.colors import LinearSegmentedColormap, LogNorm
+from matplotlib.ticker import FuncFormatter
 
 import common
+
+# turbo recortada: las dos puntas del mapa original son casi negras (violeta
+# abajo, bordo arriba) y con las dos oscuras no se distingue de un vistazo
+# cual es el extremo rapido. Recortadas, el minimo es el azul mas profundo y
+# el maximo el rojo mas vivo, que es la lectura que se quiere.
+COLORS = LinearSegmentedColormap.from_list(
+    "turbo-recortada", plt.get_cmap("turbo")(np.linspace(0.10, 0.90, 256)))
+
+# Tramo de xo (en metros) sobre el que se ajusta la parabola del minimo. Es
+# el MISMO para todas las filas a proposito: si la ventana se eligiera fila
+# por fila (las vecinas de la celda mas baja, por ejemplo), el corrimiento
+# entre filas mezclaria el del optimo con el de la ventana, que es justo lo
+# que se quiere medir. Deja afuera las dos puntas, donde la curva se dispara
+# y no es parabolica, y adentro quedan 12 de las 16 posiciones.
+FIT_RANGE = (0.10, 0.40)
+# Celdas minimas para ajustar la parabola (tres parametros + una de sobra).
+MINIMUM_CELLS = 4
+# Realizaciones del remuestreo con el que se le pone error al vertice.
+RESAMPLES = 2000
 
 
 def summarize(root: Path, fraction: float):
@@ -45,6 +82,53 @@ def summarize(root: Path, fraction: float):
     return np.array(counts), np.array(offsets), grid, spread, reached
 
 
+def cell_edges(values: np.ndarray) -> np.ndarray:
+    """Bordes de las celdas de un eje de valores no equiespaciados: cada celda
+    llega hasta la mitad del camino a su vecina, y las dos de las puntas se
+    cierran con la mitad de su unico intervalo."""
+    middle = 0.5 * (values[1:] + values[:-1])
+    first = values[0] - (middle[0] - values[0])
+    last = values[-1] + (values[-1] - middle[-1])
+    return np.concatenate(([first], middle, [last]))
+
+
+def vertex(offsets: np.ndarray, values: np.ndarray, errors: np.ndarray):
+    """(xo del minimo, error) ajustando una parabola a la fila, pesada por el
+    error de cada celda, sobre el tramo FIT_RANGE.
+
+    La celda mas baja sola no sirve como respuesta: la curva ⟨t90⟩(xo) tiene
+    un fondo ancho y plano, y con el error de la media que tienen estas
+    mediciones cual de las celdas del fondo sale sorteada mas baja es en buena
+    parte azar (por eso el minimo parece saltar entre columnas al cambiar N:
+    a N = 50 cae en 0,175 m y a N = 150 en 0,275 m, y las dos filas tienen el
+    mismo vertice dentro del error). La parabola usa las 12 posiciones del
+    tramo y el vertice sale mucho mas estable que el argmin. El error es el
+    desvio del vertice sobre RESAMPLES remuestreos en los que cada celda se
+    sortea de una normal con su media y su error de la media."""
+    if np.isnan(values).any():
+        return None, None
+    window = (offsets >= FIT_RANGE[0] - 1e-9) & (offsets <= FIT_RANGE[1] + 1e-9)
+    x, y, e = offsets[window], values[window], errors[window]
+    if len(x) < MINIMUM_CELLS:
+        return None, None
+
+    def fit(sample):
+        a, b, _ = np.polyfit(x, sample, 2, w=1.0 / e)
+        return -0.5 * b / a if a > 0 else np.nan
+
+    centre = fit(y)
+    if not np.isfinite(centre):
+        return None, None
+    draws = np.array([fit(y + e * np.random.standard_normal(len(y)))
+                      for _ in range(RESAMPLES)])
+    draws = draws[np.isfinite(draws)]
+    # El remuestreo puede dar vertices fuera del tramo ajustado cuando la fila
+    # es muy plana: se recortan, para que el desvio no lo fije un ajuste
+    # degenerado.
+    draws = np.clip(draws, *FIT_RANGE)
+    return float(centre), float(np.std(draws)) if len(draws) else None
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -53,49 +137,46 @@ def main() -> None:
     common.add_common_arguments(parser)
     arguments = parser.parse_args()
     common.use_style(arguments.estilo)
+    np.random.seed(0)
 
     counts, offsets, grid, spread, reached = summarize(arguments.mapa, arguments.fraccion)
+    if np.all(np.isnan(grid)):
+        raise SystemExit(f"ninguna celda de {arguments.mapa} llega a Fu = "
+                         f"{arguments.fraccion:g}: el barrido se cortó antes (ver el campo "
+                         "'corte' del index.txt). Para pedir una fracción mayor hay que "
+                         "correrlo de nuevo sin --until-fraction.")
     out_dir = common.folder("2.4", arguments.figures)
     percent = int(round(100 * arguments.fraccion))
+    error = spread / np.sqrt(np.maximum(reached, 1.0))
 
     with open(arguments.mapa / f"mapa_{percent}.csv", "w", newline="") as handle:
         writer = csv.writer(handle)
-        writer.writerow(["N", "xo", f"t{percent}_medio", "alcanzan"])
+        writer.writerow(["N", "xo", f"t{percent}_medio", f"t{percent}_error", "alcanzan"])
         for row, count in enumerate(counts):
             for column, offset in enumerate(offsets):
-                writer.writerow([count, offset, grid[row, column], int(reached[row, column])])
+                writer.writerow([count, offset, grid[row, column], error[row, column],
+                                 int(reached[row, column])])
 
-    # Celdas de igual tamano (ejes categoricos): los N y los xo del barrido no
-    # estan igualmente espaciados y con ejes lineales las filas de N chico
-    # quedan aplastadas contra el borde.
+    # Eje x: la posicion real de los obstaculos, con las celdas del ancho del
+    # intervalo que representan (el barrido es mas fino donde esta el minimo).
+    # Eje y: una fila por N, todas del mismo alto, porque los N del barrido
+    # van de 10 a 300 y con eje lineal las filas de N chico se aplastan.
     figure, axes = plt.subplots()
     axes.grid(False)
-    mesh = axes.pcolormesh(np.arange(len(offsets) + 1) - 0.5,
-                           np.arange(len(counts) + 1) - 0.5, grid, cmap="viridis",
+    mesh = axes.pcolormesh(cell_edges(offsets), np.arange(len(counts) + 1) - 0.5, grid,
+                           cmap=COLORS, norm=LogNorm(vmin=np.nanmin(grid),
+                                                      vmax=np.nanmax(grid)),
                            shading="flat")
     bar = figure.colorbar(mesh, ax=axes)
     bar.set_label(f"$\\langle t_{{{percent}}} \\rangle$ (s)")
-    # La celda mas baja de cada fila NO se marca en la figura. Con 6
-    # realizaciones por punto casi nunca se distingue de sus vecinas (a N = 50
-    # son compatibles desde xo = 0,1 hasta 0,4), asi que un circulo sobre una
-    # sola celda afirmaria una precision que la medicion no tiene y haria
-    # parecer que el optimo salta entre 0,2 y 0,3 cuando eso es ruido. El mapa
-    # muestra la banda oscura y la lectura la hacemos nosotros. Por consola si
-    # va, con el error de la media y que celdas son compatibles con el minimo.
-    for row, count in enumerate(counts):
-        if np.all(np.isnan(grid[row])):
-            continue
-        best = int(np.nanargmin(grid[row]))
-        error = spread[row] / np.sqrt(np.maximum(reached[row], 1.0))
-        compatible = [offsets[column] for column in range(len(offsets))
-                      if not np.isnan(grid[row, column])
-                      and grid[row, column] - error[column] <= grid[row, best] + error[best]]
-        print(f"N = {count}: mínimo en xo = {offsets[best]:.4f} m, "
-              f"<t{percent}> = {grid[row, best]:.1f} ± {error[best]:.1f} s; "
-              "compatibles dentro del error: "
-              + ", ".join(f"{value:g}" for value in compatible))
-    axes.set_xticks(np.arange(len(offsets)))
-    axes.set_xticklabels([common.decimal(round(x, 4)) for x in offsets])
+    # Con escala logaritmica matplotlib rotula 10^1 y nada mas: el mapa abarca
+    # una sola decada larga y los valores se quieren leer en segundos.
+    ticks = [t for t in (10, 15, 20, 30, 40, 60, 80, 100, 150)
+             if np.nanmin(grid) <= t <= np.nanmax(grid)]
+    bar.set_ticks(ticks)
+    bar.ax.yaxis.set_minor_formatter(FuncFormatter(lambda value, _: ""))
+    bar.ax.set_yticklabels([common.decimal(t) for t in ticks])
+
     axes.set_yticks(np.arange(len(counts)))
     axes.set_yticklabels([str(int(n)) for n in counts])
     axes.set_xlabel(common.AXIS_OFFSET)
@@ -104,11 +185,69 @@ def main() -> None:
     common.save(figure, out)
     plt.close(figure)
 
+    # La lectura fina, por consola: el vertice de la parabola de cada fila (el
+    # optimo), que celdas son compatibles con el minimo y cuanto castiga la
+    # peor posicion. Nada de esto se dibuja encima del mapa.
+    best_offsets = []
+    for row, count in enumerate(counts):
+        if np.all(np.isnan(grid[row])):
+            continue
+        best = int(np.nanargmin(grid[row]))
+        compatible = [offsets[column] for column in range(len(offsets))
+                      if not np.isnan(grid[row, column])
+                      and grid[row, column] - error[row, column]
+                      <= grid[row, best] + error[row, best]]
+        centre, uncertainty = vertex(offsets, grid[row], error[row])
+        worst = int(np.nanargmax(grid[row]))
+        fitted = ("sin ajuste" if centre is None else
+                  f"ajuste parabólico xo = {centre:.3f}"
+                  + (f" ± {uncertainty:.3f} m" if uncertainty is not None else " m"))
+        if centre is not None:
+            best_offsets.append((count, centre, uncertainty))
+        print(f"N = {count:3d}: celda más baja en xo = {offsets[best]:.4f} m, "
+              f"<t{percent}> = {grid[row, best]:.1f} ± {error[row, best]:.1f} s; "
+              f"{fitted}; peor xo = {offsets[worst]:.4f} m "
+              f"({grid[row, worst] / grid[row, best]:.1f} veces el mínimo); "
+              f"compatibles con el mínimo: {len(compatible)} celdas "
+              f"({min(compatible):g}–{max(compatible):g} m)")
+
+    if len(best_offsets) > 2:
+        # Hay o no hay corrimiento del optimo con la densidad: se contesta con
+        # una recta xo(log N) pesada por el error de cada vertice. Si la
+        # pendiente es compatible con cero, el optimo no se corre dentro de lo
+        # que mide este barrido, y el promedio pesado es el unico numero que
+        # hace falta.
+        ns = np.array([n for n, *_ in best_offsets], dtype=float)
+        centres = np.array([c for _, c, _ in best_offsets])
+        errors_of = np.array([u for *_, u in best_offsets])
+        weights = 1.0 / errors_of ** 2
+        average = float(np.average(centres, weights=weights))
+        deviation = float(np.sqrt(1.0 / weights.sum()))
+        (slope, _), covariance = np.polyfit(np.log10(ns), centres, 1, w=1.0 / errors_of,
+                                            cov="unscaled")
+        print(f"óptimo promedio sobre las {len(best_offsets)} densidades: "
+              f"xo = {average:.3f} ± {deviation:.3f} m (dispersión de los vértices "
+              f"{centres.std(ddof=1):.3f} m); corrimiento con la densidad: "
+              f"{slope:+.3f} ± {np.sqrt(covariance[0, 0]):.3f} m por década de N")
+        # Que fila se aparta del promedio mas de lo que admite su error: es la
+        # forma directa de contestar si el optimo depende de la densidad sin
+        # que la respuesta dependa de haber ajustado una recta.
+        distance = np.abs(centres - average) / np.sqrt(errors_of ** 2 + deviation ** 2)
+        odd = [(n, c, d) for (n, c, _), d in zip(best_offsets, distance) if d > 2.0]
+        if odd:
+            print("  vértices que NO son compatibles con ese promedio: "
+                  + ", ".join(f"N = {n} (xo = {c:.3f} m, {d:.1f} σ)" for n, c, d in odd))
+        else:
+            print("  todas las densidades son compatibles con ese promedio "
+                  "(ninguna se aparta más de 2 σ): el óptimo no se corre con N")
+
     missing = [(counts[r], offsets[c]) for r in range(len(counts)) for c in range(len(offsets))
                if np.isnan(grid[r, c])]
     if missing:
         print(f"celdas sin valor (alguna realización no llega a {percent} %): " +
               ", ".join(f"N = {n}, xo = {x:.4f}" for n, x in missing))
+    print(f"{len(counts)} densidades x {len(offsets)} posiciones x "
+          f"{int(reached.max())} realizaciones = {int(reached.sum())} corridas")
     print(out)
     print(arguments.mapa / f"mapa_{percent}.csv")
 

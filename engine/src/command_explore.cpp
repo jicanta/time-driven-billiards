@@ -70,6 +70,13 @@ int runExplore(const Arguments& arguments) {
   const long requestedSaveEvery = arguments.integer("save-every", 0);
   const double frameStep = arguments.number("dt2", 0.0);
   const bool untilAllUsed = arguments.flag("until-all-used");
+  // Con --until-all-used la corrida se corta apenas se convierten todas las
+  // particulas: despues de eso no cambia ningun observable. --until-fraction
+  // mueve ese corte a la fraccion que de verdad se va a medir: el mapa del
+  // item 2.4.b solo usa t90, y esperar de t90 a t100 cuesta el triple de
+  // tiempo de computo (a N = 300, t90 ~ 29 s y t100 ~ 98 s) sin agregar nada
+  // a la figura.
+  const double usedFraction = arguments.number("until-fraction", 1.0);
   const std::filesystem::path root = arguments.text("dir", "../data/explore/prueba");
   const unsigned int baseSeed = billiard.seed;
   if (seeds <= 0) {
@@ -80,6 +87,9 @@ int runExplore(const Arguments& arguments) {
   }
   if (offsets.empty()) {
     throw std::invalid_argument("--xos necesita al menos un valor (numero o \"sin\")");
+  }
+  if (usedFraction <= 0.0 || usedFraction > 1.0) {
+    throw std::invalid_argument("--until-fraction tiene que estar en (0, 1]");
   }
 
   std::vector<Case> cases;
@@ -100,7 +110,8 @@ int runExplore(const Arguments& arguments) {
                                 (root / "index.txt").string());
   }
   index << std::setprecision(12) << "# tmax " << tmax << " seeds " << seeds << " dt2 "
-        << frameStep << " R " << billiard.domainRadius << " r " << billiard.radius << " k "
+        << frameStep << " corte " << (untilAllUsed ? usedFraction : 0.0) << " R "
+        << billiard.domainRadius << " r " << billiard.radius << " k "
         << billiard.stiffness << "\n"
         << "# caso N xo dt semilla carpeta\n";
 
@@ -112,6 +123,11 @@ int runExplore(const Arguments& arguments) {
                                            : requestedSaveEvery;
     WriterOptions options;
     options.frames = saveEvery > 0;
+    // Particulas usadas con las que se llega a la fraccion de corte, la misma
+    // cuenta que hace el analisis para leer t90 (ceil(f N), con un margen para
+    // el redondeo del producto).
+    const int neededUsed =
+        static_cast<int>(std::ceil(usedFraction * billiard.count - 1e-9));
     std::cout << item.name << " " << std::flush;
     for (int repeat = 0; repeat < seeds; ++repeat) {
       billiard.seed = baseSeed + static_cast<unsigned int>(repeat);
@@ -132,7 +148,7 @@ int runExplore(const Arguments& arguments) {
         if (options.frames && n % saveEvery == 0) {
           writer.writeFrame(simulation);
         }
-        if (untilAllUsed && simulation.used() == billiard.count) {
+        if (untilAllUsed && simulation.used() >= neededUsed) {
           break;
         }
       }

@@ -20,6 +20,7 @@ void printUsage() {
       << "             [--warmup 1] [--seed 1] [--dir ../data/bench]\n\n"
       << "  explore    [--ns 100] [--xos 0.0175,...|sin] [--dts 1e-4] [--seeds 5]\n"
       << "             [--seed 1] [--tmax 100] [--save-every 0] [--until-all-used]\n"
+      << "             [--until-fraction 1]\n"
       << "             [--dir ../data/explore/prueba]\n\n"
       << "  Parametros del sistema 2 (por defecto los del enunciado): --radio 0.51\n"
       << "  --r 0.0175 --m 0.025 --v0 1 --k 1e4. Los dos obstaculos fijos van en\n"
@@ -45,7 +46,10 @@ void printUsage() {
       << "  consecutivas desde --seed y escribe por corrida static.txt y las\n"
       << "  conversiones, mas un index.txt con una linea por corrida; con\n"
       << "  --save-every mayor que cero escribe tambien dynamic.txt, que es lo que\n"
-      << "  usan los items 2.1.a (energia) y 2.3 (distribucion de velocidades).\n";
+      << "  usan los items 2.1.a (energia) y 2.3 (distribucion de velocidades).\n"
+      << "  --until-all-used corta la corrida apenas se convierten todas las\n"
+      << "  particulas, y --until-fraction baja ese corte a la fraccion que se va\n"
+      << "  a medir (0.9 para un barrido del que solo se lee t90).\n";
 }
 
 }

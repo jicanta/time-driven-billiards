@@ -429,9 +429,9 @@
               obstáculos, $t_{max} = \SI{30}{\second}$, $\dtd = \SI{0.05}{\second}$,
               \textbf{10 realizaciones}.
         \item \textbf{Densidad} \cita{2.4}: las corridas del 2.1.b, extendidas
-              hasta $N = 5$, y un barrido $(x_o, N)$ con
-              $N \in \{20, 50, 100, 200, 300\}$ y 6 valores de $x_o$,
-              \textbf{6 realizaciones} por punto.
+              hasta $N = 5$, y un barrido $(x_o, N)$ con 9 densidades
+              ($N$ de 10 a 300) y 16 posiciones, \textbf{20 realizaciones} por
+              punto: 2880 corridas.
     \end{itemize}
 \end{frame}
 
@@ -441,13 +441,14 @@
 
 \begin{frame}{Sistema 1: error cuadrático medio contra el paso}
     \figbulw[0.2em]{slide-13-ECM-vs-dt.png}{%
-        \item \textbf{Beeman} y \textbf{Verlet original}: ECM $\propto \dt^{4}$, o sea
-              error $\propto \dt^{2}$. En esta escala se superponen.
-        \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$, un
-              orden menos. A $\dt = \SI{1e-4}{\second}$, ocho órdenes hasta Beeman.
+        \item \textbf{Beeman} y \textbf{Verlet original}: ECM $\propto \dt^{4}$ (pendiente
+              ajustada $4{,}0$), o sea error $\propto \dt^{2}$: se superponen.
+        \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$
+              ($2{,}0$ y $1{,}9$), un orden menos. A $\dt = \SI{1e-4}{\second}$,
+              ocho órdenes hasta Beeman.
         \item \alert{Beeman es el mejor}: menor ECM en 8 de los 9 pasos. En
               $\dt = \SI{1e-5}{\second}$ Verlet ya mide el \textbf{piso de redondeo}
-              (símbolo hueco) y queda 50 veces por encima.
+              y queda 50 veces por encima.
         \cond{$m = \SI{70}{\kilogram}$, $k = \SI{1e4}{\newton\per\meter}$, $\gamma = \SI{100}{\kilogram\per\second}$, $A = \SI{1}{\meter}$, $t_f = \SI{5}{\second}$}
     }
 \end{frame}
@@ -605,14 +606,14 @@
 
 \begin{frame}{Posición óptima para cada densidad}
     \figbulw[0.25em]{slide-27-mapa-t90-xo-N.png}{%
-        \item La banda oscura está en $x_o = 0{,}2$--$\SI{0.3}{\meter}$ en las cinco
-              densidades, y ahí el mínimo no se distingue de su vecino dentro del
-              error: \alert{no se resuelve un corrimiento con $N$}.
-        \item Los extremos son los peores, y el castigo crece con la densidad:
-              $1{,}9$ veces el mínimo a $N = 20$ y $2{,}4$ a $N = 300$.
-        \item $\mtnov$ en el mínimo pasa de $11{,}8 \pm \SI{1.9}{\second}$ a
-              $28{,}9 \pm \SI{0.8}{\second}$ entre $N = 20$ y $300$.
-        \cond{$t_{max} = \SI{100}{\second}$, 6 realizaciones; error de la media $0{,}5$--\SI{3.1}{\second}}
+        \item El valle cae en el mismo lugar en las nueve densidades: el vértice de
+              la parábola de cada fila da $x_o = 0{,}236 \pm \SI{0.002}{\meter}$ y
+              \alert{no se corre con $N$} ($-0{,}012 \pm \SI{0.008}{\meter}$ por década).
+        \item Salvo $N = 10$ ($0{,}350 \pm \SI{0.031}{\meter}$): sin choques manda el
+              parámetro de impacto (ítem 2.4.a).
+        \item La pared es lo peor, y castiga más cuanto más denso: $1{,}9$ veces el
+              mínimo a $N = 20$ y $2{,}4$ a $N = 300$.
+        \cond{$t_{max} = \SI{100}{\second}$, 16 posiciones $\times$ 9 densidades $\times$ 20 realizaciones}
     }
 \end{frame}
 
@@ -631,8 +632,8 @@
               mucho más rápido: se cruzan cerca de $N = 470$ y a $N = 600$ los eventos
               cuestan $2{,}9$ veces más.
         \item Hay un $x_o$ \alert{óptimo} en $0{,}2$--$\SI{0.3}{\meter}$:
-              \SI{14.8}{\second} contra \SI{31.2}{\second} en la pared; es el mismo
-              de $N = 20$ a $300$.
+              \SI{14.8}{\second} contra \SI{31.2}{\second} en la pared, y es el mismo
+              ($0{,}236 \pm \SI{0.002}{\meter}$) de $N = 20$ a $300$.
         \item $f(v)$ llega a Maxwell-Boltzmann en medio segundo, con
               $k_BT = \SI{12.4}{\milli\joule}$: el $m v_0^2/2$ del arranque.
         \item Con los obstáculos en el centro hay una densidad óptima, $N = 30$--$50$;

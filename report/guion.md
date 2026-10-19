@@ -73,7 +73,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 - Sistema 1: 4 esquemas, 9 pasos de 5·10⁻³ a 10⁻⁵ s. Paso temporal: N = 300 sin obstáculos, 7 pasos, verificado a N = 700 con obstáculos.
 - Costo: xo = r, N de 50 a 700, 10 realizaciones por N, contra el motor del TP3 en la misma máquina.
-- Posición de los obstáculos: 11 valores de xo con N = 100 y 20, 15 realizaciones. Velocidades: N = 100, 10 realizaciones. Densidad: las corridas del 2.1.b y un barrido (xo, N) con 6 realizaciones.
+- Posición de los obstáculos: 11 valores de xo con N = 100 y 20, 15 realizaciones. Velocidades: N = 100, 10 realizaciones. Densidad: las corridas del 2.1.b y un barrido (xo, N) de 16 posiciones × 9 densidades con 20 realizaciones por punto (2880 corridas).
 
 ## 12. Resultados (separador)
 
@@ -83,7 +83,8 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 - Beeman y Verlet original van los dos como ECM ∝ Δt⁴, o sea error de segundo orden, y en diez órdenes de magnitud se superponen. Velocity Verlet y Euler p-c van como Δt², un orden menos, por cómo evalúan a(t + Δt) (ya se explicó en la diapositiva de integración).
 - A Δt = 10⁻⁴ s hay ocho órdenes entre Beeman y Euler p-c. Beeman es el mejor: tiene el menor ECM en 8 de los 9 pasos del barrido.
-- El punto hueco de Verlet en Δt = 10⁻⁵ s es donde se separan: ahí Verlet ya no mide el error del esquema sino el piso de redondeo del doble (su recurrencia resta dos números casi iguales) y queda 50 veces por encima de Beeman. Está dibujado porque es una medición, pero fuera del ajuste, porque no mide el orden.
+- El último punto de Verlet, en Δt = 10⁻⁵ s, es donde se separan: ahí Verlet ya no mide el error del esquema sino el piso de redondeo del doble (su recurrencia resta dos números casi iguales) y queda 50 veces por encima de Beeman. Está dibujado como todos los demás, porque es una medición más; lo único que cambia es que queda fuera del ajuste, porque no mide el orden.
+- Si preguntan por las pendientes: el ajuste de la ley de potencia ECM = c Δtᵖ da p = 4,00 (Beeman), 4,02 (Verlet original), 2,04 (Velocity Verlet) y 1,92 (Euler p-c). No están en la leyenda porque el enunciado pide esa diapositiva sin más información que la figura; los números están en `data/oscilador/ecm.csv` y en la salida de `make oscilador-figuras`.
 - Si preguntan por qué Beeman y no Verlet, que en la figura se superponen: lo que los separa no es la pendiente sino la constante. Dividiendo el ECM por Δt⁴ queda 330 para Beeman y 380 para Verlet, un 15 % más de ECM con el mismo paso (la figura está en `data/figures/1_oscilador/ECM_constante_vs_dt.png`, fuera de la charla porque el enunciado pide una sola diapositiva del sistema 1).
 - Esa diferencia es toda de la fuerza que depende de la velocidad. Con γ = 0 las dos constantes dan 21000 y 21019, iguales dentro del redondeo (`make oscilador-sin-amortiguamiento`).
 
@@ -112,6 +113,21 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - Se cruzan cerca de N = 470; a N = 600 los eventos cuestan 2,9 veces más (14,8 s contra 42,3 s).
 - Las barras de desvío están dibujadas pero no se ven: la figura abarca cuatro décadas y σ/⟨t⟩ es como mucho el 4 %. Cuánto vale está escrito arriba a la izquierda.
 - Ojo si preguntan: ese 4 % es el **desvío estándar**, no una cota de cuánto se aparta la peor corrida. El rango completo (máx − mín) llega al 7 % en el paso temporal (N = 200) y al 12 % en los eventos (N = 400). Lo imprime `make bench-figuras`.
+- Si preguntan si no es poco, o si falta precisión en la medición: no falta. El cronómetro es `steady_clock` y el tiempo se escribe en milisegundos con seis decimales (resolución de nanosegundos) sobre mediciones de 1,9 a 20 s; la resolución está siete órdenes de magnitud por debajo de lo medido. Lo que hace chico al desvío es que con paso temporal fijo **todas las realizaciones de un mismo N hacen exactamente el mismo trabajo**: 600 000 pasos, el mismo barrido de 29 × 29 celdas y prácticamente los mismos contactos; lo único que cambia entre semillas son las posiciones y las direcciones iniciales. Lo que queda es ruido de la máquina, y se nota que es eso porque **baja** cuando la corrida es más larga (0,1–0,4 % de N = 400 para arriba, contra 2–3 % en las corridas de 2 s). En los eventos del TP3 el desvío es mayor (hasta 3,9 %) justamente porque ahí el trabajo sí depende de la semilla: el número de eventos cambia de una realización a otra.
+- Los números, por si los piden (promedio ± desvío sobre M = 10 realizaciones, sin la de calentamiento):
+
+  | N | paso temporal (TP4) | σ/⟨t⟩ | eventos (TP3) | σ/⟨t⟩ |
+  |---:|---:|---:|---:|---:|
+  | 50  | 1,8828 ± 0,0485 s | 2,6 % | 0,0061 ± 0,0002 s | 3,4 % |
+  | 100 | 2,6704 ± 0,0580 s | 2,2 % | 0,0430 ± 0,0005 s | 1,1 % |
+  | 200 | 4,4858 ± 0,1095 s | 2,4 % | 0,3805 ± 0,0014 s | 0,4 % |
+  | 300 | 6,4343 ± 0,0391 s | 0,6 % | 1,6356 ± 0,0280 s | 1,7 % |
+  | 400 | 8,7761 ± 0,0100 s | 0,1 % | 5,4333 ± 0,2116 s | 3,9 % |
+  | 500 | 11,4009 ± 0,0274 s | 0,2 % | 16,4279 ± 0,5369 s | 3,3 % |
+  | 600 | 14,7894 ± 0,0350 s | 0,2 % | 42,3285 ± 1,0298 s | 2,4 % |
+  | 700 | 19,9085 ± 0,0886 s | 0,4 % | — | — |
+
+  (La medición de calentamiento, la que se descarta, queda dentro del ±4,5 % del promedio en todos los N: el arranque en frío tampoco es lo que domina.)
 
 ## 18. Obstáculos en la posición óptima — `slide-18-animacion-optimo.png`
 
@@ -169,10 +185,14 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 27. Posición óptima para cada densidad — `slide-27-mapa-t90-xo-N.png`
 
-- A propósito no marcamos la celda más baja de cada fila: con 6 realizaciones por punto el mínimo casi nunca se distingue de su vecina (a N = 50 son compatibles desde xo = 0,1 hasta 0,4), así que marcarla haría parecer que el óptimo salta entre 0,2 y 0,3 cuando eso es ruido. La lectura la hacemos nosotros.
-- Lo que sí se lee es la banda oscura: está en xo = 0,2–0,3 m en las cinco densidades. Dentro del error no se resuelve un corrimiento con N; el único caso donde el mínimo queda solo es N = 300, en xo = 0,2.
-- Los extremos son siempre los peores, y el castigo crece con la densidad: 1,9 veces el óptimo a N = 20 y 2,4 a N = 300.
-- ⟨t90⟩ en el óptimo pasa de 11,8 s a 28,9 s entre N = 20 y 300.
+- El barrido es de 16 posiciones × 9 densidades × 20 realizaciones (2880 corridas): hace falta esa resolución para distinguir si el óptimo se corre con N o si es siempre el mismo.
+- El valle azul es ancho y está en el mismo lugar en las nueve filas: entre xo = 0,15 y 0,30 m, ⟨t90⟩ queda dentro del 20 % del mínimo de la fila.
+- A propósito no marcamos ninguna celda: cuál de las del fondo sale la más baja es en buena parte azar (a N = 50 cae en 0,175 m y a N = 150 en 0,275 m, y las dos tienen el mismo óptimo dentro del error). El número sale de ajustar una parábola a cada fila sobre el mismo tramo, xo = 0,10–0,40 m, y quedarse con el vértice.
+- Esos vértices dan 0,236 ± 0,002 m promediando las nueve densidades, y el corrimiento con la densidad es −0,012 ± 0,008 m por década de N: compatible con cero. **El óptimo no se corre con N**, y no es exactamente 0,2 sino 0,24 m (la mitad del radio del dominio, 0,46 R).
+- La única fila que se aparta es N = 10 (0,350 ± 0,031 m, a 3,7 σ): con tan pocas partículas casi no hay choques y la conversión la decide el parámetro de impacto de cada trayectoria, así que separar los obstáculos cubre más parámetros de impacto. Es el mismo argumento del ítem 2.4.a (con N = 1 sólo convierte si b < 3r).
+- Los extremos son siempre los peores, y cuál de los dos es peor cambia con la densidad: a N = 10 el centro y la pared cuestan lo mismo (30,1 y 29,5 s), y a N = 300 la pared es claramente peor (69,8 contra 54,3 s). El castigo de la pared crece con N: 1,9 veces el mínimo a N = 20 y 2,4 a N = 300.
+- ⟨t90⟩ en el óptimo pasa de 11,0 s (N = 10) a 29,5 s (N = 300).
+- Si preguntan por qué el barrido corta en Fu = 0,9: el mapa sólo mide t90, y seguir hasta que se convierten todas cuesta el triple de cómputo (a N = 300, t90 ≈ 29 s contra t100 ≈ 98 s de tiempo simulado). Está verificado contra una corrida completa: la conversión número 90 de la misma semilla cae exactamente en el mismo instante.
 
 ## 28. Conclusiones (separador)
 
