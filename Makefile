@@ -439,11 +439,12 @@ slides-images:
 	$(MAKE) slides-images-tikz
 	@ls $(FIGS) | wc -l
 
-# Los esquemas TikZ de las diapositivas de introduccion e implementacion
-# (report/figuras/*.tikz, los mismos que \input presentacion.tex) renderizados
-# sueltos a PNG con la misma tipografia y colores, numerados por diapositiva.
+# Los fragmentos de las diapositivas escritos en LaTeX (report/figuras/*.tikz,
+# los mismos que \input presentacion.tex: los esquemas TikZ de introduccion e
+# implementacion y la tabla de parametros) renderizados sueltos a PNG con la
+# misma tipografia y colores, numerados por diapositiva.
 TIKZ_FIGS := 02-sistema 03-modelo-pared-imagen 06-motor-uml 07-bucle-paso-temporal \
-             09-parametros-dominio
+             09-parametros-tabla 09-parametros-dominio
 slides-images-tikz:
 	mkdir -p $(DOCS)/figuras $(FIGS)
 	for f in $(TIKZ_FIGS); do \

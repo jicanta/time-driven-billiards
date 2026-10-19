@@ -111,7 +111,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - Paso temporal: siempre 600 000 pasos y costo O(N) por la celda de índice. El ajuste da t ∝ N^0,88 (la recta punteada azul).
 - Eventos (TP3): t ∝ N^3,52 (la recta punteada roja), porque cada choque rehace parte del calendario y los choques crecen con N.
 - Se cruzan cerca de N = 470; a N = 600 los eventos cuestan 2,9 veces más (14,8 s contra 42,3 s).
-- Las barras de desvío están dibujadas pero no se ven: la figura abarca cuatro décadas y σ/⟨t⟩ es como mucho el 4 %. Cuánto vale está escrito arriba a la izquierda.
+- Las barras de desvío están dibujadas pero no se ven: la figura abarca cuatro décadas y σ/⟨t⟩ es como mucho el 4 %. **Hay que decirlo**, porque ya no está escrito dentro de la figura: eran dos bloques de texto compitiendo con la leyenda. Lo imprime `make bench-figuras`.
 - Ojo si preguntan: ese 4 % es el **desvío estándar**, no una cota de cuánto se aparta la peor corrida. El rango completo (máx − mín) llega al 7 % en el paso temporal (N = 200) y al 12 % en los eventos (N = 400). Lo imprime `make bench-figuras`.
 - Si preguntan si no es poco, o si falta precisión en la medición: no falta. El cronómetro es `steady_clock` y el tiempo se escribe en milisegundos con seis decimales (resolución de nanosegundos) sobre mediciones de 1,9 a 20 s; la resolución está siete órdenes de magnitud por debajo de lo medido. Lo que hace chico al desvío es que con paso temporal fijo **todas las realizaciones de un mismo N hacen exactamente el mismo trabajo**: 600 000 pasos, el mismo barrido de 29 × 29 celdas y prácticamente los mismos contactos; lo único que cambia entre semillas son las posiciones y las direcciones iniciales. Lo que queda es ruido de la máquina, y se nota que es eso porque **baja** cuando la corrida es más larga (0,1–0,4 % de N = 400 para arriba, contra 2–3 % en las corridas de 2 s). En los eventos del TP3 el desvío es mayor (hasta 3,9 %) justamente porque ahí el trabajo sí depende de la semilla: el número de eventos cambia de una realización a otra.
 - Los números, por si los piden (promedio ± desvío sobre M = 10 realizaciones, sin la de calentamiento):
@@ -163,13 +163,14 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - A los 0,15 s el pico ya cayó a un tercio y apareció la cola de velocidades bajas; la curva de t = 30 s es el estacionario, y desde 0,5 s las curvas ya no se distinguen entre sí (por eso están éstas tres y no más).
 - Las tres son instantes exactos, cada uno con su t: el estacionario se muestra como el último cuadro guardado, no como un promedio sobre cuadros. Ese promedio se usa en la figura del ajuste, que es donde hace falta la estadística.
 - f(v) se ensancha sin que cambie E: el sistema es conservativo.
-- Las barras son el **desvío estándar entre las 30 realizaciones**, intervalo por intervalo, la misma convención que el resto de las figuras. En un instante suelto son grandes (51 % en promedio) porque cada realización reparte sus 100 partículas en 40 intervalos; por eso están dibujadas más tenues que las curvas.
+- Las barras son el **desvío estándar entre las 30 realizaciones**, intervalo por intervalo, la misma convención que el resto de las figuras, y con el mismo estilo que las de la figura del ajuste (mismo grosor, misma capucha, el color de su serie): son la misma magnitud medida igual. En un instante suelto son grandes, 51 % en promedio, porque cada realización reparte sus 100 partículas en 40 intervalos; en la estacionaria bajan al 4,8 % porque junta todos los cuadros. Esa diferencia de tamaño es la comparación, y se ve sólo si el estilo es el mismo.
 
 ## 24. Ajuste de Maxwell-Boltzmann — `slide-24-f-v-ajuste.png`
 
 - Maxwell-Boltzmann en dos dimensiones con kBT como único parámetro libre.
-- kBT = 12,41 mJ contra mv0²/2 = 12,50 mJ: −0,7 %.
-- m⟨v²⟩/2 = 12,32 mJ es un poco menor: en promedio el 1,4 % de E está en los resortes.
+- Las tres energías del análisis que pide el ítem (las imprime `make velocidades-figuras`): la inicial **½ m v0² = 12,50 mJ** (exacta: todas arrancan con |v| = v0), la del estacionario **½ m ⟨v²⟩ = 12,32 mJ** y el ajuste **kBT = 12,41 mJ**.
+- kBT contra ½ m v0²: −0,7 %. Contra ½ m ⟨v²⟩: +0,7 %. El ajuste cae entre las dos.
+- ½ m ⟨v²⟩ es 1,4 % menor que ½ m v0² porque E se conserva pero no toda es cinética: en promedio ese 1,4 % está en los resortes de los contactos. Por eso kBT, que ajusta la forma de f(v), no tiene por qué dar exactamente ninguna de las dos.
 - Acá la estacionaria junta todos los cuadros con t ≥ 10 s de las 30 realizaciones (1,2·10⁶ muestras), así que el desvío entre realizaciones baja al 4,8 % y las barras se ven como una marca sobre cada barra.
 - Si preguntan qué son las barras: el desvío estándar entre realizaciones, intervalo por intervalo, igual que en todas las demás figuras.
 
@@ -181,10 +182,10 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 26. Efecto de la densidad — `slide-26-t90-t100-vs-densidad.png`
 
-- Dos ejes y nada más, que es lo que pide el ítem: la densidad ρ = N/πR² (definida en la diapositiva de parámetros) y el tiempo de conversión. El N de cada densidad está en la tabla: ρ = 12 es N = 10, ρ = 122 es N = 100, ρ = 245 es N = 200.
-- ⟨t90⟩ ≈ 21 s de N = 10 a 50 y 23,7 s en N = 100; desde N = 200 ninguna realización llega a 0,9 en 30 s, y de ahí para arriba lo único que se puede afirmar es que el tiempo de conversión es mayor que tf: ésas son las flechas.
+- Dos ejes y nada más, que es lo que pide el ítem: la densidad ρ = N/πR² en partículas/m² (definida en la diapositiva de parámetros, con la misma unidad) y el tiempo de conversión. El N de cada densidad está en la tabla: ρ = 12 es N = 10, ρ = 122 es N = 100, ρ = 245 es N = 200.
+- ⟨t90⟩ ≈ 21 s de N = 10 a 50 y 23,7 s en N = 100; desde N = 200 ninguna realización llega a 0,9 en 30 s. Ahí **no hay tiempo de conversión que medir**, así que la escala de la densidad se corta en el último punto medido (ρ = 122) en vez de dejar abierto un tramo vacío.
 - Los símbolos blancos son los N en los que alguna realización no llegó antes de tf: a N = 5 llegó 1 de 10 y a N = 10, 5 de 10. Ahí el promedio es sólo de las que llegaron, o sea que está sesgado hacia abajo, y tiene que verse que lo está.
-- Si preguntan por qué hay menos puntos que en la figura de tiempos de ejecución: no hay menos. Están los 12 N del barrido del 2.1.b. Los de la derecha no tienen promedio porque no llega ninguna realización antes de tf, pero sí tienen cota: el tiempo de conversión es mayor que tf, y van dibujados como flecha que sale de la línea de tf = 30 s. En ⟨t90⟩ eso pasa desde N = 200 y en ⟨t100⟩ desde N = 100.
+- Si preguntan por qué hay menos puntos que en la figura de tiempos de ejecución, o por qué el eje se corta en ρ = 122 y no en 857: son los mismos 12 N del barrido del 2.1.b, pero de N = 200 para arriba ninguna realización llega al 90 % antes de tf = 30 s (en ⟨t100⟩ eso ya pasa desde N = 100), así que esas densidades no tienen tiempo de conversión. Lo que se sabe de ellas es que es mayor que tf, y eso **se dice**: dibujarlo como flecha era meter en la figura símbolos que no son datos medidos. Lo que sí está medido de ellas es Fu(tf), que va en la figura de al lado.
 - Sí hay densidad óptima, N = 30–100: es el único tramo donde llegan las 10 realizaciones y ⟨t90⟩ es mínimo. Por debajo faltan choques (con N = 1 convierte sólo el 13 %, 40 de 300 realizaciones, exactamente las de parámetro de impacto b < 3r) y por arriba se achica el camino libre.
 - Fu(tf) lo confirma: 0,58 en N = 5, máximo 0,97 en N = 30–50, 0,84 en N = 200 y 0,01 en N = 700 (el 82 % del área). Está medido y la figura está en `data/figures/2.4_densidad/Fu_tf_vs_densidad_M10.png`, fuera de la charla: ponerla como segundo eje de la figura del ítem daba cuatro escalas en un panel.
 - Si preguntan por qué no está Fu(tf) en la figura: porque el ítem pide ⟨t90⟩ y ⟨t100⟩ en función de la densidad, dos ejes; la tenemos aparte y la mostramos si quieren.

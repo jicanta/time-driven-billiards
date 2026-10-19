@@ -1,0 +1,35 @@
+% La tabla de parametros de la diapositiva "Parametros", en los tres bloques
+% que pide la devolucion del TP2 (fijos, variables y simulacion), como la del
+% TP3: simbolo y valor, angosta para que el esquema del dominio sea grande.
+%
+% Esta en un archivo aparte, igual que los esquemas TikZ, para que
+% make slides-images-tikz la renderice tambien suelta a PNG en slides-images/:
+% es el unico bloque de la charla escrito en LaTeX (no es figura ni esquema) y
+% asi en slides-images/ esta toda imagen de la presentacion, esta incluida.
+%
+% La densidad va en particulas por metro cuadrado, la misma unidad que el eje
+% de la figura del item 2.4 (visualization/common.py: AXIS_DENSITY).
+\footnotesize
+\begin{tabular}{@{}l@{\hspace{1.0em}}l@{}}
+    \toprule
+    \multicolumn{2}{@{}l}{\rotulo{Fijos}}\\
+    \midrule
+    $R$     & \SI{0.51}{\meter}\\
+    $r$     & \SI{0.0175}{\meter}\\
+    $m$     & \SI{0.025}{\kilogram}\\
+    $v_0$   & \SI{1}{\meter\per\second}\\
+    $k$     & \SI{1e4}{\newton\per\meter}\\
+    \addlinespace[0.15em]
+    \multicolumn{2}{@{}l}{\rotulo{Variables}}\\
+    \midrule
+    $N$     & $5 \ldots 700$\\
+    $\rho$  & $6 \ldots \SI{857}{\particulas\per\meter\squared}$\\
+    $x_o$   & $r \ldots R - r$\\
+    \addlinespace[0.15em]
+    \multicolumn{2}{@{}l}{\rotulo{Simulación}}\\
+    \midrule
+    $\dt$   & \SI{5e-5}{\second}\\
+    $\dtd$  & $0{,}01 \ldots \SI{0.05}{\second}$\\
+    $t_f$   & $5 \ldots \SI{100}{\second}$\\
+    \bottomrule
+\end{tabular}%

@@ -352,7 +352,7 @@ vale `m v0²/2 = 0,0125 J`.
 | `check.py` | — | validación desde los estados guardados: deriva de energía, solapamiento máximo con partículas, obstáculos y pared, y escape fuera del dominio |
 
 El nombre de cada eje es el **símbolo del enunciado con su unidad** (`N`,
-`ρ (1/m²)`, `x_o (m)`, `⟨t90⟩ (s)`, `f(v) (s/m)`), no la frase que lo
+`ρ (partículas/m²)`, `x_o (m)`, `⟨t90⟩ (s)`, `f(v) (s/m)`), no la frase que lo
 describe: el símbolo está definido en las diapositivas de observables y de
 parámetros, y así el rótulo no se come el ancho del eje. Sólo van en palabras
 los que no tienen símbolo (el tiempo de ejecución, el ECM del ajuste). El
@@ -380,11 +380,13 @@ estén en las figuras mostradas. La última diapositiva es la **declaración de 
 
 Los esquemas de las diapositivas de introducción e implementación (sistema,
 pared como partícula imagen, UML del motor, bucle del paso temporal y
-dominio) están en
+dominio) y la **tabla de parámetros** están en
 `report/figuras/*.tikz`; `presentacion.tex` los lee con `\input` y
 `make slides-images-tikz` los renderiza sueltos a PNG en `slides-images/`,
-con la misma tipografía y colores (`report/comun.tex`), así que en
-`slides-images/` está **toda** imagen que aparece en la presentación.
+con los mismos colores (`report/comun.tex`), así que en
+`slides-images/` está **toda** imagen que aparece en la presentación. La
+diapositiva de parámetros entera, tal como queda compilada, está además en
+`capturas/` (`make capturas` la recorta del PDF).
 `report/guion.md` tiene dos o tres puntos para decir en cada diapositiva.
 
 El zip de código que se entrega es el **motor de simulación** (`engine/`) más

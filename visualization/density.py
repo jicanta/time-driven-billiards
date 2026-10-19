@@ -6,14 +6,15 @@ promedia sobre las M realizaciones de cada N, con el desvio estandar como
 barra de error. La densidad es rho = N / (pi R^2).
 
 La figura del item tiene DOS ejes, que es lo que pide: la densidad y el
-tiempo de conversion. Estan TODOS los N del barrido del 2.1.b: los que no
-llegan a la fraccion antes de tf no tienen promedio, pero si cota inferior
-(el tiempo de conversion es mayor que tf), y van dibujados como tal, con una
-flecha que arranca en tf. Un eje de arriba con el N y otro a la derecha con
-Fu(tf) hacen cuatro escalas en un solo panel y el ojo no sabe cual leer; el N
-de cada densidad esta en la tabla de la consola y en densidad.csv, y Fu(tf)
-va en su propia figura (misma densidad en el eje x), que es material de
-analisis y no entra en la charla.
+tiempo de conversion. El eje de la densidad se corta donde termina el ultimo
+punto medido: de ahi para arriba ninguna realizacion llega a la fraccion
+antes de tf, asi que no hay tiempo de conversion que dibujar, y una cota
+dibujada con flechas suma simbolos que no son datos. Que esas densidades no
+tengan punto es el resultado, y lo que queda de ellas es su Fu(tf). Un eje
+de arriba con el N y otro a la derecha con Fu(tf) hacen cuatro escalas en un
+solo panel y el ojo no sabe cual leer; el N de cada densidad esta en la tabla
+de la consola y en densidad.csv, y Fu(tf) va en su propia figura (misma
+densidad en el eje x), que es material de analisis y no entra en la charla.
 
 Si para un N alguna realizacion no llega a la fraccion pedida antes de tf, el
 punto va con simbolo hueco y el promedio se toma sobre las que llegaron: es
@@ -39,10 +40,6 @@ import common
 
 FRACTIONS = [(0.9, "$\\langle t_{90} \\rangle$", common.FRESH, "o"),
              (1.0, "$\\langle t_{100} \\rangle$", common.USED, "s")]
-# Las dos series comparten las densidades en las que no llega ninguna
-# realizacion, asi que sus cotas caerian una encima de la otra: se corren un
-# 7 % en el eje (logaritmico) para que se vean las dos.
-NUDGE = 1.07
 
 
 def summarize(root: Path) -> tuple[dict, list[dict]]:
@@ -110,33 +107,21 @@ def main() -> None:
 
     figure, axes = plt.subplots()
     incomplete = False
-    final = header.get("tmax", 30.0)
-    for index, (fraction, label, color, marker) in enumerate(FRACTIONS):
+    plotted: list[float] = []
+    for fraction, label, color, marker in FRACTIONS:
         key = f"t{int(round(100 * fraction))}"
         shown = [row for row in rows if row[f"{key}_alcanzan"] > 0]
         density = np.array([row["densidad"] for row in shown])
         means = np.array([row[f"{key}_medio"] for row in shown])
         stds = np.array([row[f"{key}_desvio"] for row in shown])
         complete = np.array([row[f"{key}_alcanzan"] == row["M"] for row in shown])
+        plotted.extend(density)
         axes.errorbar(density, means, yerr=stds, color=color, marker=marker, linestyle="-",
                       label=label)
         if not complete.all():
             axes.plot(density[~complete], means[~complete], marker=marker, linestyle="none",
                       color=color, markerfacecolor="white", zorder=5, label="_nolegend_")
             incomplete = True
-        # Las densidades en las que NO llega ninguna realizacion antes de tf no
-        # tienen promedio, pero tampoco son un agujero en los datos: de ahi
-        # para arriba el tiempo de conversion es mayor que tf, y eso se sabe.
-        # Van como cota inferior, con la flecha arrancando en tf, asi estan
-        # TODOS los N del barrido del item 2.1.b en la figura: que la serie se
-        # vaya para arriba y se corte es el resultado.
-        missing = np.array([row["densidad"] for row in rows
-                            if row[f"{key}_alcanzan"] == 0])
-        if len(missing):
-            axes.errorbar(missing * NUDGE ** (2 * index - 1), np.full(len(missing), final),
-                          yerr=0.1 * final, lolims=True, color=color, marker=marker,
-                          markerfacecolor="white", linestyle="none", zorder=4,
-                          label="_nolegend_")
         best = shown[int(np.nanargmin(means))]
         print(f"{key}: mínimo en N = {best['N']} (rho = {best['densidad']:.0f} 1/m²), "
               f"{best[f'{key}_medio']:.1f} ± {best[f'{key}_desvio']:.1f} s")
@@ -145,17 +130,11 @@ def main() -> None:
     # contra el borde izquierdo.
     density_ticks(axes, rows)
     axes.set_ylabel("$\\langle t \\rangle$ (s)")
-    # Arriba entran las flechas de las cotas, que salen de tf.
-    common.headroom(axes, 0.30)
-    densities = [row["densidad"] for row in rows]
-    axes.set_xlim(0.8 * min(densities), 1.25 * max(densities))
-    # La linea de tf es de donde salen las flechas: deja claro que la cota es
-    # el horizonte de la simulacion y no un valor medido.
-    axes.axhline(final, color="#999999", linestyle=":", linewidth=1.2, zorder=1)
-    axes.annotate("$t_f$", xy=(0.012, final), xycoords=("axes fraction", "data"),
-                  va="bottom", ha="left", color="#777777",
-                  fontsize=plt.rcParams["legend.fontsize"])
-    # Arriba a la DERECHA: ahi no hay nada dibujado, asi que la leyenda no
+    # El eje se corta en el ultimo punto medido: a la derecha de ahi no hay
+    # tiempo de conversion (ninguna realizacion llega antes de tf), asi que
+    # dejar la escala abierta es dejar un hueco que no se puede llenar.
+    axes.set_xlim(0.8 * min(plotted), 1.25 * max(plotted))
+    # Abajo a la DERECHA: ahi no hay nada dibujado, asi que la leyenda no
     # tapa ningun dato. La entrada del simbolo blanco va al final: no es una
     # serie, es que significa ese simbolo.
     handles, labels = axes.get_legend_handles_labels()

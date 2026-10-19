@@ -7,6 +7,10 @@ estado estacionario. La distribucion de un instante se arma juntando los
 de error de cada intervalo es el desvio estandar entre realizaciones (cada
 realizacion da su propio histograma; la curva es el promedio de los M y la
 barra, el desvio), que es la misma convencion que el resto de las figuras.
+Las dos figuras del item dibujan esa barra con el MISMO estilo
+(common.ERRORBAR) y en el color de su serie: son la misma magnitud medida de
+la misma manera, y si una lleva capucha y la otra no, se leen como si fueran
+cosas distintas. Lo unico que cambia entre las dos es cuanto miden.
 
 La figura de la evolucion muestra INSTANTES, cada uno con su t exacto,
 incluido el ultimo: un "t >= algo" no es un instante sino un promedio sobre
@@ -128,12 +132,14 @@ def main() -> None:
         axes.step(centers, density, where="mid", color=color,
                   linewidth=2.4 if target == targets[-1] else 1.6,
                   label=f"$t$ = {common.decimal(times[frame], 2)} s")
-        # La barra, aparte y mas tenue que la curva: en un instante suelto el
-        # desvio entre realizaciones es grande (cada una reparte N = 100
-        # particulas en 40 intervalos) y si se dibuja con el mismo peso que la
-        # curva, tapa la forma de f(v), que es lo que la figura muestra.
-        axes.errorbar(centers, density, yerr=spread, color=color, linestyle="none",
-                      elinewidth=0.8, capsize=0, alpha=0.5, label="_nolegend_")
+        # La barra va aparte de la curva (la curva es el promedio sobre
+        # realizaciones y la barra, el desvio), con el estilo comun a las dos
+        # figuras del item y en el color de su instante. En un instante suelto
+        # el desvio es grande -- cada realizacion reparte N = 100 particulas
+        # en 40 intervalos -- y eso tiene que verse: es la diferencia con la
+        # estacionaria, que junta todos los cuadros.
+        axes.errorbar(centers, density, yerr=spread, color=color, zorder=2.5,
+                      label="_nolegend_", **common.ERRORBAR)
     axes.set_xlabel(common.AXIS_SPEED)
     axes.set_ylabel(common.AXIS_PDF)
     axes.set_xlim(0.0, 2.8 * static["v0"])
@@ -163,11 +169,13 @@ def main() -> None:
     figure, axes = plt.subplots()
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
              edgecolor=common.FRESH, label="simulación")
-    # La barra va en un azul bien oscuro sobre el relleno claro y con capucha:
-    # es chica (el desvio entre realizaciones es del orden del 5 % y el
-    # histograma junta un millon de muestras) y sin contraste no se ve.
-    axes.errorbar(centers, density, yerr=spread, color="#0b2d6b", linestyle="none",
-                  elinewidth=1.2, capsize=2.5, capthick=1.2, label="_nolegend_")
+    # Mismo estilo de barra que la figura de los instantes, en el color de la
+    # serie: el relleno del histograma va al 45 % y la barra a pleno, asi que
+    # sobre el azul claro se ve igual de bien. Es chica (el desvio entre
+    # realizaciones es del orden del 5 %: el histograma junta un millon de
+    # muestras) y esa es justamente la comparacion con la otra figura.
+    axes.errorbar(centers, density, yerr=spread, color=common.FRESH, zorder=2.5,
+                  label="_nolegend_", **common.ERRORBAR)
     fine = np.linspace(edges[0], edges[-1], 400)
     axes.plot(fine, common.maxwell_boltzmann(fine, thermal, mass), color=common.USED,
               linewidth=2.4, label="Maxwell-Boltzmann")

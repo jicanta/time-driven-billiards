@@ -31,10 +31,11 @@
 %
 % Las figuras se leen de slides-images/ (make slides-images), numeradas con la
 % diapositiva en la que van: son las mismas de data/figuras_diapositivas/, el
-% analisis de data/figures/ con tipografia de presentacion. Los cinco
-% esquemas (sistema, pared imagen, UML, bucle y dominio) NO entran por ahi: se
-% dibujan con \input{figuras/*.tikz}, y make slides-images-tikz los renderiza
-% ademas a PNG en slides-images/ para que ahi este toda imagen de la charla.
+% analisis de data/figures/ con tipografia de presentacion. Los cinco esquemas
+% (sistema, pared imagen, UML, bucle y dominio) y la tabla de parametros NO
+% entran por ahi: se escriben en LaTeX con \input{figuras/*.tikz}, y make
+% slides-images-tikz los renderiza ademas a PNG en slides-images/ para que ahi
+% este toda imagen de la charla.
 %
 %   make documentos        -> report/build/presentacion.pdf
 % =========================================================
@@ -345,30 +346,7 @@
 \begin{frame}{Parámetros}
     \begin{columns}[c,onlytextwidth]
         \begin{column}{0.42\textwidth}
-            \footnotesize
-            \begin{tabular}{@{}l@{\hspace{1.0em}}l@{}}
-                \toprule
-                \multicolumn{2}{@{}l}{\rotulo{Fijos}}\\
-                \midrule
-                $R$     & \SI{0.51}{\meter}\\
-                $r$     & \SI{0.0175}{\meter}\\
-                $m$     & \SI{0.025}{\kilogram}\\
-                $v_0$   & \SI{1}{\meter\per\second}\\
-                $k$     & \SI{1e4}{\newton\per\meter}\\
-                \addlinespace[0.15em]
-                \multicolumn{2}{@{}l}{\rotulo{Variables}}\\
-                \midrule
-                $N$     & $5 \ldots 700$\\
-                $\rho$  & $6 \ldots \SI{857}{\per\meter\squared}$\\
-                $x_o$   & $r \ldots R - r$\\
-                \addlinespace[0.15em]
-                \multicolumn{2}{@{}l}{\rotulo{Simulación}}\\
-                \midrule
-                $\dt$   & \SI{5e-5}{\second}\\
-                $\dtd$  & $0{,}01 \ldots \SI{0.05}{\second}$\\
-                $t_f$   & $5 \ldots \SI{100}{\second}$\\
-                \bottomrule
-            \end{tabular}\\[0.25em]
+            \input{figuras/parametros-tabla.tikz}\\[0.25em]
             {\scriptsize\color{gris}\sloppy $\rho = N/\pi R^2$: la densidad
              (ítem 2.4). $\dt$ sale de la conservación de la energía (ítem 2.1.a);
              $\dtd$ y $t_f$ van por caso.}
@@ -596,8 +574,8 @@
 \begin{frame}{Efecto de la densidad}
     \figbulw[0.3em]{slide-26-t90-t100-vs-densidad.png}{%
         \item $\mtnov \approx \SI{21}{\second}$ de $N = 10$ a $50$ y \SI{23.7}{\second}
-              en $N = 100$. Blanco: no llegan las 10. Flecha: no llega \textbf{ninguna},
-              así que $\langle t \rangle > t_f$ (desde $N = 200$ en $\mtnov$).
+              en $N = 100$. Blanco: no llegan las 10. Desde $N = 200$ no llega
+              \textbf{ninguna} en $t_f$ y la escala se corta ahí.
         \item \alert{Sí hay densidad óptima}, $N = 30$--$100$: llegan todas y $\mtnov$
               es mínimo. Abajo faltan choques (con $N = 1$ convierte el
               \SI{13}{\percent}) y arriba se achica el camino libre.

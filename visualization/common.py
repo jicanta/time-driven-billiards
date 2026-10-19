@@ -75,7 +75,7 @@ AXIS_T90 = "$\\langle t_{90} \\rangle$ (s)"
 AXIS_OFFSET = "$x_o$ (m)"
 AXIS_SPEED = "$v = |\\vec{v}|$ (m/s)"
 AXIS_PDF = "$f(v)$ (s/m)"
-AXIS_DENSITY = "$\\rho$ (1/m$^2$)"
+AXIS_DENSITY = "$\\rho$ (partículas/m$^2$)"
 AXIS_FIT_ERROR = "error cuadrático medio $E$ (s$^2$/m$^2$)"
 
 SCHEME_LABEL = {
@@ -91,6 +91,13 @@ SCHEME_STYLE = {
     "euler-pc": ("#d62728", "v"),
 }
 SCHEMES = list(SCHEME_LABEL)
+
+# Las barras de error que van DIBUJADAS APARTE de la curva (f(v): la curva es
+# el promedio sobre realizaciones y la barra, el desvio) llevan todas este
+# mismo estilo, en el color de su serie: dos figuras del mismo item con barras
+# de distinto grosor o unas con capucha y otras sin, se leen como si midieran
+# cosas distintas.
+ERRORBAR = {"linestyle": "none", "elinewidth": 1.2, "capsize": 2.5, "capthick": 1.2}
 
 FRESH = "#1f5fbf"
 USED = "#d62728"

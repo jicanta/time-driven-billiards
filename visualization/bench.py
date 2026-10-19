@@ -16,11 +16,12 @@ ajuste de cada una y no necesitan entrada propia (se ve de que serie es cada
 una por el color). El exponente se dice en la charla y esta en esta salida.
 
 El desvio estandar se dibuja igual, pero en una figura que abarca cuatro
-decadas una barra del 4 % mide un pixel: el rotulo informa el desvio relativo
-maximo, que es la unica forma de que se lea. Dice sigma/<t> y no "del valor"
-a proposito: sigma es el desvio entre realizaciones, no una cota de cuanto se
-aparta la peor. El rango completo (max - min) llega al 12 % en el barrido del
-TP3; este script lo imprime por si lo preguntan.
+decadas una barra del 4 % mide un pixel: cuanto vale lo imprime este script y
+se dice en la charla. Escrito dentro de la figura era un segundo bloque de
+texto compitiendo con la leyenda, y en una diapositiva eso se lee como dos
+leyendas. El valor que se informa es sigma/<t>, el desvio entre
+realizaciones, no una cota de cuanto se aparta la peor: el rango completo
+(max - min) llega al 12 % en el barrido del TP3 y tambien va impreso.
 
     python3 visualization/bench.py --bench data/bench/hexagonal/tiempos.txt,data/bench/tp3_hexagonal.txt \\
         --labels "paso temporal (TP4),eventos (TP3)"
@@ -139,18 +140,16 @@ def main() -> None:
         axes.set_xlabel(common.AXIS_COUNT)
         axes.set_ylabel(style["ylabel"])
         log_axes(axes, np.array(every))
+        # Una sola leyenda, la de las series. Las barras de desvio estan
+        # dibujadas pero en cuatro decadas de eje no se ven: cuanto valen se
+        # imprime abajo y se dice en la charla, que es lo que pide el
+        # enunciado ("incluyendo su desvío estándar").
         axes.legend(handles=handles, loc="lower right")
-        # Las barras de desvio estan dibujadas, pero en cuatro decadas de eje
-        # no se ven: cuanto valen va escrito, que es lo que pide el enunciado
-        # ("incluyendo su desvío estándar").
-        axes.text(0.02, 0.97, f"barras: desvío estándar de {repeats} realizaciones\n"
-                              f"($\\sigma/\\langle t \\rangle \\leq$ {100 * spread:.0f} %, "
-                              "menor que el símbolo)",
-                  transform=axes.transAxes, ha="left", va="top", color="#555555",
-                  fontsize=plt.rcParams["legend.fontsize"])
         out = out_dir / f"{style['name']}_{suffix}_M{repeats}_log.png"
         common.save(figure, out)
         plt.close(figure)
+        print(f"{style['name']}: barras = desvío estándar de {repeats} realizaciones, "
+              f"σ/⟨t⟩ ≤ {100 * spread:.0f} % (menor que el símbolo)")
         print(out)
 
     print(f"M = {repeats} realizaciones por N, más la primera medición, descartada del "
