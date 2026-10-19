@@ -179,9 +179,27 @@ las del fondo sale la más baja es azar: a `N = 50` cae en `0,175 m` y a
 ### B7. `f(v)` estacionaria: cómo juntamos las muestras
 
 > Para la distribución estacionaria juntamos **todos los cuadros con
-> `t ≥ 10 s`** de las 10 realizaciones: 4·10⁵ muestras. Los cuadros de una
-> misma realización están correlacionados entre sí. ¿Está bien juntarlos así,
-> o esperan un solo instante por realización?
+> `t ≥ 10 s`** de las 30 realizaciones. Los cuadros de una misma realización
+> están correlacionados entre sí. ¿Está bien juntarlos así, o esperan un solo
+> instante por realización?
+
+### B7b. `f(v)`: ¿lleva barras de error?
+
+> Las dos figuras del 2.3 son promedios sobre 30 realizaciones, así que les
+> pusimos barras de error: el **error de la media** sobre las realizaciones,
+> `σ/√M`, intervalo por intervalo. Pusimos el error de la media y no `σ` a
+> secas porque en un histograma `σ` mide el ruido de contar `N` partículas en
+> un intervalo —no una propiedad del sistema— y no baja aunque se corran más
+> realizaciones; lo que la figura reporta es la `f(v)` promedio, y lo que
+> hace falta saber es cuán bien se la conoce. En las otras figuras del trabajo
+> (tiempos de ejecución, `⟨t90⟩`) la barra sí es `σ`, porque ahí la dispersión
+> entre realizaciones es parte del resultado. ¿Les parece bien así, o
+> prefieren `σ` en todas por consistencia?
+
+**Lo que da**: en un instante suelto la barra es del orden del 10 % de cada
+intervalo (son `M·N = 3000` muestras repartidas en 40 intervalos); en la
+estacionaria, que junta todos los cuadros desde `t = 10 s`, es del orden del
+1 %. Por eso la del ajuste es la que tiene las barras más chicas.
 
 ### B8. El enunciado dice `m⟨v²⟩/2 = m v₀²/2`, y nos dan distinto
 

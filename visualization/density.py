@@ -3,13 +3,20 @@
 Usa las mismas corridas del item 2.1.b (`billar bench`, obstaculos en contacto
 y tf fijo): de cada realizacion saca t90 y t100 del registro de conversiones y
 promedia sobre las M realizaciones de cada N, con el desvio estandar como
-barra de error. La densidad es rho = N / (pi R^2) y en el eje de arriba va el
-N correspondiente.
+barra de error. La densidad es rho = N / (pi R^2).
+
+La figura del item tiene DOS ejes, que es lo que pide: la densidad y el
+tiempo de conversion. Un eje de arriba con el N y otro a la derecha con
+Fu(tf) hacen cuatro escalas en un solo panel y el ojo no sabe cual leer; el N
+de cada densidad esta en la tabla de la consola y en densidad.csv, y Fu(tf)
+va en su propia figura (misma densidad en el eje x), que es material de
+analisis y no entra en la charla.
 
 Si para un N alguna realizacion no llega a la fraccion pedida antes de tf, el
-punto va con simbolo hueco, el promedio se toma sobre las que llegaron y en
-resumen.csv queda cuantas llegaron y la Fu media a tf; si no llega ninguna, el
-N no tiene punto y se informa su Fu(tf).
+punto va con simbolo hueco y el promedio se toma sobre las que llegaron: es
+un promedio sesgado (solo las realizaciones afortunadas) y tiene que verse
+que lo es. Si no llega ninguna, el N no tiene punto, y lo que queda de ese
+sistema es su Fu(tf).
 
     python3 visualization/density.py
     python3 visualization/density.py --estilo diapositiva --figures data/figuras_diapositivas
@@ -23,6 +30,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.lines import Line2D
 
 import common
 
@@ -35,9 +43,10 @@ def summarize(root: Path) -> tuple[dict, list[dict]]:
     rows = []
     for name, case in cases.items():
         static = common.read_static(case["runs"][0])
+        used = [len(common.read_conversions(run)) / case["N"] for run in case["runs"]]
+        mean_used, spread_used = common.mean_std(used)
         row = {"caso": name, "N": case["N"], "R": static["R"],
-               "Fu_tf_medio": float(np.mean([len(common.read_conversions(run)) / case["N"]
-                                             for run in case["runs"]])),
+               "Fu_tf_medio": mean_used, "Fu_tf_desvio": spread_used,
                "M": len(case["runs"])}
         for fraction, *_ in FRACTIONS:
             times = [common.conversion_time(run, fraction) for run in case["runs"]]
@@ -54,7 +63,8 @@ def summarize(root: Path) -> tuple[dict, list[dict]]:
 
 def write_csv(rows: list[dict], path: Path) -> None:
     fields = ["caso", "N", "densidad", "fraccion_de_area", "M", "t90_alcanzan", "t90_medio",
-              "t90_desvio", "t100_alcanzan", "t100_medio", "t100_desvio", "Fu_tf_medio"]
+              "t90_desvio", "t100_alcanzan", "t100_medio", "t100_desvio", "Fu_tf_medio",
+              "Fu_tf_desvio"]
     with open(path, "w", newline="") as handle:
         writer = csv.writer(handle)
         writer.writerow(fields)
@@ -62,7 +72,15 @@ def write_csv(rows: list[dict], path: Path) -> None:
             writer.writerow([row["caso"], row["N"], row["densidad"], row["fraccion"], row["M"],
                              row["t90_alcanzan"], row["t90_medio"], row["t90_desvio"],
                              row["t100_alcanzan"], row["t100_medio"], row["t100_desvio"],
-                             row["Fu_tf_medio"]])
+                             row["Fu_tf_medio"], row["Fu_tf_desvio"]])
+
+
+def density_ticks(axes, rows: list[dict]) -> None:
+    """Eje x de densidad: logaritmico y rotulado en los valores medidos."""
+    axes.set_xscale("log")
+    axes.set_xticks([10, 20, 50, 100, 200, 500])
+    axes.set_xticklabels(["10", "20", "50", "100", "200", "500"])
+    axes.set_xlabel(common.AXIS_DENSITY)
 
 
 def main() -> None:
@@ -84,7 +102,7 @@ def main() -> None:
     repeats = min(row["M"] for row in rows)
 
     figure, axes = plt.subplots()
-    incomplete_labelled = False
+    incomplete = False
     for fraction, label, color, marker in FRACTIONS:
         key = f"t{int(round(100 * fraction))}"
         shown = [row for row in rows if row[f"{key}_alcanzan"] > 0]
@@ -96,56 +114,50 @@ def main() -> None:
                       label=label)
         if not complete.all():
             axes.plot(density[~complete], means[~complete], marker=marker, linestyle="none",
-                      color=color, markerfacecolor="white", zorder=5,
-                      label=None if incomplete_labelled
-                      else "hueco: no llegan todas")
-            incomplete_labelled = True
+                      color=color, markerfacecolor="white", zorder=5, label="_nolegend_")
+            incomplete = True
         best = shown[int(np.nanargmin(means))]
         print(f"{key}: mínimo en N = {best['N']} (rho = {best['densidad']:.0f} 1/m²), "
               f"{best[f'{key}_medio']:.1f} ± {best[f'{key}_desvio']:.1f} s")
-    # Por encima de cierta densidad ninguna realizacion llega a Fu = 0,9 antes
-    # de tf y el observable deja de existir: la fraccion de usadas alcanzada en
-    # tf, en el eje de la derecha, es lo que sigue informando al sistema ahi (y
-    # es lo que pide el enunciado cuando no se alcanza la fraccion).
-    right = axes.twinx()
-    right.grid(False)
-    right.plot([row["densidad"] for row in rows], [row["Fu_tf_medio"] for row in rows],
-               color="#2ca02c", marker="^", linestyle="--",
-               label=f"$F_u(t_f)$, $t_f$ = {common.decimal(header.get('tmax', 30.0))} s")
-    right.set_ylabel("fracción de usadas $F_u(t_f)$")
-    # Las dos series quedan en los dos tercios de abajo para que la leyenda
-    # entre arriba sin tapar nada (el eje derecho solo se rotula hasta 1).
-    right.set_ylim(0.0, 1.8)
-    right.set_yticks([0.0, 0.25, 0.5, 0.75, 1.0])
     # El barrido de N cubre dos decadas de densidad y los puntos donde t90
     # existe estan todos en la primera: con eje lineal quedan amontonados
     # contra el borde izquierdo.
-    axes.set_xscale("log")
-    axes.set_xticks([10, 20, 50, 100, 200, 500])
-    axes.set_xticklabels(["10", "20", "50", "100", "200", "500"])
-    axes.set_xlabel(common.AXIS_DENSITY)
+    density_ticks(axes, rows)
     axes.set_ylabel("tiempo de conversión (s)")
-    common.headroom(axes, 0.33)
-    # Arriba a la DERECHA: ahi no hay nada dibujado (<t90> y <t100> dejan de
-    # existir pasado rho ~ 130 y la curva de Fu(tf) ya viene bajando), asi que
-    # la leyenda no tapa ningun dato. Arriba a la izquierda rozaba los puntos
-    # de <t100> y el maximo de Fu(tf). Sin marco, para que no corte la grilla.
-    handles = axes.get_legend_handles_labels()
-    extra = right.get_legend_handles_labels()
-    axes.legend(handles[0] + extra[0], handles[1] + extra[1], loc="upper right",
-                frameon=False, labelspacing=0.35, handletextpad=0.5, borderaxespad=0.4)
-
-    # Eje de arriba con el N que corresponde a cada densidad.
-    top = axes.secondary_xaxis("top", functions=(lambda d: d * np.pi * domain ** 2,
-                                                 lambda n: n / (np.pi * domain ** 2)))
-    # Las marcas automaticas del eje logaritmico solo dejan 10 y 100: se
-    # rotulan los N del barrido.
-    labelled = [n for n in (10, 20, 50, 100, 200, 500) if n <= max(row["N"] for row in rows)]
-    top.set_xticks(labelled)
-    top.set_xticklabels([str(n) for n in labelled])
-    top.set_xlabel(common.AXIS_COUNT)
+    common.headroom(axes, 0.26)
+    # El eje x llega hasta la densidad mas alta simulada aunque las dos series
+    # terminen a un quinto de ahi: que no haya puntos a la derecha ES el
+    # resultado (pasado rho = 245 ninguna realizacion llega al 90 % en tf).
+    densities = [row["densidad"] for row in rows]
+    axes.set_xlim(0.8 * min(densities), 1.25 * max(densities))
+    # Arriba a la DERECHA: ahi no hay nada dibujado, asi que la leyenda no
+    # tapa ningun dato. La entrada del simbolo hueco va al final y en gris:
+    # no es una serie, es una aclaracion sobre los puntos.
+    handles, labels = axes.get_legend_handles_labels()
+    if incomplete:
+        handles.append(Line2D([], [], marker="o", color="#777777", linestyle="none",
+                              markerfacecolor="white"))
+        labels.append("hueco: no llegan todas")
+    axes.legend(handles, labels, loc="upper right", labelspacing=0.35, handletextpad=0.5)
     out = out_dir / f"t90_t100_vs_densidad_M{repeats}.png"
     common.save(figure, out)
+    plt.close(figure)
+
+    # Figura aparte (misma densidad en el eje x): la fraccion de usadas que se
+    # alcanza en tf. Es lo unico que queda del sistema donde t90 y t100 ya no
+    # existen -- de rho = 245 para arriba ninguna realizacion llega al 90 % --
+    # y es con lo que se contesta la segunda parte del item (por que hay una
+    # densidad optima). No va a la presentacion: la diapositiva lleva la
+    # figura que pide el enunciado y estos numeros se dicen.
+    figure, axes = plt.subplots()
+    axes.errorbar([row["densidad"] for row in rows], [row["Fu_tf_medio"] for row in rows],
+                  yerr=[row["Fu_tf_desvio"] for row in rows], color="#2ca02c", marker="^",
+                  linestyle="--")
+    density_ticks(axes, rows)
+    axes.set_ylabel(f"$F_u(t_f)$, $t_f$ = {common.decimal(header.get('tmax', 30.0))} s")
+    axes.set_ylim(0.0, 1.05)
+    used_figure = out_dir / f"Fu_tf_vs_densidad_M{repeats}.png"
+    common.save(figure, used_figure)
     plt.close(figure)
 
     print(f"{'N':>5} {'ρ (1/m²)':>10} {'φ':>6} {'<t90> (s)':>20} {'<t100> (s)':>20} "
@@ -156,6 +168,7 @@ def main() -> None:
               f"{row['t100_medio']:9.2f} ± {row['t100_desvio']:5.2f} ({row['t100_alcanzan']:2d}) "
               f"{row['Fu_tf_medio']:7.2f}")
     print(out)
+    print(used_figure)
     print(arguments.bench / "densidad.csv")
 
 

@@ -31,6 +31,7 @@
 #                           copia las 15 figuras y renderiza los 5 esquemas TikZ
 #   make slides-images-tikz renderiza a PNG los esquemas TikZ de las diapositivas (report/figuras)
 #   make documentos     compila report/presentacion.tex (la presentación, lee slides-images/)
+#   make capturas       PNG de diapositivas sueltas (la tabla de parametros) en capturas/
 #   make entrega        SdS_TP4_2026Q2G10S2_Codigo.zip (< 100 KB) y ..._Presentación.pdf (la beamer)
 #   make todo           oscilador + energia(+densa) + bench + obstaculos + velocidades + mapa
 #   make all            alias de todo
@@ -113,7 +114,7 @@ XO_BORDE    ?= xo0.4925
 
 # --- item 2.3 --------------------------------------------------------------
 N_VEL       ?= 100
-SEEDS_VEL   ?= 10
+SEEDS_VEL   ?= 30
 TMAX_VEL    ?= 30
 DT2_VEL     ?= 0.05
 ESTACIONARIO ?= 10
@@ -160,7 +161,7 @@ ZIP         := $(ENTREGA)_Codigo.zip
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
         densidad-figuras mapa mapa-figuras check una-particula animations youtube figuras-diapositivas \
-        slides-images slides-images-tikz documentos entrega clean-figures
+        slides-images slides-images-tikz documentos capturas entrega clean-figures
 
 all: todo
 
@@ -444,6 +445,23 @@ slides-images-tikz:
 	    $(TEXC) report/figuras/_$$n.tex --outdir $(DOCS)/figuras; \
 	    pdftoppm -r 600 -png -singlefile $(DOCS)/figuras/_$$n.pdf $(FIGS)/slide-$$f; \
 	    rm -f report/figuras/_$$n.tex; \
+	done
+
+# Capturas de diapositivas sueltas, en PNG, para pasarlas a otro lado: la
+# tabla de parametros esta escrita en LaTeX dentro de la diapositiva (no es
+# una figura aparte), asi que la unica forma de tenerla como imagen es
+# recortar la pagina del PDF ya compilado. PAGINAS son pares pagina:nombre,
+# con la pagina del PDF (que es el numero del pie mas uno, porque la portada
+# no se numera).
+CAPTURAS ?= capturas
+PAGINAS  ?= 10:slide-09-parametros
+capturas: documentos
+	mkdir -p $(CAPTURAS)
+	@for par in $(PAGINAS); do \
+	    pagina=$${par%%:*}; nombre=$${par##*:}; \
+	    pdftoppm -f $$pagina -l $$pagina -r 200 -png -singlefile \
+	        $(DOCS)/presentacion.pdf $(CAPTURAS)/$$nombre; \
+	    echo "  $(CAPTURAS)/$$nombre.png (página $$pagina)"; \
 	done
 
 # --------------------------------------------------------------------------

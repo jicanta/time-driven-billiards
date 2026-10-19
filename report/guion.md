@@ -73,7 +73,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 - Sistema 1: 4 esquemas, 9 pasos de 5·10⁻³ a 10⁻⁵ s. Paso temporal: N = 300 sin obstáculos, 7 pasos, verificado a N = 700 con obstáculos.
 - Costo: xo = r, N de 50 a 700, 10 realizaciones por N, contra el motor del TP3 en la misma máquina.
-- Posición de los obstáculos: 11 valores de xo con N = 100 y 20, 15 realizaciones. Velocidades: N = 100, 10 realizaciones. Densidad: las corridas del 2.1.b y un barrido (xo, N) de 16 posiciones × 9 densidades con 20 realizaciones por punto (2880 corridas).
+- Posición de los obstáculos: 11 valores de xo con N = 100 y 20, 15 realizaciones. Velocidades: N = 100, 30 realizaciones. Densidad: las corridas del 2.1.b y un barrido (xo, N) de 16 posiciones × 9 densidades con 20 realizaciones por punto (2880 corridas).
 
 ## 12. Resultados (separador)
 
@@ -160,28 +160,32 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 ## 23. Distribución del módulo de la velocidad — `slide-23-f-v-vs-t.png`
 
 - En t = 0 f(v) es una delta en v0 que se sale de la figura.
-- A los 0,5 s ya es indistinguible de la estacionaria.
+- A los 0,15 s el pico ya cayó a un tercio y apareció la cola de velocidades bajas; la curva de t = 30 s es el estacionario, y desde 0,5 s las curvas ya no se distinguen entre sí (por eso están éstas tres y no más).
+- Las tres son instantes exactos, cada uno con su t: el estacionario se muestra como el último cuadro guardado, no como un promedio sobre cuadros. Ese promedio se usa en la figura del ajuste, que es donde hace falta la estadística.
 - f(v) se ensancha sin que cambie E: el sistema es conservativo.
+- Las barras son el **error de la media** sobre las 30 realizaciones (σ/√M, intervalo por intervalo). En un instante suelto son del 9 % en promedio: son M·N = 3000 muestras repartidas en 40 intervalos.
 
 ## 24. Ajuste de Maxwell-Boltzmann — `slide-24-f-v-ajuste.png`
 
 - Maxwell-Boltzmann en dos dimensiones con kBT como único parámetro libre.
-- kBT = 12,42 mJ contra mv0²/2 = 12,50 mJ: −0,6 %.
+- kBT = 12,41 mJ contra mv0²/2 = 12,50 mJ: −0,7 %.
 - m⟨v²⟩/2 = 12,32 mJ es un poco menor: en promedio el 1,4 % de E está en los resortes.
+- Acá la estacionaria junta todos los cuadros con t ≥ 10 s de las 30 realizaciones (1,2·10⁶ muestras), así que el error de la media baja al 0,9 % y las barras no se llegan a ver: por eso está escrito cuánto valen.
 
 ## 25. Error cuadrático medio del ajuste — `slide-25-E-vs-kT.png`
 
 - Método de la Teórica 0: se recorre kBT en una grilla y se toma el mínimo de E(kBT).
-- El error se duplica ya en 12,2 y 12,7 mJ: el ajuste queda determinado dentro del 2 %.
+- El error se duplica ya en 12,31 y 12,53 mJ: el ajuste queda determinado dentro del 1 %.
 - "Energía térmica" es el nombre que le da el enunciado a kBT: es el único parámetro libre del ajuste, no una temperatura medida.
 
 ## 26. Efecto de la densidad — `slide-26-t90-t100-vs-densidad.png`
 
-- El eje de abajo es la densidad ρ = N/πR², que es como lo pide el enunciado, y el de arriba el N que le corresponde; ρ quedó definida en la diapositiva de parámetros.
-- ⟨t90⟩ ≈ 21 s de N = 10 a 50 y 23,7 s en N = 100; desde N = 200 ninguna realización llega a 0,9 en 30 s.
-- Sí hay densidad óptima: Fu(tf) es máxima en N = 30–50 (0,97). Sin choques cada partícula conserva su momento angular y no llega al centro (con N = 1 convierte sólo el 13 %, 40 de 300 realizaciones, exactamente las de parámetro de impacto b < 3r); con muchas, el camino libre se achica.
-- A N = 700, el 82 % del área, se convierte el 1 %.
-- Los símbolos huecos son los N en los que alguna realización no llegó antes de tf: el promedio se toma sobre las que sí llegaron y Fu(tf) está en el eje de la derecha, que es lo que pide el enunciado cuando no se alcanza la fracción.
+- Dos ejes y nada más, que es lo que pide el ítem: la densidad ρ = N/πR² (definida en la diapositiva de parámetros) y el tiempo de conversión. El N de cada densidad está en la tabla: ρ = 12 es N = 10, ρ = 122 es N = 100, ρ = 245 es N = 200.
+- ⟨t90⟩ ≈ 21 s de N = 10 a 50 y 23,7 s en N = 100; desde N = 200 ninguna realización llega a 0,9 en 30 s, y por eso las curvas se cortan aunque el eje siga: que no haya puntos a la derecha es parte del resultado.
+- Los símbolos huecos son los N en los que alguna realización no llegó antes de tf: a N = 5 llegó 1 de 10 y a N = 10, 5 de 10. Ahí el promedio es sólo de las que llegaron, o sea que está sesgado hacia abajo, y tiene que verse que lo está.
+- Sí hay densidad óptima, N = 30–100: es el único tramo donde llegan las 10 realizaciones y ⟨t90⟩ es mínimo. Por debajo faltan choques (con N = 1 convierte sólo el 13 %, 40 de 300 realizaciones, exactamente las de parámetro de impacto b < 3r) y por arriba se achica el camino libre.
+- Fu(tf) lo confirma: 0,58 en N = 5, máximo 0,97 en N = 30–50, 0,84 en N = 200 y 0,01 en N = 700 (el 82 % del área). Está medido y la figura está en `data/figures/2.4_densidad/Fu_tf_vs_densidad_M10.png`, fuera de la charla: ponerla como segundo eje de la figura del ítem daba cuatro escalas en un panel.
+- Si preguntan por qué no está Fu(tf) en la figura: porque el ítem pide ⟨t90⟩ y ⟨t100⟩ en función de la densidad, dos ejes; la tenemos aparte y la mostramos si quieren.
 
 ## 27. Posición óptima para cada densidad — `slide-27-mapa-t90-xo-N.png`
 

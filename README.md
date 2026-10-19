@@ -317,6 +317,17 @@ las realizaciones en ese cuadro; la estacionaria junta además todos los cuadros
 con `t ≥ 10 s` (promedio temporal, que para un estado estacionario es el mismo
 promedio de ensamble) y así tiene estadística suficiente para el ajuste.
 
+La figura de la evolución muestra **instantes**, cada uno con su `t` exacto
+(el último cuadro guardado hace de estacionario): un `t ≥ algo` es un promedio
+sobre cuadros, no un instante. Las dos figuras llevan barra de error por
+intervalo, y es el **error de la media** sobre las realizaciones, `σ/√M`: la
+curva es la `f(v)` promedio y lo que hace falta saber es cuán bien se la
+conoce. El `σ` entre realizaciones a secas no serviría acá, porque en un
+histograma mide el ruido de contar `N` partículas en un intervalo y no baja
+por más realizaciones que se corran (en las figuras de tiempos sí es `σ`:
+ahí la dispersión entre realizaciones es parte del resultado). Da 9 % en un
+instante suelto y 0,9 % en la estacionaria.
+
 La estacionaria se ajusta con Maxwell-Boltzmann en dos dimensiones,
 `f(v) = (m v / kT) exp(−m v²/2kT)`, con `kT` como único parámetro libre y por
 el método de la Teórica 0: se recorre `kT` en una grilla y se toma el mínimo
@@ -334,8 +345,8 @@ vale `m v0²/2 = 0,0125 J`.
 | `bench.py` | 2.1.b | tiempo de ejecución contra `N` con el desvío entre las 10 realizaciones (dibujado, y escrito en el pie porque en cuatro décadas no se ve), una serie por archivo de tiempos, ajuste `t = c Nᵃ` punteado y sin entrada propia en la leyenda, ejes doble logarítmicos |
 | `explore.py` | 2.2 | `t90` de cada corrida desde el registro de conversiones, `resumen.csv` con `⟨t90⟩ ± σ`, cuántas realizaciones llegan y `Fu(tmax)`; figura `⟨t90⟩` contra `xo` con una curva por `N`; `--fraccion 1` hace lo mismo con `t100` |
 | `conversion.py` | 2.2 | `--casos`: `Fu(t)` promedio de varios `xo` en una misma figura, con banda de `± σ` entre realizaciones y `⟨t90⟩ ± σ` marcado sobre la línea de `0,9` (es la figura que pide el ítem); `--runs` dibuja corridas sueltas como escalón, para mirar una configuración de cerca |
-| `speeds.py` | 2.3 | `f(v)` en varios instantes y la estacionaria, ajuste de Maxwell-Boltzmann por el mínimo de `E(kT)` y comparación con `m ⟨v²⟩/2` |
-| `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad desde las corridas del 2.1.b, con el `N` en el eje de arriba |
+| `speeds.py` | 2.3 | `f(v)` en varios instantes exactos (con el error de la media entre realizaciones), ajuste de Maxwell-Boltzmann de la estacionaria por el mínimo de `E(kT)` y comparación con `m ⟨v²⟩/2` |
+| `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad desde las corridas del 2.1.b, en dos ejes y nada más (hueco donde no llegan todas las realizaciones); `Fu(tf)` contra la densidad va en su propia figura |
 | `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`: eje `x` con la posición real de los obstáculos, una fila por `N` y escala de colores logarítmica (⟨t90⟩ crece más con `N` que con `xo`; en escala lineal el color lo gobierna la fila y adentro de cada una queda todo del mismo tono). Ningún símbolo encima: el mínimo se lee por color, y por consola salen el vértice de la parábola ajustada a la panza de cada fila (el `xo` óptimo con su error), qué celdas son compatibles con el mínimo y cuánto castiga la peor posición |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
 | `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |

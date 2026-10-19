@@ -427,7 +427,7 @@
               \textbf{15 realizaciones} por punto.
         \item \textbf{Distribución de velocidades} \cita{2.3}: $N = 100$ sin
               obstáculos, $t_{max} = \SI{30}{\second}$, $\dtd = \SI{0.05}{\second}$,
-              \textbf{10 realizaciones}.
+              \textbf{30 realizaciones}.
         \item \textbf{Densidad} \cita{2.4}: las corridas del 2.1.b, extendidas
               hasta $N = 5$, y un barrido $(x_o, N)$ con 9 densidades
               ($N$ de 10 a 300) y 16 posiciones, \textbf{20 realizaciones} por
@@ -563,9 +563,11 @@
     \figbul{slide-23-f-v-vs-t.png}{%
         \item En $t = 0$ todas tienen $|\vv| = v_0$: $f(v)$ es una \textbf{delta}
               que se sale de la figura.
-        \item A los \SI{0.5}{\second} ya es indistinguible de la estacionaria.
+        \item A los \SI{0.15}{\second} el pico ya cayó a un tercio y apareció la cola;
+              desde \SI{0.5}{\second} las curvas no se distinguen de la de
+              \SI{30}{\second}.
         \item El sistema es conservativo: $f(v)$ se ensancha sin que cambie $E$.
-        \cond{$N = 100$, sin obstáculos, $\dtd = \SI{0.05}{\second}$, 10 realizaciones}
+        \cond{$N = 100$, sin obstáculos, $\dtd = \SI{0.05}{\second}$, 30 realizaciones; barras: error de la media}
     }
 \end{frame}
 
@@ -573,11 +575,11 @@
     \figbul{slide-24-f-v-ajuste.png}{%
         \item $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$, con $k_BT$ como
               \textbf{único parámetro libre}.
-        \item $k_BT = \SI{12.42}{\milli\joule}$ contra
-              $m v_0^2/2 = \SI{12.50}{\milli\joule}$: \SI{-0.6}{\percent}.
+        \item \alert{$k_BT = \SI{12.41}{\milli\joule}$} contra
+              $m v_0^2/2 = \SI{12.50}{\milli\joule}$: \SI{-0.7}{\percent}.
         \item $m\langle v^2\rangle/2 = \SI{12.32}{\milli\joule}$ es un poco menor:
               en promedio el \SI{1.4}{\percent} de $E$ está en los resortes.
-        \cond{todos los cuadros con $t \geq \SI{10}{\second}$ de 10 realizaciones: $4{,}0\cdot10^{5}$ muestras}
+        \cond{todos los cuadros con $t \geq \SI{10}{\second}$ de 30 realizaciones: $1{,}2\cdot10^{6}$ muestras}
     }
 \end{frame}
 
@@ -585,21 +587,22 @@
     \figbul{slide-25-E-vs-kT.png}{%
         \item Método de la Teórica 0: se recorre $k_BT$ en una grilla y se toma el
               \textbf{mínimo} del error cuadrático medio $E(k_BT)$.
-        \item El error se duplica ya en $k_BT = 12{,}2$ y $\SI{12.7}{\milli\joule}$:
-              el ajuste queda determinado dentro del \SI{2}{\percent}.
+        \item El error se duplica ya en $k_BT = 12{,}31$ y $\SI{12.53}{\milli\joule}$:
+              el ajuste queda determinado dentro del \SI{1}{\percent}.
         \cond{el mismo conjunto de muestras que el ajuste, en 40 intervalos de $v$}
     }
 \end{frame}
 
 \begin{frame}{Efecto de la densidad}
-    \figbulw{slide-26-t90-t100-vs-densidad.png}{%
+    \figbulw[0.3em]{slide-26-t90-t100-vs-densidad.png}{%
         \item $\mtnov \approx \SI{21}{\second}$ de $N = 10$ a $50$ y \SI{23.7}{\second}
-              en $N = 100$; desde $N = 200$ ninguna llega a $0{,}9$ en \SI{30}{\second}.
-        \item \alert{Sí hay densidad óptima}: $\Fu(t_f)$ es máxima en $N = 30$--$50$
-              ($0{,}97$). Sin choques cada partícula conserva su momento angular y no
-              llega al centro: con $N = 1$ sólo convierte el \SI{13}{\percent} (300
-              realizaciones). Con muchas, el camino libre se achica.
-        \item A $N = 700$ (\SI{82}{\percent} del área) se convierte el \SI{1}{\percent}.
+              en $N = 100$. Hueco: no llegan las 10. Sin puntos a la derecha porque
+              desde $N = 200$ ($\rho = 245$) \textbf{ninguna} llega a $0{,}9$.
+        \item \alert{Sí hay densidad óptima}, $N = 30$--$100$: llegan todas y $\mtnov$
+              es mínimo. Abajo faltan choques (con $N = 1$ convierte el
+              \SI{13}{\percent}) y arriba se achica el camino libre.
+        \item $\Fu(t_f)$ lo confirma: $0{,}58$ ($N = 5$), $0{,}97$ ($N = 30$--$50$),
+              $0{,}01$ ($N = 700$).
         \cond{ítem 2.1.b: $x_o = r$, $t_f = \SI{30}{\second}$, 10 realizaciones}
     }
 \end{frame}
