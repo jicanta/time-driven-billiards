@@ -81,8 +81,17 @@ termina. Está en `make bench-figuras`, figura
 > llegan 5 de 10 realizaciones, a `N = 20` llegan 8 de 10, y **desde `N = 200`
 > no llega ninguna** (`F_u(t_f)` medio: 0,84 a `N = 200` y 0,01 a `N = 700`).
 > Informamos `⟨t90⟩` y `⟨t100⟩` donde existen, con símbolo hueco cuando no
-> llegan todas, y `F_u(t_f)` en todo el rango sobre el eje derecho.
+> llegan todas, y la escala de la densidad cortada en el último punto medido
+> (`ρ = 122`, que es `N = 100`); de ahí para arriba lo único medido es
+> `F_u(t_f)`, que tenemos en una figura aparte y decimos de palabra.
 > ¿Alcanza así, o esperan que alarguemos `t_f` sólo para este ítem?
+
+**Si preguntan por qué el eje se corta y no se ve el rango completo:** porque
+ahí no hay tiempo de conversión que graficar. Lo probamos con flechas de cota
+saliendo de `t_f` y eran doce símbolos que no son datos medidos, con la escala
+abierta hasta `ρ = 857` para que entraran. `F_u(t_f)` contra la misma densidad
+está en `data/figures/2.4_densidad/Fu_tf_vs_densidad_M10.png` y la mostramos si
+la piden.
 
 ---
 
@@ -191,9 +200,10 @@ las del fondo sale la más baja es azar: a `N = 50` cae en `0,175 m` y a
 > que esperan en un histograma, o prefieren el error de la media (`σ/√M`)?
 
 **Lo que da**: en un instante suelto el desvío es del 51 % de cada intervalo
-(cada realización reparte sus 100 partículas en 40 intervalos), y por eso en
-esa figura va dibujado más tenue que las curvas; en la estacionaria, que junta
-todos los cuadros desde `t = 10 s`, baja al 4,8 %.
+(cada realización reparte sus 100 partículas en 40 intervalos); en la
+estacionaria, que junta todos los cuadros desde `t = 10 s`, baja al 4,8 %. Las
+dos figuras dibujan la barra con el mismo estilo, justamente para que esa
+diferencia de tamaño se lea como lo que es.
 
 ### B8. El enunciado dice `m⟨v²⟩/2 = m v₀²/2`, y nos dan distinto
 
@@ -201,7 +211,7 @@ todos los cuadros desde `t = 10 s`, baja al 4,8 %.
 > simulación esas dos **no** son iguales: nos da `m⟨v²⟩/2 = 12,32 mJ` contra
 > `m v₀²/2 = 12,50 mJ`, un 1,4 % menos, porque en el estacionario parte de la
 > energía está guardada en los resortes de los contactos (el sistema conserva
-> la energía total, no la cinética). El ajuste da `k_BT = 12,42 mJ`.
+> la energía total, no la cinética). El ajuste da `k_BT = 12,41 mJ`, entre las dos.
 > ¿Es eso lo que esperan que discutamos?
 
 ### B9. Cifras significativas del error
