@@ -99,6 +99,14 @@
 % diapositiva se proyecta con el video embebido y sin link (D12 del TP2).
 \newcommand{\video}[1]{{\scriptsize\href{#1}{\texttt{\detokenize{#1}}}}}
 
+% La DECISION tomada en cada esquema, media linea gris debajo de sus
+% ecuaciones: con que velocidad se evalua a(t+dt) cuando la fuerza depende de
+% la velocidad. Es lo que distingue a un esquema de otro en este sistema (y lo
+% que explica el orden que mide la figura de ECM), asi que va al lado de cada
+% uno y no en un parrafo suelto al pie, donde habia que leerlo entero para
+% poder comparar.
+\newcommand{\decision}[1]{\text{\color{gris}\textbf{decisión:} #1}}
+
 % Figura principal a la izquierda y dos o tres vinetas cortas a la derecha:
 % la figura es lo que ocupa la diapositiva, las vinetas dicen lo que se lee.
 \newcommand{\figbul}[2]{%
@@ -282,34 +290,34 @@
                       de las posiciones: paso explícito.
                 \item Tres posiciones por partícula: $\vr(t)$ y $\vv(t)$ del
                       \textbf{mismo instante}.
+                \item \rotulo{Decisión} (oscilador): $\vv(t{+}\dt)$ \textbf{despejada}
+                      ($\vF$ lineal en $\vv$), $O(\dt^2)$.
             \end{itemize}}
         \end{column}\hfill
         \begin{column}{0.53\textwidth}
             \rotulo{Oscilador (sistema 1): además}
+            \cita{$\va(t{+}\dt)$ necesita $\vv(t{+}\dt)$: hay que elegir con cuál}
             \vspace{-0.5em}
             {\scriptsize
             \[\begin{aligned}
                 &\textbf{Velocity Verlet}\\
                 &\vr(t{+}\dt) = \vr(t) + \dt\,\vv(t) + \tfrac{\dt^2}{2}\va(t), \quad
                  \vv(t{+}\tfrac{\dt}{2}) = \vv(t) + \tfrac{\dt}{2}\va(t)\\
-                &\vv(t{+}\dt) = \vv(t{+}\tfrac{\dt}{2}) + \tfrac{\dt}{2}\va(t{+}\dt)\\[0.15em]
+                &\vv(t{+}\dt) = \vv(t{+}\tfrac{\dt}{2}) + \tfrac{\dt}{2}\va(t{+}\dt)\\
+                &\decision{la de \textbf{medio paso} $\vv(t{+}\tfrac{\dt}{2})$, $O(\dt)$:
+                            \alert{pierde un orden}}\\[0.15em]
                 &\textbf{Beeman (predictor-corrector)}\\
                 &\vr(t{+}\dt) = \vr(t) + \vv(t)\dt + \tfrac{2}{3}\va(t)\dt^2 - \tfrac{1}{6}\va(t{-}\dt)\dt^2\\
                 &\vv^{\,p}(t{+}\dt) = \vv(t) + \tfrac{3}{2}\va(t)\dt - \tfrac{1}{2}\va(t{-}\dt)\dt\\
-                &\vv(t{+}\dt) = \vv(t) + \tfrac{1}{3}\va(t{+}\dt)\dt + \tfrac{5}{6}\va(t)\dt - \tfrac{1}{6}\va(t{-}\dt)\dt\\[0.15em]
+                &\vv(t{+}\dt) = \vv(t) + \tfrac{1}{3}\va(t{+}\dt)\dt + \tfrac{5}{6}\va(t)\dt - \tfrac{1}{6}\va(t{-}\dt)\dt\\
+                &\decision{la \textbf{predicha} $\vv^{\,p}(t{+}\dt)$, $O(\dt^2)$}\\[0.15em]
                 &\textbf{Euler predictor-corrector}\\
                 &\vv^{\,p} = \vv(t) + \va(t)\dt, \quad \vr^{\,p} = \vr(t) + \vv(t)\dt\\
-                &\vv(t{+}\dt) = \vv(t) + \va(t{+}\dt)\dt, \quad \vr(t{+}\dt) = \vr(t) + \vv(t{+}\dt)\dt
+                &\vv(t{+}\dt) = \vv(t) + \va(t{+}\dt)\dt, \quad \vr(t{+}\dt) = \vr(t) + \vv(t{+}\dt)\dt\\
+                &\decision{la \textbf{de Euler} $\vv^{\,p}$, $O(\dt)$}
             \end{aligned}\]}
         \end{column}
     \end{columns}
-    \vspace{-0.1em}
-    {\footnotesize
-    En el oscilador $\vF = -k\vr - \gamma\vv$ \textbf{depende de la velocidad}:
-    $\va(t{+}\dt)$ necesita $\vv(t{+}\dt)$, y hay que elegir con qué $\vv$ evaluarla.
-    Verlet original la despeja; Beeman, la predicha, $O(\dt^2)$; \textbf{Velocity
-    Verlet}, la de medio paso, $O(\dt)$, y \alert{pierde un orden}; Euler p-c, la
-    de Euler.}
 \end{frame}
 
 
@@ -422,8 +430,8 @@
         \item \textbf{Beeman} y \textbf{Verlet original}: ECM $\propto \dt^{4}$ (pendiente
               ajustada $4{,}0$), o sea error $\propto \dt^{2}$: se superponen.
         \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$
-              ($2{,}0$ y $1{,}9$), un orden menos. A $\dt = \SI{1e-4}{\second}$,
-              ocho órdenes hasta Beeman.
+              ($2{,}0$ y $1{,}9$), un orden menos: lo paga la $\vv$ con la que
+              cada uno evalúa $\va(t{+}\dt)$.
         \item \alert{Beeman es el mejor}: menor ECM en 8 de los 9 pasos. En
               $\dt = \SI{1e-5}{\second}$ Verlet ya mide el \textbf{piso de redondeo}
               y queda 50 veces por encima.
