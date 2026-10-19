@@ -17,7 +17,8 @@
 #   make obstaculos-figuras <t90> vs xo y Fu(t) de los tres xo tipicos, en una figura
 #   make velocidades    item 2.3: N = 100 sin obstaculos, cuadros hasta el estacionario
 #   make velocidades-figuras  f(v) por instante, ajuste de Maxwell-Boltzmann y E(kT)
-#   make densidad-figuras   item 2.4.a: <t90> y <t100> vs densidad (usa las corridas de 2.1.b)
+#   make densidad       item 2.4.a: barrido de N con xo = r y tmax largo, sin corte
+#   make densidad-figuras   item 2.4.a: <t90> y <t100> vs densidad
 #   make mapa           item 2.4.b: barrido (xo, N) (el enunciado lo da como opcional; se hace)
 #                           10 densidades x 16 posiciones x 20 realizaciones, en paralelo
 #   make mapa-figuras       mapa de calor de <t90> en el plano (xo, N)
@@ -112,6 +113,26 @@ XO_CENTRO   ?= xo0.0175
 XO_OPTIMO   ?= xo0.2000
 XO_BORDE    ?= xo0.4925
 
+# --- item 2.4.a ------------------------------------------------------------
+# Barrido propio del item 2.4.a, con la catedra de acuerdo (consulta A4): no se
+# toman las corridas del 2.1.b. Esas tienen tf = 30 s fijo, y con los
+# obstaculos en contacto casi ningun N llega a Fu = 0,9 antes de ese corte (de
+# N = 200 para arriba no llega ninguna realizacion, y a N = 5 llega una sola de
+# diez, asi que el promedio sale de una muestra y ni siquiera tiene desvio).
+# Con tf = 30 s la figura no muestra ninguna densidad optima: es plana en 21 s
+# y despues se corta.
+#
+# Es la MISMA configuracion (xo = r, obstaculos en contacto) y las MISMAS
+# densidades que la columna xo = r del mapa del item 2.4.b, para que las dos
+# figuras del item hablen de lo mismo; lo que cambia es que aca no se corta en
+# Fu = 0,9, asi que la corrida sigue hasta convertirlas TODAS y se miden t90 y
+# t100 de la misma corrida.
+NS_DENSIDAD    ?= 5,10,20,30,50,70,100,150,200,300
+TMAX_DENSIDAD  ?= 300
+SEEDS_DENSIDAD ?= 20
+JOBS_DENSIDAD  ?= 7
+DENSIDAD       := data/densidad
+
 # --- item 2.3 --------------------------------------------------------------
 N_VEL       ?= 100
 SEEDS_VEL   ?= 30
@@ -167,7 +188,7 @@ ZIP         := $(ENTREGA)_Codigo.zip
         energia energia-figuras energia-densa \
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
-        densidad-figuras mapa mapa-figuras check una-particula animations youtube figuras-diapositivas \
+        densidad densidad-figuras mapa mapa-figuras check una-particula animations youtube figuras-diapositivas \
         slides-images slides-images-tikz documentos capturas entrega clean-figures
 
 all: todo
@@ -349,6 +370,17 @@ mapa: build
 	        --seed $(SEED0) --tmax $(TMAX_MAPA) --until-all-used --until-fraction 0.9 \
 	        --dir $(MAPA)/n$$0_xo$$1 > /dev/null'
 
+# Un proceso por N y los grandes primero, que son los caros. Sin cuadros: de
+# estas corridas solo se leen los events.txt (el instante de cada conversion).
+densidad: build
+	rm -rf $(DENSIDAD)
+	@mkdir -p $(DENSIDAD)
+	@for n in $(subst $(COMMA), ,$(NS_DENSIDAD)); do printf '%s\n' "$$n"; done \
+	    | sort -k1,1nr | xargs -P $(JOBS_DENSIDAD) -n 1 sh -c \
+	    '$(BILLAR) explore --ns $$0 --xos $(XO_CENTRO_V) --dts $(DT) \
+	        --seeds $(SEEDS_DENSIDAD) --seed $(SEED0) --tmax $(TMAX_DENSIDAD) \
+	        --until-all-used --dir $(DENSIDAD)/n$$0 > /dev/null'
+
 mapa-figuras:
 	$(PY) visualization/heatmap.py
 	$(PY) visualization/heatmap.py --figures $(SLIDES) --estilo diapositiva
@@ -422,8 +454,8 @@ clean-figures:
 slides-images:
 	rm -rf $(FIGS) && mkdir -p $(FIGS)
 	cp $(SLIDES)/1_oscilador/ECM_vs_dt.png                                          $(FIGS)/slide-13-ECM-vs-dt.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/energia_vs_t_N$(N_ENERGIA).png                  $(FIGS)/slide-14-energia-vs-t.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/deriva_vs_dt_N$(N_ENERGIA).png                  $(FIGS)/slide-15-deriva-vs-dt.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/error_energia_vs_t_N$(N_ENERGIA).png            $(FIGS)/slide-14-error-energia-vs-t.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/error_maximo_vs_dt_N$(N_ENERGIA).png            $(FIGS)/slide-15-error-maximo-vs-dt.png
 	cp $(SLIDES)/animaciones/cuadro_centro_t$(CUADRO).png                           $(FIGS)/slide-16-animacion-centro.png
 	cp $(SLIDES)/2.1_paso_y_tiempos/tiempo_total_vs_N_paradigmas_M$(REPEATS)_log.png $(FIGS)/slide-17-tiempo-ejecucion-vs-N.png
 	cp $(SLIDES)/animaciones/cuadro_optimo_t$(CUADRO).png                           $(FIGS)/slide-18-animacion-optimo.png
@@ -434,7 +466,7 @@ slides-images:
 	cp $(SLIDES)/2.3_velocidades/f_v_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png               $(FIGS)/slide-23-f-v-vs-t.png
 	cp $(SLIDES)/2.3_velocidades/f_v_estacionaria_ajuste_N$(N_VEL)_M$(SEEDS_VEL).png $(FIGS)/slide-24-f-v-ajuste.png
 	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-25-E-vs-kT.png
-	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(REPEATS).png                  $(FIGS)/slide-26-t90-t100-vs-densidad.png
+	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(SEEDS_DENSIDAD).png           $(FIGS)/slide-26-t90-t100-vs-densidad.png
 	cp $(SLIDES)/2.4_densidad/mapa_t90_xo_N.png                                     $(FIGS)/slide-27-mapa-t90-xo-N.png
 	$(MAKE) slides-images-tikz
 	@ls $(FIGS) | wc -l

@@ -60,15 +60,17 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 ## 9. Parámetros — `slide-09-parametros-dominio.png`
 
 - La tabla va en tres bloques. **Fijos**, lo que no se toca en todo el trabajo: R = 0,51 m, r = 0,0175 m, m = 0,025 kg, v0 = 1 m/s y k = 10⁴ N/m.
-- **Variables**, lo que se barre: N de 5 a 700, la densidad ρ = N/πR² que le corresponde (de 6 a 857 partículas por m², es el mismo barrido contado por unidad de área, y es el parámetro con el que el ítem 2.4 pide los resultados), y xo de r (obstáculos en contacto entre sí) a R − r (en contacto con la pared).
-- **Simulación**, lo que fija la integración y no el sistema: Δt = 5·10⁻⁵ s, que se elige en Resultados por conservación de la energía, más Δt₂ y t_f, que van por caso y están en la diapositiva siguiente.
+- **Variables**, lo que se barre, escrito como **intervalo entre corchetes** porque es un rango recorrido y no una lista de valores sueltos: N ∈ [5, 700], la densidad ρ = N/πR² que le corresponde, ρ ∈ [6, 857] partículas/m² (el mismo barrido contado por unidad de área, y el parámetro con el que el ítem 2.4 pide los resultados), y xo ∈ [r, R − r], de obstáculos en contacto entre sí a obstáculos contra la pared.
+- **Simulación**: Δt = 5·10⁻⁵ s, que no es del sistema sino de la integración, y que se elige en Resultados por conservación de la energía.
+- El paso de guardado y el t_f **no están en la tabla**: van por caso, según qué mide cada figura, y están en la línea de condiciones de la figura que los usa. Si preguntan: 0,01 s para la energía, 0,05 s para f(v), 0,04 s para las animaciones, y los barridos grandes no guardan cuadros.
 - πR² = 0,817 m², la misma área que la mesa del TP3: igual densidad a igual N.
 
 ## 10. Observables
 
-- Conversión: Fu(t) = Nu/N, y t90 y t100 en el instante exacto de cada conversión.
-- Energía total sobre los estados guardados (cinética más elástica) y la deriva relativa máxima D(Δt), un escalar por paso.
-- f(v) en 40 intervalos con las N partículas de las M realizaciones; para el sistema 1, el ECM contra la solución analítica. Las barras de error son el desvío estándar entre realizaciones.
+- Conversión: Fu(t) = Nu/N. **t_x es el instante en que la conversión llega al x %**, el que cumple Fu(t_x) = x/100; medimos t90 y t100, que son ese t_x con x = 90 y x = 100. Decirlo así, con la definición general primero: los dos observables del trabajo son el mismo con distinto x.
+- Energía total (cinética más elástica de los contactos), y su **error relativo en porcentaje** ε(t) = 100·(E(t) − E0)/E0. El escalar que resume cada corrida es ε_máx = máx|ε(t)|, un número por Δt.
+- f(v) en 40 intervalos, **un solo histograma por bolsa**: todos los |v| de las N partículas de las M realizaciones juntos. Para el sistema 1, el ECM contra la solución analítica.
+- Promedios sobre M realizaciones, con el **desvío estándar** entre ellas como barra de error (no el error de la media σ/√M).
 
 ## 11. Casos estudiados
 
@@ -89,17 +91,19 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - Si preguntan por qué Beeman y no Verlet, que en la figura se superponen: lo que los separa no es la pendiente sino la constante. Dividiendo el ECM por Δt⁴ queda 330 para Beeman y 380 para Verlet, un 15 % más de ECM con el mismo paso (la figura está en `data/figures/1_oscilador/ECM_constante_vs_dt.png`, fuera de la charla porque el enunciado pide una sola diapositiva del sistema 1).
 - Esa diferencia es toda de la fuerza que depende de la velocidad. Con γ = 0 las dos constantes dan 21000 y 21019, iguales dentro del redondeo (`make oscilador-sin-amortiguamiento`).
 
-## 14. Energía total contra el tiempo — `slide-14-energia-vs-t.png`
+## 14. Conservación de la energía — `slide-14-error-energia-vs-t.png`
 
-- E0 = 3,75 J y el sistema es conservativo: todo lo que se aparta es error del integrador.
-- 5·10⁻⁴ s deriva 2,6 % y 2·10⁻⁴ s un 0,6 % (hacia abajo); de 10⁻⁴ s para abajo no se distinguen de E0.
-- Son 3 de los 7 Δt medidos, los que se leen en una misma escala: uno que deriva hacia arriba, uno hacia abajo y el que se queda sobre E0. Δt = 10⁻³ s se dispara hasta 45 J y aplastaría a todas las demás contra E0 (el choque dura 3,5 ms y entran sólo tres pasos); 10⁻⁴, 2·10⁻⁵ y 10⁻⁵ s caen encima de 5·10⁻⁵ y no se distinguen. El barrido completo está en la figura de la deriva, que es la que elige el paso.
+- E0 = 3,75 J y el sistema es conservativo: todo lo que se aparta es error del integrador. El eje **no es la energía en Joule sino cuánto se aparta, en porcentaje**: así el número del eje es el número de la frase con la que se elige el paso ("me quedo con éste porque el error es menor que tanto por ciento").
+- El cero es la conservación exacta y está **en el medio** de la figura: las curvas que se van hacia arriba de un lado, las que se van hacia abajo del otro. En Joule la referencia era una recta de E0 contra el borde de abajo y había que medir la separación a ojo.
+- 5·10⁻⁴ s se va al 2,6 % y 2·10⁻⁴ s al −0,6 %; 5·10⁻⁵ s se queda en el 0,04 %.
+- Son 3 de los 7 Δt medidos, los que se leen en una misma escala. Δt = 10⁻³ s llega al **1100 %** y aplastaría a todas las demás contra el cero (el choque dura 3,5 ms y entran sólo tres pasos); 10⁻⁴, 2·10⁻⁵ y 10⁻⁵ s caen encima del elegido. El barrido completo está en la figura siguiente, que es la que elige el paso.
 
-## 15. Elección del paso: deriva relativa máxima — `slide-15-deriva-vs-dt.png`
+## 15. Elección del paso: error máximo — `slide-15-error-maximo-vs-dt.png`
 
-- D(Δt) resume cada corrida en un número; sobre los pasos estables ajusta Δt^2,0, el segundo orden de Verlet.
-- Criterio: el Δt más largo con D ≤ 10⁻³, el más barato con el error aceptado.
-- Queda Δt = 5·10⁻⁵ s: D = 3,8·10⁻⁴, y 2,6·10⁻⁴ en el caso más exigente, N = 700 con obstáculos.
+- ε_máx(Δt) resume cada corrida en un número; sobre los pasos estables ajusta Δt^2,0.
+- Criterio: el Δt más largo con ε_máx ≤ 0,1 %, el más barato con el error aceptado. La cota va en gris punteado porque es el criterio, no un resultado; el rojo queda para el único dato que la figura señala, el paso elegido.
+- **La frase**: para que el error de la energía quede por debajo del 0,1 % hace falta Δt = 5·10⁻⁵ s. Da 0,04 %, y 0,03 % en el caso más exigente del trabajo, N = 700 con obstáculos.
+- Si preguntan por el exponente 2,0: es el orden del esquema. No hace falta nombrar a Verlet acá, ya se dijo en la diapositiva de integración.
 
 ## 16. Obstáculos en el centro — `slide-16-animacion-centro.png`
 
@@ -109,8 +113,9 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 17. Tiempo de ejecución contra N — `slide-17-tiempo-ejecucion-vs-N.png`
 
-- Paso temporal: siempre 600 000 pasos y costo O(N) por la celda de índice. El ajuste da t ∝ N^0,88 (la recta punteada azul).
-- Eventos (TP3): t ∝ N^3,52 (la recta punteada roja), porque cada choque rehace parte del calendario y los choques crecen con N.
+- Paso temporal: **t ∝ N^0,88**, casi lineal; siempre 600 000 pasos y costo O(N) por la celda de índice. La recta punteada azul es ese ajuste.
+- Eventos (TP3): **t ∝ N^3,52** (la recta punteada roja), porque cada choque rehace parte del calendario y los choques crecen con N.
+- Los dos exponentes están **escritos en las viñetas**: si se dibuja la recta de regresión hay que decir qué pendiente dio.
 - Se cruzan cerca de N = 470; a N = 600 los eventos cuestan 2,9 veces más (14,8 s contra 42,3 s).
 - Las barras de desvío están dibujadas pero no se ven: la figura abarca cuatro décadas y σ/⟨t⟩ es como mucho el 4 % (3,9 %, en los eventos a N = 400). En log, una barra del 4 % mide unos 5 píxeles contra 21 del símbolo: queda adentro del marcador. Y es el **desvío**, no el error de la media: con σ/√10 sería 3,2 veces más chica todavía. **Hay que decirlo**, porque ya no está escrito dentro de la figura: eran dos bloques de texto compitiendo con la leyenda. Lo imprime `make bench-figuras`.
 - Ojo si preguntan: ese 4 % es el **desvío estándar**, no una cota de cuánto se aparta la peor corrida. El rango completo (máx − mín) llega al 7 % en el paso temporal (N = 200) y al 12 % en los eventos (N = 400). Lo imprime `make bench-figuras`.
@@ -164,7 +169,8 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - A los 0,15 s el pico ya cayó a un tercio y apareció la cola de velocidades bajas; la curva de t = 30 s es el estacionario, y desde 0,5 s las curvas ya no se distinguen entre sí (por eso están éstas tres y no más).
 - Las tres son instantes exactos, cada uno con su t: el estacionario se muestra como el último cuadro guardado, no como un promedio sobre cuadros. Ese promedio se usa en la figura del ajuste, que es donde hace falta la estadística.
 - f(v) se ensancha sin que cambie E: el sistema es conservativo.
-- Las barras son el **desvío estándar entre las 30 realizaciones**, intervalo por intervalo, la misma convención que el resto de las figuras, y con el mismo estilo que las de la figura del ajuste (mismo grosor, misma capucha, el color de su serie): son la misma magnitud medida igual. En un instante suelto son grandes, 51 % en promedio, porque cada realización reparte sus 100 partículas en 40 intervalos; en la estacionaria bajan al 4,8 % porque junta todos los cuadros. Esa diferencia de tamaño es la comparación, y se ve sólo si el estilo es el mismo.
+- Cada curva es **un solo histograma de una bolsa**: los |v| de las 100 partículas de las 30 realizaciones de ese instante, todos juntos, 3000 muestras. No es el promedio de 30 histogramas con su desvío como barra: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y promediarlos con barras del 51 % tapaba la forma de f(v), que es lo que la figura muestra. Decir cuántas realizaciones y cuántas muestras entran en la bolsa: está en la línea de condiciones.
+- Si preguntan por el desvío entre realizaciones: se mide y lo imprime `make velocidades-figuras` (51 % en un instante suelto, 4,8 % en la estacionaria), pero no se dibuja.
 
 ## 24. Ajuste de Maxwell-Boltzmann — `slide-24-f-v-ajuste.png`
 
@@ -172,32 +178,33 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - Las tres energías del análisis que pide el ítem (las imprime `make velocidades-figuras`): la inicial **½ m v0² = 12,50 mJ** (exacta: todas arrancan con |v| = v0), la del estacionario **½ m ⟨v²⟩ = 12,32 mJ** y el ajuste **kBT = 12,41 mJ**.
 - kBT contra ½ m v0²: −0,7 %. Contra ½ m ⟨v²⟩: +0,7 %. El ajuste cae entre las dos.
 - ½ m ⟨v²⟩ es 1,4 % menor que ½ m v0² porque E se conserva pero no toda es cinética: en promedio ese 1,4 % está en los resortes de los contactos. Por eso kBT, que ajusta la forma de f(v), no tiene por qué dar exactamente ninguna de las dos.
-- Acá la estacionaria junta todos los cuadros con t ≥ 10 s de las 30 realizaciones (1,2·10⁶ muestras), así que el desvío entre realizaciones baja al 4,8 % y las barras se ven como una marca sobre cada barra.
-- Si preguntan qué son las barras: el desvío estándar entre realizaciones, intervalo por intervalo, igual que en todas las demás figuras.
+- La bolsa del estacionario: **30 realizaciones × 401 cuadros (t ≥ 10 s) × 100 partículas = 1,2·10⁶ muestras**, un solo histograma de 40 intervalos y área 1. Decir los tres factores: es de donde sale que la curva se superponga tan bien con Maxwell-Boltzmann.
+- Los cuadros de una misma realización están correlacionados entre sí; igual se juntan, porque lo que hace falta acá es la forma de f(v) en el estacionario y el promedio temporal de un estado estacionario es el mismo promedio de ensamble.
 
 ## 25. Error cuadrático medio del ajuste — `slide-25-E-vs-kT.png`
 
 - Método de la Teórica 0: se recorre kBT en una grilla y se toma el mínimo de E(kBT).
-- El error se duplica ya en 12,31 y 12,53 mJ: el ajuste queda determinado dentro del 1 %.
+- **El ancho del mínimo es el error del ajuste**, que es lo que esta figura agrega: E se duplica ya en 12,31 y 12,53 mJ, o sea kBT = 12,41 ± 0,11 mJ, un 0,9 %. Es la forma de ponerle error a un ajuste de un parámetro sin más que la curva E(parámetro).
 - "Energía térmica" es el nombre que le da el enunciado a kBT: es el único parámetro libre del ajuste, no una temperatura medida.
 
 ## 26. Efecto de la densidad — `slide-26-t90-t100-vs-densidad.png`
 
-- Dos ejes y nada más, que es lo que pide el ítem: la densidad ρ = N/πR² en partículas/m² (definida en la diapositiva de parámetros, con la misma unidad) y el tiempo de conversión. El N de cada densidad está en la tabla: ρ = 12 es N = 10, ρ = 122 es N = 100, ρ = 245 es N = 200.
-- ⟨t90⟩ ≈ 21 s de N = 10 a 50 y 23,7 s en N = 100; desde N = 200 ninguna realización llega a 0,9 en 30 s. Ahí **no hay tiempo de conversión que medir**, así que la escala de la densidad se corta en el último punto medido (ρ = 122) en vez de dejar abierto un tramo vacío.
-- Los símbolos blancos son los N en los que alguna realización no llegó antes de tf: a N = 5 llegó 1 de 10 y a N = 10, 5 de 10. Ahí el promedio es sólo de las que llegaron, o sea que está sesgado hacia abajo, y tiene que verse que lo está.
-- **Si preguntan por qué dos puntos no tienen barra de error**: porque son promedio de **una sola** realización, y el desvío entre realizaciones necesita dos. Son el de más a la izquierda (ρ = 6, N = 5: llegó 1 de 10, y con 5 partículas el 90 % y el 100 % son lo mismo, por eso las dos series caen en el mismo punto, 9,26 s) y el último cuadrado rojo (ρ = 61, N = 50: al 90 % llegaron las 10, pero a convertirlas todas llegó 1). No es que el desvío sea chico: no hay dispersión que medir con una muestra. Los dos ya van con símbolo hueco, que es lo mismo que dice la leyenda.
-- Si preguntan por qué hay menos puntos que en la figura de tiempos de ejecución, o por qué el eje se corta en ρ = 122 y no en 857: son los mismos 12 N del barrido del 2.1.b, pero de N = 200 para arriba ninguna realización llega al 90 % antes de tf = 30 s (en ⟨t100⟩ eso ya pasa desde N = 100), así que esas densidades no tienen tiempo de conversión. Lo que se sabe de ellas es que es mayor que tf, y eso **se dice**: dibujarlo como flecha era meter en la figura símbolos que no son datos medidos. Lo que sí está medido de ellas es Fu(tf), que va en la figura de al lado.
-- Sí hay densidad óptima, N = 30–100: es el único tramo donde llegan las 10 realizaciones y ⟨t90⟩ es mínimo. Por debajo faltan choques (con N = 1 convierte sólo el 13 %, 40 de 300 realizaciones, exactamente las de parámetro de impacto b < 3r) y por arriba se achica el camino libre.
-- Fu(tf) lo confirma: 0,58 en N = 5, máximo 0,97 en N = 30–50, 0,84 en N = 200 y 0,01 en N = 700 (el 82 % del área). Está medido y la figura está en `data/figures/2.4_densidad/Fu_tf_vs_densidad_M10.png`, fuera de la charla: ponerla como segundo eje de la figura del ítem daba cuatro escalas en un panel.
-- Si preguntan por qué no está Fu(tf) en la figura: porque el ítem pide ⟨t90⟩ y ⟨t100⟩ en función de la densidad, dos ejes; la tenemos aparte y la mostramos si quieren.
+- Dos ejes y nada más, que es lo que pide el ítem: la densidad ρ = N/πR² en partículas/m² (definida en la diapositiva de parámetros, con la misma unidad) y el tiempo de conversión. El N de cada densidad, por si lo piden: ρ = 6 es N = 5, ρ = 24 es N = 20, ρ = 86 es N = 70, ρ = 367 es N = 300.
+- **Las dos curvas son una U y hay densidad óptima.** ⟨t90⟩ baja de 66,3 ± 40,3 s en ρ = 6 hasta 21,8 ± 3,0 s en ρ = 86 (N = 70) y vuelve a subir a 54,3 ± 3,7 s en ρ = 367 (N = 300).
+- El fondo es **ancho**: de ρ = 24 a 86 (N = 20 a 70) las cuatro densidades dan 22,0, 22,6, 22,3 y 21,8 s, todas iguales dentro del desvío. El óptimo es ese tramo, no un punto.
+- Por qué sube de los dos lados. **Abajo** faltan choques: sin choques cada partícula conserva el momento angular respecto del centro y sólo convierte si su parámetro de impacto es b < 3r (medido: con N = 1 convierten 40 de 300 realizaciones, el 13 %). **Arriba** se achica el camino libre y el blanco queda rodeado por las demás partículas.
+- ⟨t100⟩ tiene la misma forma pero el mínimo más abajo, en ρ = 24 (36,3 ± 9,6 s), y crece mucho más rápido: 135,0 ± 19,7 s en ρ = 367. El **último 10 %** es el que más castiga la densidad alta, porque las que faltan son justamente las que quedaron en las órbitas que no pasan por el blanco.
+- **Este barrido es propio del ítem, no son las corridas del 2.1.b**, y lo consultamos. Las del 2.1.b tienen tf = 30 s fijo: con los obstáculos en contacto, de N = 200 para arriba no llegaba ninguna realización a Fu = 0,9 y a N = 5 llegaba una sola de diez (promedio de una muestra, sin desvío). Con ese corte la figura era plana en 21 s y después se cortaba: no mostraba ninguna densidad óptima, que es justo lo que el ítem pregunta. Lo que cambia es sólo el tf; la configuración es la misma (xo = r) y las densidades son las mismas que la columna xo = r del mapa de la diapositiva siguiente.
+- Las condiciones, por si las piden: xo = r, 20 realizaciones por densidad, cada corrida hasta convertirlas **todas** (tmax = 300 s, que ninguna necesita). Las 20 llegan en todas las densidades y en los dos observables: **todos los puntos tienen desvío**, que es lo que antes no pasaba.
+- Si preguntan por qué el eje llega a ρ = 367 y no a 857: porque el barrido de esta figura es el de las diez densidades del mapa, para que las dos figuras del ítem 2.4 hablen de lo mismo. De N = 300 para arriba la fracción de área pasa el 35 % y la conversión se vuelve muy lenta; el comportamiento ya se ve.
 
 ## 27. Posición óptima para cada densidad — `slide-27-mapa-t90-xo-N.png`
 
 - El barrido es de 16 posiciones × 10 densidades × 20 realizaciones (3200 corridas): hace falta esa resolución para distinguir si el óptimo se corre con N o si es siempre el mismo.
 - La escala de colores está dada vuelta a propósito: el rojo es la conversión **más rápida**, porque lo que tiene que saltar a la vista es el óptimo y no el peor caso. Y está recortada en 38 s (1,3 veces el más alto de los mínimos de cada fila, la flecha de la barra lo marca): los bordes de las densidades extremas llegan a 70 s y se llevaban media escala ellos solos.
 - La mancha roja **cierra por arriba y por abajo**: hay óptimo en las dos variables. Por eso está la fila de N = 5, que es la que la cierra por abajo.
-- A propósito no marcamos ninguna celda: cuál de las del fondo sale la más baja es en buena parte azar (a N = 50 cae en 0,175 m y a N = 150 en 0,275 m, y las dos tienen el mismo óptimo dentro del error). El número sale de ajustar una parábola a cada fila sobre el mismo tramo, xo = 0,10–0,40 m, y quedarse con el vértice.
+- La **línea negra** es el óptimo de cada densidad, un punto por fila: el color contesta “cuánto tarda” y la línea contesta “dónde está el mínimo de esta fila”. Verla recta de N = 20 para arriba contesta de una la segunda pregunta del ítem.
+- Cada punto es el **vértice de la parábola** ajustada a la fila sobre el mismo tramo (xo = 0,10–0,40 m), no la celda más baja: cuál de las del fondo sale la más baja es en buena parte azar (a N = 50 cae en 0,175 m y a N = 150 en 0,275 m, y las dos tienen el mismo vértice dentro del error), así que una línea que uniera argminos sería un zigzag que no está en los datos.
 - De N = 20 en adelante (ocho densidades) los vértices dan **0,237 ± 0,011 m**: el óptimo no se corre con la densidad en todo ese rango, y no es exactamente 0,2 sino 0,24 m (0,46 R).
 - Las dos densidades más bajas sí se corren hacia afuera: 0,287 ± 0,020 m en N = 5 y 0,350 ± 0,031 m en N = 10 (a 2,5 y 3,7 σ del promedio). Con tan pocas partículas casi no hay choques y la conversión la decide el parámetro de impacto de cada trayectoria, así que separar los obstáculos cubre más parámetros de impacto. Es el mismo argumento del ítem 2.4.a (con N = 1 sólo convierte si b < 3r). Sobre las diez densidades el ajuste da −0,018 ± 0,007 m por década de N, y ese corrimiento lo aportan enteramente esas dos filas.
 - Los extremos son siempre los peores, y cuál de los dos es peor cambia con la densidad: a N = 5 el centro es cuatro veces y media el mínimo, a N = 10 centro y pared cuestan lo mismo (30,1 y 29,5 s), y a N = 300 la pared es claramente peor (69,8 contra 54,3 s). El castigo de la pared crece con N: 1,9 veces el mínimo a N = 20 y 2,4 a N = 300.
@@ -211,9 +218,9 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 29. Conclusiones
 
-- Beeman y Verlet original son de segundo orden en el oscilador; Beeman es el mejor. Δt = 5·10⁻⁵ s por conservación de la energía.
-- El costo del paso temporal crece casi lineal con N y el de los eventos mucho más rápido: se cruzan cerca de N = 470. Los exponentes ajustados, si los piden: 0,88 y 3,52.
-- Hay un xo óptimo en 0,2–0,3 m, el mismo de N = 20 a 300; f(v) llega a Maxwell-Boltzmann en medio segundo con kBT = mv0²/2; y con los obstáculos en el centro hay una densidad óptima en N = 30–50.
+- Beeman y Verlet original son de segundo orden en el oscilador; Beeman es el mejor. Δt = 5·10⁻⁵ s por conservación de la energía: deja el error de E en 0,04 % a N = 300 y 0,03 % a N = 700.
+- El costo del paso temporal crece casi lineal con N (t ∝ N^0,88) y el de los eventos mucho más rápido (N^3,52): se cruzan cerca de N = 470.
+- Hay un xo óptimo, 0,237 ± 0,011 m, el mismo de N = 20 a 300; f(v) llega a Maxwell-Boltzmann en medio segundo con kBT = 12,41 ± 0,11 mJ ≈ mv0²/2; y con los obstáculos en el centro hay una densidad óptima en ρ = 86 partículas/m² (N = 70), donde ⟨t90⟩ = 21,8 s contra 66 s a ρ = 6 y 54 s a ρ = 367.
 
 ## 30. Uso de agentes de IA
 

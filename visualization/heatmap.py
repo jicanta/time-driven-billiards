@@ -17,11 +17,19 @@ se corre con la densidad. Por eso:
   en escala lineal el color lo gobierna la fila y adentro de cada fila queda
   todo del mismo tono. En logaritmica una fila se lleva casi un tercio de la
   barra de color y el minimo de cada densidad se ve.
-* El minimo NO se marca con un simbolo. Se lee por color, que es lo que pide
-  el item ("se representa ⟨t90⟩ en la escala de colores"), y la cuenta fina
-  va por consola: a cada fila se le ajusta una parabola sobre el mismo tramo
-  de xo y sale el vertice con su error, que es el numero con el que se
-  contesta si el optimo depende de N.
+* El optimo de cada densidad va DIBUJADO encima del mapa, como una linea
+  negra con opacidad moderada que une un punto por fila. El color contesta
+  "cuanto tarda"; la linea contesta "donde esta el minimo de esta fila" y, al
+  verla recta, contesta de una la segunda pregunta del item: el optimo no se
+  corre con la densidad.
+
+  El punto de cada fila es el VERTICE DE LA PARABOLA ajustada a la fila, no la
+  celda mas baja. La curva ⟨t90⟩(xo) tiene un fondo ancho y plano, y con el
+  error que tienen estas mediciones cual de las celdas del fondo sale sorteada
+  mas baja es en buena parte azar: la celda minima salta de 0,175 m (N = 50) a
+  0,275 m (N = 150) cuando las dos filas tienen el mismo vertice dentro del
+  error, y una linea que une argminos se veria como un zigzag que no esta en
+  los datos. El vertice usa las 12 posiciones del tramo ajustado y es estable.
 
 El barrido que escribe `make mapa` corta cada corrida apenas Fu llega a 0,9
 (--until-fraction 0.9: esperar a que se conviertan todas cuesta el triple de
@@ -169,6 +177,16 @@ def main() -> None:
                 writer.writerow([count, offset, grid[row, column], error[row, column],
                                  int(reached[row, column])])
 
+    # El optimo de cada fila se calcula antes de dibujar, porque va dibujado
+    # encima del mapa (y despues se informa por consola con su error).
+    rows_with_vertex = []
+    for row in range(len(counts)):
+        if np.all(np.isnan(grid[row])):
+            continue
+        centre, uncertainty = vertex(offsets, grid[row], error[row])
+        if centre is not None:
+            rows_with_vertex.append((row, int(counts[row]), centre, uncertainty))
+
     # Eje x: la posicion real de los obstaculos, con las celdas del ancho del
     # intervalo que representan (el barrido es mas fino donde esta el minimo).
     # Eje y: una fila por N, todas del mismo alto, porque los N del barrido
@@ -189,6 +207,16 @@ def main() -> None:
     bar.ax.yaxis.set_minor_formatter(FuncFormatter(lambda value, _: ""))
     bar.ax.set_yticklabels([common.decimal(t) for t in ticks])
 
+    # El optimo de cada densidad, encima del mapa: negro con opacidad moderada,
+    # que se lee sobre cualquier color de la escala sin tapar las celdas por
+    # las que pasa. Sin entrada de leyenda: el mapa esta cubierto de datos y
+    # una caja encima tapa celdas; que es la linea lo dice la vineta.
+    if len(rows_with_vertex) > 1:
+        axes.plot([centre for *_, centre, _ in rows_with_vertex],
+                  [row for row, *_ in rows_with_vertex],
+                  color="#111111", alpha=0.6, linewidth=2.0, marker="o", markersize=5,
+                  markerfacecolor="#111111", zorder=3)
+
     axes.set_yticks(np.arange(len(counts)))
     axes.set_yticklabels([str(int(n)) for n in counts])
     axes.set_xlabel(common.AXIS_OFFSET)
@@ -197,9 +225,11 @@ def main() -> None:
     common.save(figure, out)
     plt.close(figure)
 
-    # La lectura fina, por consola: el vertice de la parabola de cada fila (el
-    # optimo), que celdas son compatibles con el minimo y cuanto castiga la
-    # peor posicion. Nada de esto se dibuja encima del mapa.
+    # La lectura fina, por consola: el error del vertice de cada fila (en la
+    # figura va el vertice, no su error), que celdas son compatibles con el
+    # minimo y cuanto castiga la peor posicion.
+    vertices = {row: (centre, uncertainty)
+                for row, _, centre, uncertainty in rows_with_vertex}
     best_offsets = []
     for row, count in enumerate(counts):
         if np.all(np.isnan(grid[row])):
@@ -209,7 +239,7 @@ def main() -> None:
                       if not np.isnan(grid[row, column])
                       and grid[row, column] - error[row, column]
                       <= grid[row, best] + error[row, best]]
-        centre, uncertainty = vertex(offsets, grid[row], error[row])
+        centre, uncertainty = vertices.get(row, (None, None))
         worst = int(np.nanargmax(grid[row]))
         fitted = ("sin ajuste" if centre is None else
                   f"ajuste parabólico xo = {centre:.3f}"

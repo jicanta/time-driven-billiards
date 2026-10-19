@@ -2,15 +2,22 @@
 
 Para el sistema sin obstaculos todas las particulas arrancan con el mismo
 modulo v0, asi que f(v) es una delta en t = 0 y se va ensanchando hasta el
-estado estacionario. La distribucion de un instante se arma juntando los
-|v| de las N particulas de todas las realizaciones en ese cuadro, y la barra
-de error de cada intervalo es el desvio estandar entre realizaciones (cada
-realizacion da su propio histograma; la curva es el promedio de los M y la
-barra, el desvio), que es la misma convencion que el resto de las figuras.
-Las dos figuras del item dibujan esa barra con el MISMO estilo
-(common.ERRORBAR) y en el color de su serie: son la misma magnitud medida de
-la misma manera, y si una lleva capucha y la otra no, se leen como si fueran
-cosas distintas. Lo unico que cambia entre las dos es cuanto miden.
+estado estacionario.
+
+Cada histograma se arma de UNA SOLA BOLSA de muestras: los |v| de las N
+particulas de las M realizaciones, todos juntos en el mismo histograma (N x M
+muestras por instante, y N x M x cuadros en el estacionario). No es el promedio
+de los M histogramas de cada realizacion con su desvio como barra: con N = 100
+particulas repartidas en 40 intervalos, el histograma de una realizacion sola
+es ruido, y promediar M curvas ruidosas con barras del 50 % tapa la forma de
+f(v), que es lo que la figura tiene que mostrar. Juntando todo en una bolsa la
+estadistica es M veces mayor y la curva se lee. Cuantas realizaciones y cuantos
+cuadros entran en la bolsa va dicho en la figura y en la diapositiva: es lo que
+hace falta para saber de donde sale.
+
+El desvio entre realizaciones se sigue midiendo y este script lo imprime (es la
+respuesta si preguntan por la dispersion), pero no se dibuja: la figura es el
+histograma de la bolsa.
 
 La figura de la evolucion muestra INSTANTES, cada uno con su t exacto,
 incluido el ultimo: un "t >= algo" no es un instante sino un promedio sobre
@@ -18,8 +25,8 @@ muchos cuadros, y en una figura que se llama "f(v) para distintos instantes"
 confunde. El promedio sobre cuadros se usa, pero donde hace falta, que es el
 ajuste: la estacionaria junta todos los cuadros con t >= --estacionario
 (promedio temporal, que para un estado estacionario es el mismo promedio de
-ensamble) y asi tiene estadistica suficiente. Por eso sus barras de error son
-varias veces mas chicas que las de un instante suelto.
+ensamble) y asi tiene estadistica suficiente: su bolsa tiene 400 veces mas
+muestras que la de un instante suelto.
 
 La estacionaria se ajusta con la distribucion de Maxwell-Boltzmann en dos
 dimensiones
@@ -78,21 +85,27 @@ def relative(values: np.ndarray, errors: np.ndarray) -> float:
     return float(np.mean(errors[core] / values[core]))
 
 
-def histograms(samples: np.ndarray, edges: np.ndarray):
-    """(centros, f(v) promedio, desvio entre realizaciones) de un conjunto de
-    muestras con una realizacion por fila.
+def pooled(samples: np.ndarray, edges: np.ndarray):
+    """(centros, f(v), cuantas muestras) del histograma de LA BOLSA: todas las
+    muestras del arreglo juntas, sin separar por realizacion.
 
-    El promedio de los histogramas normalizados de las M realizaciones es el
-    histograma de todas juntas (son todas del mismo tamano) y es lo que pide
-    el enunciado: f(v) promediada sobre realizaciones. La barra es el desvio
-    estandar entre realizaciones, la misma convencion que el resto del trabajo
-    (ddof = 1): una barra en una figura se lee como el desvio y no hace falta
-    aclararlo."""
+    Es lo que se dibuja. Como todas las realizaciones tienen el mismo numero de
+    particulas, el histograma de la bolsa coincide con el promedio de los
+    histogramas de cada una, pero la bolsa es lo que la figura dice que es: un
+    solo histograma de N x M muestras."""
+    centers, density = histogram(samples.ravel(), edges)
+    return centers, density, int(samples.size)
+
+
+def spread_between_runs(samples: np.ndarray, edges: np.ndarray):
+    """Desvio estandar entre realizaciones, intervalo por intervalo, con una
+    realizacion por fila. No se dibuja: la figura es el histograma de la bolsa.
+    Se mide y se imprime porque es la respuesta si preguntan por la dispersion
+    de una realizacion suelta."""
     each = np.array([histogram(row, edges)[1] for row in samples])
-    centers = 0.5 * (edges[:-1] + edges[1:])
     if len(each) < 2:
-        return centers, each.mean(axis=0), None
-    return centers, each.mean(axis=0), each.std(axis=0, ddof=1)
+        return None
+    return each.std(axis=0, ddof=1)
 
 
 def main() -> None:
@@ -122,24 +135,23 @@ def main() -> None:
     figure, axes = plt.subplots()
     ceiling = 0.0
     last = None
+    per_instant = 0
     targets = [float(v) for v in arguments.instantes.split(",")] + [times[-1]]
     for target, color in zip(targets, COLORS):
         frame = int(np.searchsorted(times, target, side="right") - 1)
-        centers, density, spread = histograms(speeds[:, frame, :], edges)
+        centers, density, per_instant = pooled(speeds[:, frame, :], edges)
         if frame > 0:
             ceiling = max(ceiling, density.max())
-            last, instant_density, instant_spread = density, density, spread
+            last = density
+            instant_density = density
+            instant_spread = spread_between_runs(speeds[:, frame, :], edges)
         axes.step(centers, density, where="mid", color=color,
                   linewidth=2.4 if target == targets[-1] else 1.6,
                   label=f"$t$ = {common.decimal(times[frame], 2)} s")
-        # La barra va aparte de la curva (la curva es el promedio sobre
-        # realizaciones y la barra, el desvio), con el estilo comun a las dos
-        # figuras del item y en el color de su instante. En un instante suelto
-        # el desvio es grande -- cada realizacion reparte N = 100 particulas
-        # en 40 intervalos -- y eso tiene que verse: es la diferencia con la
-        # estacionaria, que junta todos los cuadros.
-        axes.errorbar(centers, density, yerr=spread, color=color, zorder=2.5,
-                      label="_nolegend_", **common.ERRORBAR)
+    # De donde sale cada curva (M realizaciones x N particulas de ese cuadro) va
+    # en la linea de condiciones de la diapositiva y no escrito dentro de la
+    # figura, que es la convencion del resto del trabajo: los parametros al
+    # costado, la figura con los datos. Este script imprime los numeros.
     axes.set_xlabel(common.AXIS_SPEED)
     axes.set_ylabel(common.AXIS_PDF)
     axes.set_xlim(0.0, 2.8 * static["v0"])
@@ -157,7 +169,9 @@ def main() -> None:
     # histograma la estadistica que un instante suelto no tiene.
     per_run = speeds[:, times >= arguments.estacionario, :].reshape(runs, -1)
     stationary = per_run.ravel()
-    centers, density, spread = histograms(per_run, edges)
+    frames = int((times >= arguments.estacionario).sum())
+    centers, density, per_pool = pooled(per_run, edges)
+    spread = spread_between_runs(per_run, edges)
 
     thermal, grid, error = common.fit_thermal_energy(centers, density, mass)
     reference = 0.5 * mass * float((stationary ** 2).mean())
@@ -169,13 +183,6 @@ def main() -> None:
     figure, axes = plt.subplots()
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
              edgecolor=common.FRESH, label="simulación")
-    # Mismo estilo de barra que la figura de los instantes, en el color de la
-    # serie: el relleno del histograma va al 45 % y la barra a pleno, asi que
-    # sobre el azul claro se ve igual de bien. Es chica (el desvio entre
-    # realizaciones es del orden del 5 %: el histograma junta un millon de
-    # muestras) y esa es justamente la comparacion con la otra figura.
-    axes.errorbar(centers, density, yerr=spread, color=common.FRESH, zorder=2.5,
-                  label="_nolegend_", **common.ERRORBAR)
     fine = np.linspace(edges[0], edges[-1], 400)
     axes.plot(fine, common.maxwell_boltzmann(fine, thermal, mass), color=common.USED,
               linewidth=2.4, label="Maxwell-Boltzmann")
@@ -203,12 +210,14 @@ def main() -> None:
 
     print(f"N = {count}, sin obstáculos, {runs} realizaciones, "
           f"{len(times)} cuadros hasta t = {times[-1]:.1f} s")
-    print(f"muestras del estado estacionario (t ≥ {arguments.estacionario:g} s): "
-          f"{stationary.size} ({per_run.shape[1]} por realización)")
-    print(f"barra de error relativa media (desvío entre realizaciones, intervalos con "
-          f"f(v) > 10 % del máximo): instante suelto "
-          f"{relative(instant_density, instant_spread):.1%}, estacionaria "
-          f"{relative(density, spread):.1%}")
+    print(f"bolsa de un instante: {runs} realizaciones x {count} partículas = "
+          f"{per_instant} muestras")
+    print(f"bolsa del estacionario (t ≥ {arguments.estacionario:g} s): {runs} x {frames} "
+          f"cuadros x {count} partículas = {per_pool} muestras "
+          f"({per_run.shape[1]} por realización)")
+    print(f"desvío entre realizaciones (NO se dibuja; intervalos con f(v) > 10 % del "
+          f"máximo): instante suelto {relative(instant_density, instant_spread):.1%}, "
+          f"estacionaria {relative(density, spread):.1%}")
     doubling = grid[error <= 2.0 * error.min()]
     print(f"kT ajustado        = {thermal:.6f} J  (el error cuadrático medio del ajuste se "
           f"duplica en {1000 * doubling.min():.2f} y {1000 * doubling.max():.2f} mJ)")

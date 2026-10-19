@@ -356,8 +356,9 @@
         \begin{column}{0.42\textwidth}
             \input{figuras/parametros-tabla.tikz}\\[0.25em]
             {\scriptsize\color{gris}\sloppy $\rho = N/\pi R^2$: la densidad
-             (ítem 2.4). $\dt$ sale de la conservación de la energía (ítem 2.1.a);
-             $\dtd$ y $t_f$ van por caso.}
+             (ítem 2.4). $\dt$ sale de la conservación de la energía (ítem 2.1.a).
+             El paso de guardado y el $t_f$ de cada caso van en la figura que
+             los usa.}
         \end{column}\hfill
         \begin{column}{0.55\textwidth}
             \centering
@@ -373,17 +374,19 @@
     \small
     \begin{itemize}\setlength{\itemsep}{0.7em}
         \item \rotulo{Conversión}: $\Fu(t) = \Nu(t)/N$, con $\Nu$ las usadas
-              acumuladas; \; $\tnov = \min\{\,t : \Fu(t) \ge 0{,}9\,\}$ \; y \;
-              $\tcien = \min\{\,t : \Fu(t) = 1\,\}$, en el instante exacto de cada
-              conversión.
-        \item \rotulo{Energía total}, sobre los estados guardados cada $\dtd$:
-              $\displaystyle E(t) = \sum_{i} \tfrac{1}{2} m v_i^2
-               + \sum_{\text{contactos}} \tfrac{1}{2} k\,\xi^2$; \;
-              deriva relativa máxima $D(\dt) = \max_t |E(t) - E_0|/E_0$.
-        \item \rotulo{Distribución del módulo de la velocidad}: $f(v)$, histograma de
-              $|\vv|$ en 40 intervalos (área 1) con las $N$ partículas de las $M$
-              realizaciones en un instante; en el estacionario, además todos los
-              cuadros con $t \ge \SI{10}{\second}$.
+              acumuladas. \alert{$t_x$} es el instante en que la conversión llega
+              al $x$ \%, el que cumple $\Fu(t_x) = x/100$, tomado en el instante
+              exacto de esa conversión. Medimos $\tnov$ y $\tcien$.
+        \item \rotulo{Energía total}: $E(t) = \sum_{i} \tfrac{1}{2} m v_i^2
+              + \sum_{\text{contactos}} \tfrac{1}{2} k\,\xi^2$, constante si el
+              esquema integra bien. Se mide su \textbf{error relativo}
+              $\varepsilon(t) = 100\,(E(t) - E_0)/E_0$ en \%, y como escalar
+              $\varepsilon_{\max}(\dt) = \max_t |\varepsilon(t)|$.
+        \item \rotulo{Distribución del módulo de la velocidad}: $f(v)$, histograma
+              de $|\vv|$ en 40 intervalos (área 1) sobre \textbf{una sola bolsa}
+              con los $|\vv|$ de las $N$ partículas de las $M$ realizaciones; el
+              estacionario suma además todos los cuadros con
+              $t \ge \SI{10}{\second}$.
         \item \rotulo{Sistema 1}: $\displaystyle \mathrm{ECM}(\dt) = \frac{1}{n}
               \sum_{j=1}^{n}\left[r_{\text{num}}(t_j) - r_{\text{an}}(t_j)\right]^2$
               sobre los $n$ pasos de integración.
@@ -439,30 +442,32 @@
     }
 \end{frame}
 
-\begin{frame}{Energía total contra el tiempo}
-    \figbulw[0.35em]{slide-14-energia-vs-t.png}{%
-        \item $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$: el sistema es
-              conservativo y se mide cuánto se aparta.
-        \item $\SI{5e-4}{\second}$ deriva un \SI{2.6}{\percent} hacia arriba y
-              $\SI{2e-4}{\second}$ un \SI{0.6}{\percent} hacia abajo;
-              $\SI{5e-5}{\second}$ no se despega de $E_0$.
-        \item Son 3 de los 7 $\dt$ medidos: $\SI{1e-3}{\second}$ explota a
-              \SI{45}{\joule} y se sale de escala (el choque dura
-              $\tau = \pi\sqrt{\mu/k} = \SI{3.5}{\milli\second}$, entran tres pasos),
-              y de $\SI{1e-4}{\second}$ para abajo caen todas encima de
-              $\SI{5e-5}{\second}$.
-        \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$, $\dtd = \SI{0.01}{\second}$}
+\begin{frame}{Conservación de la energía}
+    \figbulw[0.35em]{slide-14-error-energia-vs-t.png}{%
+        \item Conservativo: $E$ tiene que quedarse en
+              $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$. Se grafica
+              \textbf{cuánto se aparta}, en \%.
+        \item $\SI{5e-4}{\second}$ se va al \SI{2.6}{\percent} y
+              $\SI{2e-4}{\second}$ al \SI{-0.6}{\percent};
+              \alert{$\SI{5e-5}{\second}$ se queda en el \SI{0.04}{\percent}}.
+        \item Son 3 de los 7 $\dt$ medidos: $\SI{1e-3}{\second}$ llega al
+              \SI{1100}{\percent} (el choque dura
+              $\tau = \pi\sqrt{\mu/k} = \SI{3.5}{\milli\second}$: entran tres pasos)
+              y de $\SI{1e-4}{\second}$ para abajo caen todas sobre el cero.
+        \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$, estado cada \SI{0.01}{\second}}
     }
 \end{frame}
 
-\begin{frame}{Elección del paso: deriva relativa máxima}
-    \figbul{slide-15-deriva-vs-dt.png}{%
-        \item Observable escalar: la deriva relativa máxima $D(\dt)$. Sobre los
-              pasos estables ajusta $D \propto \dt^{2,0}$: el segundo orden de Verlet.
-        \item Criterio: el $\dt$ \textbf{más largo} con $D \leq 10^{-3}$, el de menor
-              costo con el error aceptado.
-        \item \alert{$\dt = \SI{5e-5}{\second}$}: $D = 3{,}8\cdot10^{-4}$, y
-              $2{,}6\cdot10^{-4}$ en el caso más exigente, $N = 700$ con obstáculos.
+\begin{frame}{Elección del paso: error máximo}
+    \figbul{slide-15-error-maximo-vs-dt.png}{%
+        \item Observable escalar: $\varepsilon_{\max}(\dt)$, el error más grande de
+              la corrida. Ajusta $\varepsilon_{\max} \propto \dt^{2{,}0}$.
+        \item Criterio: el $\dt$ \textbf{más largo} con
+              $\varepsilon_{\max} \leq \SI{0.1}{\percent}$, el más barato con el
+              error aceptado.
+        \item \alert{Para bajar del \SI{0.1}{\percent} hace falta
+              $\dt = \SI{5e-5}{\second}$}: da \SI{0.04}{\percent}, y
+              \SI{0.03}{\percent} a $N = 700$ con obstáculos.
         \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$}
     }
 \end{frame}
@@ -479,10 +484,10 @@
 
 \begin{frame}{Tiempo de ejecución contra $N$}
     \figbul{slide-17-tiempo-ejecucion-vs-N.png}{%
-        \item \textbf{Paso temporal}: los pasos son 600\,000 siempre y la celda de
-              índice deja el costo de uno en $O(N)$.
-        \item \textbf{Eventos} (TP3): cada choque rehace parte del calendario, y los
-              choques crecen con $N$.
+        \item \textbf{Paso temporal}: \alert{$t \propto N^{0{,}88}$}; la celda de
+              índice deja el costo de un paso en $O(N)$.
+        \item \textbf{Eventos} (TP3): \alert{$t \propto N^{3{,}52}$}: cada choque
+              rehace parte del calendario y los choques crecen con $N$.
         \item \alert{Se cruzan en $N \approx 470$}: a $N = 600$ los eventos
               cuestan $2{,}9$ veces más (\SI{42.3}{\second} contra \SI{14.8}{\second}).
         \cond{$x_o = r$, $t_f = \SI{30}{\second}$; las punteadas son el ajuste de cada serie}
@@ -546,26 +551,28 @@
 \end{frame}
 
 \begin{frame}{Distribución del módulo de la velocidad}
-    \figbul{slide-23-f-v-vs-t.png}{%
+    \figbulw[0.45em]{slide-23-f-v-vs-t.png}{%
         \item En $t = 0$ todas tienen $|\vv| = v_0$: $f(v)$ es una \textbf{delta}
               que se sale de la figura.
         \item A los \SI{0.15}{\second} el pico ya cayó a un tercio y apareció la cola;
               desde \SI{0.5}{\second} las curvas no se distinguen de la de
               \SI{30}{\second}.
-        \item El sistema es conservativo: $f(v)$ se ensancha sin que cambie $E$.
-        \cond{$N = 100$, sin obstáculos, $\dtd = \SI{0.05}{\second}$, 30 realizaciones}
+        \item Cada curva es \textbf{un solo histograma} de la bolsa de ese
+              instante, y el sistema es conservativo: $f(v)$ se ensancha sin que
+              cambie $E$.
+        \cond{$N = 100$, sin obstáculos; bolsa de un instante: $30 \times 100 = \num{3000}$ muestras}
     }
 \end{frame}
 
 \begin{frame}{Ajuste de Maxwell-Boltzmann}
-    \figbul{slide-24-f-v-ajuste.png}{%
+    \figbulw[0.45em]{slide-24-f-v-ajuste.png}{%
         \item $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$, con $k_BT$ como
               \textbf{único parámetro libre}.
         \item \alert{$k_BT = \SI{12.41}{\milli\joule}$} contra
               $m v_0^2/2 = \SI{12.50}{\milli\joule}$: \SI{-0.7}{\percent}.
         \item $m\langle v^2\rangle/2 = \SI{12.32}{\milli\joule}$ es un poco menor:
               en promedio el \SI{1.4}{\percent} de $E$ está en los resortes.
-        \cond{todos los cuadros con $t \geq \SI{10}{\second}$ de 30 realizaciones: $1{,}2\cdot10^{6}$ muestras}
+        \cond{bolsa del estacionario: $30 \times 401$ cuadros ($t \geq \SI{10}{\second}$) $\times\,100 = 1{,}2\cdot10^{6}$ muestras, un histograma de 40 intervalos}
     }
 \end{frame}
 
@@ -573,34 +580,36 @@
     \figbul{slide-25-E-vs-kT.png}{%
         \item Método de la Teórica 0: se recorre $k_BT$ en una grilla y se toma el
               \textbf{mínimo} del error cuadrático medio $E(k_BT)$.
-        \item El error se duplica ya en $k_BT = 12{,}31$ y $\SI{12.53}{\milli\joule}$:
-              el ajuste queda determinado dentro del \SI{1}{\percent}.
-        \cond{el mismo conjunto de muestras que el ajuste, en 40 intervalos de $v$}
+        \item El \textbf{ancho del mínimo es el error del ajuste}: $E$ se duplica
+              ya en $12{,}31$ y $\SI{12.53}{\milli\joule}$, o sea
+              \alert{$k_BT = 12{,}41 \pm \SI{0.11}{\milli\joule}$}
+              (\SI{0.9}{\percent}).
+        \cond{la misma bolsa de muestras que el ajuste, en 40 intervalos de $v$}
     }
 \end{frame}
 
 \begin{frame}{Efecto de la densidad}
     \figbulw[0.3em]{slide-26-t90-t100-vs-densidad.png}{%
-        \item $\mtnov \approx \SI{21}{\second}$ de $N = 10$ a $50$ y \SI{23.7}{\second}
-              en $N = 100$. Blanco: no llegan las 10. Desde $N = 200$ no llega
-              \textbf{ninguna} en $t_f$ y la escala se corta ahí.
-        \item \alert{Sí hay densidad óptima}, $N = 30$--$100$: llegan todas y $\mtnov$
-              es mínimo. Abajo faltan choques (con $N = 1$ convierte el
-              \SI{13}{\percent}) y arriba se achica el camino libre.
-        \item $\Fu(t_f)$ lo confirma: $0{,}58$ ($N = 5$), $0{,}97$ ($N = 30$--$50$),
-              $0{,}01$ ($N = 700$).
-        \cond{ítem 2.1.b: $x_o = r$, $t_f = \SI{30}{\second}$, 10 realizaciones}
+        \item \alert{Hay densidad óptima}: $\mtnov$ baja de \SI{66}{\second}
+              ($\rho = 6$) a \SI{21.8}{\second} en $\rho = 86$, y vuelve a
+              \SI{54.3}{\second} en $\rho = 367$.
+        \item Fondo ancho: de $\rho = 24$ a $86$, lo mismo dentro del desvío. Abajo
+              faltan choques ($N = 1$ convierte el \SI{13}{\percent}); arriba se
+              achica el camino libre.
+        \item $\mtcien$: misma forma, mínimo más abajo ($\rho = 24$). El último
+              \SI{10}{\percent} es el que más castiga la densidad alta.
+        \cond{$x_o = r$, 20 realizaciones por densidad, cada corrida hasta convertirlas todas}
     }
 \end{frame}
 
 \begin{frame}{Posición óptima para cada densidad}
     \figbulw[0.2em]{slide-27-mapa-t90-xo-N.png}{%
-        \item Rojo es más rápido: la mancha cierra arriba y abajo, hay óptimo en las
-              dos variables. \alert{De $N = 20$ a $300$ el valle no se mueve}:
-              $x_o = 0{,}237 \pm \SI{0.011}{\meter}$.
-        \item A densidad baja se corre hacia afuera: $0{,}287$ y
-              $\SI{0.350}{\meter}$ en $N = 5$ y $10$. Sin choques manda el parámetro
-              de impacto.
+        \item Rojo es más rápido; la \textbf{línea negra} es el óptimo de cada
+              densidad, el vértice de la parábola de su fila.
+        \item \alert{De $N = 20$ a $300$ la línea es recta}:
+              $x_o = 0{,}237 \pm \SI{0.011}{\meter}$. A $N = 5$ y $10$ se corre
+              afuera ($0{,}287$ y $\SI{0.350}{\meter}$): sin choques manda el
+              parámetro de impacto.
         \item Centro y pared son lo peor: la pared cuesta $1{,}9$ veces el mínimo a
               $N = 20$ y $2{,}4$ a $N = 300$.
         \cond{$t_{max} = \SI{300}{\second}$, 16 posiciones $\times$ 10 densidades $\times$ 20 realizaciones}
@@ -616,8 +625,9 @@
     \begin{itemize}\setlength{\itemsep}{0.75em}
         \item Beeman y Verlet original: $\mathrm{ECM} \propto \dt^{4}$; Velocity Verlet
               y Euler p-c: $\propto \dt^{2}$. Beeman es el mejor para el oscilador.
-        \item Por conservación de la energía, $\dt = \SI{5e-5}{\second}$: deriva
-              $3{,}8\cdot10^{-4}$ a $N = 300$ y $2{,}6\cdot10^{-4}$ a $N = 700$.
+        \item Por conservación de la energía, $\dt = \SI{5e-5}{\second}$: el error
+              de $E$ queda en \SI{0.04}{\percent} a $N = 300$ y \SI{0.03}{\percent}
+              a $N = 700$.
         \item El costo del paso temporal crece casi lineal con $N$ y el de los eventos
               mucho más rápido: se cruzan cerca de $N = 470$ y a $N = 600$ los eventos
               cuestan $2{,}9$ veces más.
@@ -626,8 +636,10 @@
               ($0{,}237 \pm \SI{0.011}{\meter}$) de $N = 20$ a $300$.
         \item $f(v)$ llega a Maxwell-Boltzmann en medio segundo, con
               $k_BT = \SI{12.4}{\milli\joule}$: el $m v_0^2/2$ del arranque.
-        \item Con los obstáculos en el centro hay una densidad óptima, $N = 30$--$50$;
-              a $N = 700$ se convierte el \SI{1}{\percent} en \SI{30}{\second}.
+        \item Con los obstáculos en el centro hay una densidad óptima,
+              $\rho = \SI{86}{\particulas\per\meter\squared}$ ($N = 70$):
+              $\mtnov = \SI{21.8}{\second}$, contra \SI{66}{\second} a
+              $\rho = 6$ y \SI{54.3}{\second} a $\rho = 367$.
     \end{itemize}
 \end{frame}
 

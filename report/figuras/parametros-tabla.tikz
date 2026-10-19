@@ -9,6 +9,14 @@
 %
 % La densidad va en particulas por metro cuadrado, la misma unidad que el eje
 % de la figura del item 2.4 (visualization/common.py: AXIS_DENSITY).
+%
+% Los parametros que barre cada caso van como INTERVALO, entre corchetes: es
+% un rango recorrido y no una lista de valores sueltos, y asi se lee de una.
+%
+% dt2 (el paso con el que se guarda el estado) y tf NO entran: no son
+% parametros del sistema sino de cada medicion, van por caso y estan en la
+% linea de condiciones de la figura que los usa. La tabla queda con lo que
+% define al sistema mas el dt de integracion, que es resultado del item 2.1.a.
 \footnotesize
 \begin{tabular}{@{}l@{\hspace{1.0em}}l@{}}
     \toprule
@@ -18,18 +26,16 @@
     $r$     & \SI{0.0175}{\meter}\\
     $m$     & \SI{0.025}{\kilogram}\\
     $v_0$   & \SI{1}{\meter\per\second}\\
-    $k$     & \SI{1e4}{\newton\per\meter}\\
+    $k$     & \SI{e4}{\newton\per\meter}\\
     \addlinespace[0.15em]
     \multicolumn{2}{@{}l}{\rotulo{Variables}}\\
     \midrule
-    $N$     & $5 \ldots 700$\\
-    $\rho$  & $6 \ldots \SI{857}{\particulas\per\meter\squared}$\\
-    $x_o$   & $r \ldots R - r$\\
+    $N$     & $[5,\; 700]$\\
+    $\rho$  & $[6,\; 857]$ \si{\particulas\per\meter\squared}\\
+    $x_o$   & $[r,\; R - r]$\\
     \addlinespace[0.15em]
     \multicolumn{2}{@{}l}{\rotulo{Simulación}}\\
     \midrule
     $\dt$   & \SI{5e-5}{\second}\\
-    $\dtd$  & $0{,}01 \ldots \SI{0.05}{\second}$\\
-    $t_f$   & $5 \ldots \SI{100}{\second}$\\
     \bottomrule
 \end{tabular}%

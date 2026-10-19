@@ -10,28 +10,39 @@ esquema de integracion (Teorica 4, diapositiva 35). El motor no la calcula:
 sale de los estados guardados en dynamic.txt, con las mismas xi del enunciado
 (pares de particulas, obstaculos y la particula imagen de la pared).
 
-El observable escalar que resume cada curva es la **deriva relativa maxima**
+Lo que se grafica NO es la energia en Joule sino su **error relativo en
+porcentaje**
 
-    D(dt) = max_t |E(t) - E(0)| / E(0),
+    eps(t) = 100 (E(t) - E_0) / E_0,
+
+que es lo que se decide con esta figura: "me quedo con este paso porque el
+error es menor que tanto por ciento". En Joule hay que leer la separacion
+contra una recta de E0 y despues dividir mentalmente; en porcentaje el numero
+del eje ya es el numero de la frase, y el cero -- que es la conservacion
+exacta -- queda en el medio, con las curvas que derivan hacia arriba de un
+lado y las que derivan hacia abajo del otro.
+
+El observable escalar que resume cada curva es el **maximo de ese error**
+
+    eps_max(dt) = max_t |eps(t)|,
 
 una sola cifra por corrida, que se grafica contra dt para elegir el paso: se
-toma el dt mas grande cuya deriva queda por debajo de la tolerancia (--cota),
+toma el dt mas grande cuyo error queda por debajo de la tolerancia (--cota),
 porque es el que da el menor tiempo de ejecucion con el error aceptado.
 
     python3 visualization/energy.py
     python3 visualization/energy.py --estilo diapositiva --figures data/figuras_diapositivas
 
-La figura de la energia dibuja un solo panel y solo los dt de --pasos: el
-barrido entero son siete curvas y en una misma escala no se distinguen. El
-mas largo (10^-3 s) explota dos ordenes de magnitud por encima de E0 y aplasta
-a todas las demas contra la recta de E0; 10^-4 s y los dos mas cortos (2*10^-5
-y 10^-5 s) caen encima del elegido y no se distinguen de el. Quedan tres, que
-es lo que pide el enunciado ("distintos valores de dt") y se leen las tres en
-la misma escala: una que deriva hacia arriba, una hacia abajo y la elegida,
-que no se despega de E0. El barrido
-completo igual se mide: va entero en la tabla, en resumen.csv y en la figura
-de la deriva, que es la que elige el paso y lleva el ajuste de la ley de
-potencia D = c dt^a sobre los pasos estables, con el exponente en la leyenda.
+La figura del error dibuja un solo panel y solo los dt de --pasos: el barrido
+entero son siete curvas y en una misma escala no se distinguen. El mas largo
+(10^-3 s) se va al 1000 % y aplasta a todas las demas contra el cero; 10^-4 s y
+los dos mas cortos (2*10^-5 y 10^-5 s) caen encima del elegido y no se
+distinguen de el. Quedan tres, que es lo que pide el enunciado ("distintos
+valores de dt") y se leen las tres en la misma escala: una que se va hacia
+arriba, una hacia abajo y la elegida, que se queda sobre el cero. El barrido
+completo igual se mide: va entero en la tabla, en resumen.csv y en la figura de
+eps_max, que es la que elige el paso y lleva el ajuste de la ley de potencia
+eps_max = c dt^a sobre los pasos estables, con el exponente en la leyenda.
 """
 
 from __future__ import annotations
@@ -105,7 +116,7 @@ def main() -> None:
 
     # Un solo panel y una sola escala, con los dt de --pasos: los que se leen
     # juntos. El resto del barrido no se pierde, sigue en la tabla, en
-    # resumen.csv y en la figura de la deriva.
+    # resumen.csv y en la figura de eps_max.
     wanted = [float(value) for value in arguments.pasos.split(",") if value]
     shown = [row for row in rows if any(np.isclose(row["dt"], value) for value in wanted)]
     missing = [value for value in wanted
@@ -113,37 +124,52 @@ def main() -> None:
     if missing:
         raise SystemExit("no hay corrida con dt = " + ", ".join(f"{v:g}" for v in missing))
     figure, axes = plt.subplots()
+    reach = 0.0
     for row, color in zip(shown, COLORS):
-        axes.plot(row["t"], row["E"], color=color,
+        error = 100.0 * (row["E"] - row["E0"]) / row["E0"]
+        reach = max(reach, float(np.abs(error).max()))
+        axes.plot(row["t"], error, color=color,
                   label=f"$\\Delta t = {common.scientific(row['dt'])}$ s")
-    axes.axhline(rows[0]["E0"], color="#111111", linestyle="--", linewidth=1.2,
-                 label=f"$E_0$ = {common.decimal(rows[0]['E0'], 2)} J")
-    axes.set_ylabel(common.AXIS_ENERGY)
+    # La referencia es el CERO, que es la conservacion exacta, y el eje se abre
+    # igual para los dos lados: queda en el medio de la figura, con las curvas
+    # que se van hacia arriba de un lado y las que se van hacia abajo del otro.
+    # Antes la referencia era la recta de E0 en Joule, que con estas curvas
+    # caia contra el borde de abajo y habia que mirarla de costado.
+    axes.axhline(0.0, color="#111111", linestyle=":", linewidth=1.3,
+                 label="conservación exacta", zorder=1)
+    axes.set_ylabel(common.AXIS_ENERGY_ERROR)
     axes.set_xlabel(common.AXIS_TIME)
-    # Las curvas ocupan todo el ancho: la leyenda va arriba, en el hueco que
-    # deja el margen, y en dos columnas para no robarle alto a la figura.
-    common.headroom(axes, 0.34)
-    axes.legend(loc="upper left", ncol=2)
-    energy_figure = out_dir / f"energia_vs_t_N{count}.png"
+    # Simetrico: el cero queda en el medio. Las curvas no lo son (la que deriva
+    # hacia arriba llega al 2,6 % y la que deriva hacia abajo al -0,6 %), y esa
+    # mitad de abajo que queda libre es donde entra la leyenda sin tapar nada.
+    axes.set_ylim(-1.3 * reach, 1.3 * reach)
+    axes.legend(loc="lower left", ncol=2)
+    energy_figure = out_dir / f"error_energia_vs_t_N{count}.png"
     common.save(figure, energy_figure)
     plt.close(figure)
 
     steps = np.array([row["dt"] for row in rows])
-    drift = np.array([row["deriva"] for row in rows])
-    chosen = float(steps[drift <= arguments.cota].max()) if (drift <= arguments.cota).any() else None
+    # En porcentaje, la misma unidad que la figura de eps(t): la cota de la
+    # linea de comandos viene en relativo y se convierte aca.
+    drift = 100.0 * np.array([row["deriva"] for row in rows])
+    limit = 100.0 * arguments.cota
+    chosen = float(steps[drift <= limit].max()) if (drift <= limit).any() else None
 
-    stable = drift <= arguments.estable
+    stable = drift <= 100.0 * arguments.estable
     exponent, intercept = np.polyfit(np.log(steps[stable]), np.log(drift[stable]), 1)
 
     figure, axes = plt.subplots()
     axes.plot(steps, drift, color=common.FRESH, marker="o", linestyle="none", markersize=8,
-              label="deriva medida")
+              label="error medido")
     line = np.geomspace(steps[stable].min(), steps[stable].max(), 100)
     axes.plot(line, np.exp(intercept) * line ** exponent, color=common.FRESH, linestyle="--",
               linewidth=1.6,
               label=f"ajuste $c\\,\\Delta t^{{a}}$, $a$ = {common.decimal(exponent, 1)}")
-    axes.axhline(arguments.cota, color=common.USED, linestyle="--", linewidth=1.4,
-                 label=f"cota {common.decimal(arguments.cota)}")
+    # La cota va en gris punteado y no en rojo: es el criterio, no un
+    # resultado. El rojo queda para el unico dato que la figura senala, que es
+    # el paso elegido.
+    axes.axhline(limit, color="#777777", linestyle=":", linewidth=1.4,
+                 label=f"cota {common.decimal(limit)} %", zorder=1)
     if chosen is not None:
         axes.plot([chosen], [drift[steps == chosen][0]], marker="o", markersize=16,
                   markerfacecolor="none", markeredgecolor=common.USED, markeredgewidth=2,
@@ -153,24 +179,29 @@ def main() -> None:
     axes.set_yscale("log")
     axes.set_xlabel(common.AXIS_STEP)
     axes.set_ylabel(common.AXIS_DRIFT)
-    # Los puntos suben en diagonal: la esquina superior izquierda queda libre.
-    common.headroom(axes, 0.36)
+    # Los puntos suben en diagonal: la esquina libre es la de arriba a la
+    # izquierda. El hueco que se le deja es chico a proposito: en escala
+    # logaritmica cada punto de headroom son decadas enteras, y con el paso
+    # inestable arriba (1000 %) y el mas corto abajo (0,001 %) el eje ya cubre
+    # seis decadas; agregarle cuatro vacias dejaba todos los puntos aplastados
+    # contra el borde de abajo.
+    common.headroom(axes, 0.20)
     axes.legend(loc="upper left")
-    drift_figure = out_dir / f"deriva_vs_dt_N{count}.png"
+    drift_figure = out_dir / f"error_maximo_vs_dt_N{count}.png"
     common.save(figure, drift_figure)
     plt.close(figure)
 
     offset = rows[0]["xo"]
     where = "sin obstáculos" if offset < 0 else f"xo = {offset:g} m"
     print(f"N = {count}, {where}, E0 = {rows[0]['E0']:.6g} J")
-    print(f"{'dt (s)':>10} {'cuadros':>8} {'deriva máxima':>16} {'deriva final':>14}")
+    print(f"{'dt (s)':>10} {'cuadros':>8} {'|eps| máximo (%)':>18} {'eps final (%)':>15}")
     for row in rows:
-        print(f"{row['dt']:10.1e} {row['cuadros']:8d} {row['deriva']:16.3e} "
-              f"{row['deriva_final']:14.3e}")
-    print("dt en la figura de E(t): " + ", ".join(f"{row['dt']:g} s" for row in shown)
+        print(f"{row['dt']:10.1e} {row['cuadros']:8d} {100 * row['deriva']:18.4g} "
+              f"{100 * row['deriva_final']:15.4g}")
+    print("dt en la figura de eps(t): " + ", ".join(f"{row['dt']:g} s" for row in shown)
           + f" (de los {len(rows)} del barrido; el resto no se distingue en esa escala)")
-    print(f"ajuste deriva = c dt^a sobre los pasos estables: a = {exponent:.2f}")
-    print(f"dt elegido (deriva ≤ {arguments.cota:g}): {chosen:g} s" if chosen
+    print(f"ajuste eps_max = c dt^a sobre los pasos estables: a = {exponent:.2f}")
+    print(f"dt elegido (error ≤ {limit:g} %): {chosen:g} s" if chosen
           else "ningún dt del barrido queda por debajo de la cota")
     print(energy_figure)
     print(drift_figure)

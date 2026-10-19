@@ -1,4 +1,4 @@
-# Consultas para la cátedra — última oportunidad antes de entregar
+# Consultas para la cátedra
 
 Ordenadas por lo que puede costar nota. Cada una tiene **qué preguntar** y
 **qué contestamos si nos devuelven la pregunta** (porque siempre la devuelven).
@@ -10,9 +10,33 @@ que se consulte lo que no quede claro, y las devoluciones del TP2 piden
 
 ---
 
+## Lo que se contestó en la consulta del 19/10
+
+Idea de fondo que dieron, y que ordena el resto: **lo interesante es tomar
+decisiones**, y cada decisión tiene que estar escrita como una viñeta corta, al
+lado de lo que decide, para que se puedan comparar. De ahí sale que cada
+esquema de integración lleve su "decisión: con qué v evalúa a(t+dt)".
+
+| Consulta | Qué contestaron | Qué se hizo |
+|---|---|---|
+| **A1** Velocity Verlet | Está bien evaluar con la velocidad de medio paso | Queda como estaba; la decisión va escrita al lado de las ecuaciones de cada esquema |
+| **A2** El exponente del ajuste | Si se dibuja la recta de regresión, hay que decir la pendiente | `t ∝ N^0,88` y `N^3,52`, escritos en las viñetas de la diapositiva 17 |
+| **A4** `tf = 30 s` del 2.4.a | No hace falta atenerse a las corridas del 2.1.b | Barrido propio (`make densidad`): xo = r, las densidades del mapa, 20 realizaciones, hasta convertirlas todas. Las dos curvas existen en todas las densidades y la U se ve |
+| **B3** El observable de la energía | Graficar el error en **porcentaje**, no la energía absoluta | `eps(t) = 100 (E − E0)/E0` y `eps_max` contra dt, las dos en % |
+| **B7b** Las barras de error | Desvío, no error de la media (`σ/√M` tiende a cero) | Queda el desvío estándar entre realizaciones |
+| **B7** La bolsa de `f(v)` | Un solo histograma con todas las realizaciones juntas | Bolsa de N × M muestras (y × cuadros en el estacionario), sin barras |
+| **2.4.b** El mapa | Dibujar encima el xo óptimo de cada densidad | Línea negra con opacidad moderada sobre el mapa de calor |
+| **Tabla** | Sacar dt2 y tf, corchetes en los intervalos, `10^4` y no `1 × 10^4` | Hecho |
+| **Observables** | Definir `t_x` como el que cumple `Fu(t_x) = x/100` | Hecho, con t90 y t100 como los dos casos |
+
+Lo que sigue abajo queda como registro de lo que se preguntó y de lo que se
+contesta si vuelven sobre el tema en la defensa.
+
+---
+
 ## A. Las que pueden cambiar un resultado o una figura
 
-### A1. Velocity Verlet: ¿despejamos o usamos la velocidad de medio paso?
+### A1. Velocity Verlet: ¿despejamos o usamos la velocidad de medio paso? — RESUELTO: la de medio paso
 
 > La fuerza del oscilador es `f = −k r − γ v`, o sea que depende de la
 > velocidad. En Velocity Verlet, `v(t+Δt) = v(t) + (Δt/2m)(f(t) + f(t+Δt))`, y
@@ -34,13 +58,17 @@ que se consulte lo que no quede claro, y las devoluciones del TP2 piden
 la velocidad, ¿despejamos `v(t+Δt)` o usamos la de medio paso? Porque si
 despejamos nos da exactamente Verlet original y quedan 3 esquemas en vez de 4."
 
+**Contestaron que está bien la de medio paso**, que es la que corre. La decisión
+queda escrita en la diapositiva de integración, al lado de las ecuaciones de cada
+esquema, para que se pueda comparar con la de los otros tres.
+
 **Lo que tenemos medido**, por si lo piden: medio paso `p = 2,04` (orden 1);
 despejada `p = 4,00` (orden 2); con la predicción de Euler `p = 4,00`; con
 `v(t)` congelada `p = 2,02`. Hoy corre la de medio paso.
 
 ---
 
-### A2. ¿El exponente del ajuste tiene que estar escrito en la diapositiva?
+### A2. ¿El exponente del ajuste tiene que estar escrito en la diapositiva? — RESUELTO: sí
 
 > En la figura de tiempo de ejecución contra `N` dibujamos los puntos con su
 > desvío y la recta del ajuste `t = c N^a` punteada, pero sacamos el exponente
@@ -53,6 +81,9 @@ el ítem 2.1.b pide "comparar y discutir cómo escala el costo computacional",
 y hoy los exponentes (`0,88` y `3,52`) no están en ninguna parte del PDF. Si
 dicen que tienen que estar, se vuelven a poner en las viñetas: son dos
 números.
+
+**Contestaron que sí**: si se dibuja la recta de regresión hay que decir qué
+pendiente dio. Los dos exponentes están ahora en las viñetas.
 
 ---
 
@@ -73,7 +104,7 @@ termina. Está en `make bench-figuras`, figura
 
 ---
 
-### A4. Ítem 2.4.a: con `t_f = 30 s` casi nadie llega a `F_u = 0,9`
+### A4. Ítem 2.4.a: con `t_f = 30 s` casi nadie llega a `F_u = 0,9` — RESUELTO: barrido propio
 
 > El 2.4.a pide tomar los outputs del 2.1.b y reportar `⟨t90⟩` y `⟨t100⟩` en
 > función de la densidad. Esas corridas son con los obstáculos en contacto y
@@ -132,7 +163,7 @@ muestre de las mismas". Las tres juntas es lo único que deja comparar.
 
 Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
 
-### B3. El observable escalar del 2.1.a y la cota, que el enunciado no fija
+### B3. El observable escalar del 2.1.a y la cota, que el enunciado no fija — RESUELTO: en porcentaje
 
 > El 2.1.a pide proponer un observable escalar que caracterice la evolución de
 > la energía. Propusimos la **deriva relativa máxima**
@@ -185,14 +216,14 @@ las del fondo sale la más baja es azar: a `N = 50` cae en `0,175 m` y a
 > que explique lo observado tiene que estar probada y **mostrada en
 > resultados**. ¿Hace falta una figura, o alcanza con decirlo?
 
-### B7. `f(v)` estacionaria: cómo juntamos las muestras
+### B7. `f(v)` estacionaria: cómo juntamos las muestras — RESUELTO: una sola bolsa
 
 > Para la distribución estacionaria juntamos **todos los cuadros con
 > `t ≥ 10 s`** de las 30 realizaciones. Los cuadros de una misma realización
 > están correlacionados entre sí. ¿Está bien juntarlos así, o esperan un solo
 > instante por realización?
 
-### B7b. Las barras de error: ¿desvío estándar o error de la media?
+### B7b. Las barras de error: ¿desvío estándar o error de la media? — RESUELTO: el desvío
 
 > En **todas** las figuras que promedian sobre realizaciones —`f(v)` intervalo
 > por intervalo, `⟨t90⟩`, el tiempo de ejecución— la barra es el **desvío

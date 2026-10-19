@@ -42,6 +42,7 @@ OSCILLATOR = DATA / "oscilador"
 ENERGY = DATA / "energia"
 EXPLORE = DATA / "explore"
 SPEEDS = DATA / "velocidades"
+DENSITY = DATA / "densidad"
 MAP = DATA / "mapa"
 FIGURES = DATA / "figures"
 
@@ -67,7 +68,12 @@ AXIS_ECM = "ECM (m$^2$)"
 AXIS_ECM_CONSTANT = "ECM / $\\Delta t^4$ (m$^2$/s$^4$)"
 AXIS_POSITION = "$r$ (m)"
 AXIS_ENERGY = "$E$ (J)"
-AXIS_DRIFT = "$\\max_t |E(t) - E_0| / E_0$"
+# El error de la energia va en PORCENTAJE y no en Joule ni en relativo a secas:
+# lo que se decide con estas dos figuras es "me quedo con este paso porque el
+# error es menor que tanto por ciento", y asi el numero del eje es el numero de
+# la frase. epsilon esta definido en la diapositiva de observables.
+AXIS_ENERGY_ERROR = "$\\varepsilon$ (%)"
+AXIS_DRIFT = "$\\varepsilon_{\\max}$ (%)"
 AXIS_COUNT = "$N$"
 AXIS_WALL = "tiempo de ejecución (s)"
 AXIS_FU = "$F_u$"

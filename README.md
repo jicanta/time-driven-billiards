@@ -55,6 +55,7 @@ tp-4/
     ├── bench/          #   ítem 2.1.b: tiempos contra N (y los del TP3, en la misma computadora)
     ├── explore/2.2/    #   ítem 2.2: barrido de xo con N = 100 y N = 20
     ├── velocidades/    #   ítem 2.3: N = 100 sin obstáculos, cuadros hasta el estacionario
+    ├── densidad/       #   ítem 2.4.a: barrido de N con xo = r, hasta convertirlas todas
     ├── mapa/           #   ítem 2.4.b: barrido (xo, N)
     ├── runs/           #   corridas con cuadros para las animaciones y la validación
     └── figures/, figuras_diapositivas/   # figuras por ítem, en estilo de revisión y de diapositiva
@@ -305,17 +306,26 @@ sistema masa-resorte, `τ = π √(μ/k)`: 3,51 ms entre dos partículas
 (`μ = m/2`) y 4,97 ms contra un obstáculo o la pared (`μ = m`). El paso tiene
 que resolver ese choque.
 
-El observable escalar que resume cada curva `E(t)` es la **deriva relativa
-máxima**, `D(dt) = maxₜ |E(t) − E(0)| / E(0)`: una sola cifra por corrida. Se
-elige el `dt` más largo con `D ≤ 10⁻³`, porque es el que da el menor tiempo de
-ejecución con el error aceptado.
+Lo que se grafica no es `E(t)` en Joule sino su **error relativo en
+porcentaje**, `eps(t) = 100 (E(t) − E₀) / E₀`, con el cero (la conservación
+exacta) en el medio de la figura: así el número del eje es el número de la
+frase con la que se elige el paso. El observable escalar que resume cada curva
+es `eps_max(dt) = maxₜ |eps(t)|`, una sola cifra por corrida. Se elige el `dt`
+más largo con `eps_max ≤ 0,1 %`, porque es el que da el menor tiempo de
+ejecución con el error aceptado: `dt = 5·10⁻⁵ s`, que deja `0,04 %` a
+`N = 300` y `0,03 %` a `N = 700` con obstáculos.
 
 ## Ítem 2.3: distribución de velocidades
 
-La distribución de un instante junta los `|v|` de las `N` partículas de todas
-las realizaciones en ese cuadro; la estacionaria junta además todos los cuadros
-con `t ≥ 10 s` (promedio temporal, que para un estado estacionario es el mismo
-promedio de ensamble) y así tiene estadística suficiente para el ajuste.
+Cada histograma es **uno solo, sobre una bolsa de muestras**: los `|v|` de las
+`N` partículas de las `M` realizaciones, todos juntos (`N × M = 3000` por
+instante); la estacionaria suma además todos los cuadros con `t ≥ 10 s`
+(promedio temporal, que para un estado estacionario es el mismo promedio de
+ensamble): `30 × 401 × 100 = 1,2·10⁶` muestras. No es el promedio de los `M`
+histogramas de cada realización con su desvío como barra: con 100 partículas en
+40 intervalos, el histograma de una realización sola es ruido, y promediar `M`
+curvas ruidosas con barras del 50 % tapa la forma de `f(v)`. El desvío entre
+realizaciones se sigue midiendo y se imprime, pero no se dibuja.
 
 La figura de la evolución muestra **instantes**, cada uno con su `t` exacto
 (el último cuadro guardado hace de estacionario): un `t ≥ algo` es un promedio
@@ -339,13 +349,13 @@ vale `m v0²/2 = 0,0125 J`.
 |---|---|---|
 | `common.py` | — | lectura de las corridas, observables (energía, `Fu`, `t90`, ECM, ajuste de `kT`), estilos `informe`/`diapositiva` y `save()` con coma decimal en los ejes |
 | `oscillator.py` | 1.1, 1.2 | ECM contra `dt` de los cuatro esquemas, en doble logarítmica y con el exponente de `ECM = c dtᵖ` ajustado en log-log (la figura de la presentación), más `ECM/dt⁴` de los dos de cuarto orden como figura aparte; `--trayectoria dt` agrega la figura de posición contra tiempo |
-| `energy.py` | 2.1.a | `E(t)` de los `dt` de `--pasos` (los representativos, los que se leen en una misma escala) y deriva relativa máxima contra `dt` sobre el barrido entero, con el `dt` elegido marcado |
+| `energy.py` | 2.1.a | error relativo de la energía en % contra `t` para los `dt` de `--pasos` (los representativos, los que se leen en una misma escala, con el cero en el medio) y `eps_max` en % contra `dt` sobre el barrido entero, con la cota y el `dt` elegido marcados |
 | `bench.py` | 2.1.b | tiempo de ejecución contra `N` con el desvío entre las 10 realizaciones (dibujado, y escrito en el pie porque en cuatro décadas no se ve), una serie por archivo de tiempos, ajuste `t = c Nᵃ` punteado y sin entrada propia en la leyenda, ejes doble logarítmicos |
 | `explore.py` | 2.2 | `t90` de cada corrida desde el registro de conversiones, `resumen.csv` con `⟨t90⟩ ± σ`, cuántas realizaciones llegan y `Fu(tmax)`; figura `⟨t90⟩` contra `xo` con una curva por `N`; `--fraccion 1` hace lo mismo con `t100` |
 | `conversion.py` | 2.2 | `--casos`: `Fu(t)` promedio de varios `xo` en una misma figura, con banda de `± σ` entre realizaciones y `⟨t90⟩ ± σ` marcado sobre la línea de `0,9` (es la figura que pide el ítem); `--runs` dibuja corridas sueltas como escalón, para mirar una configuración de cerca |
-| `speeds.py` | 2.3 | `f(v)` en varios instantes exactos (con el desvío entre realizaciones por intervalo), ajuste de Maxwell-Boltzmann de la estacionaria por el mínimo de `E(kT)` y comparación con `m ⟨v²⟩/2` |
-| `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad desde las corridas del 2.1.b, en dos ejes y nada más (hueco donde no llegan todas las realizaciones); `Fu(tf)` contra la densidad va en su propia figura |
-| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`: eje `x` con la posición real de los obstáculos, una fila por `N` y escala de colores logarítmica (⟨t90⟩ crece más con `N` que con `xo`; en escala lineal el color lo gobierna la fila y adentro de cada una queda todo del mismo tono). Ningún símbolo encima: el mínimo se lee por color, y por consola salen el vértice de la parábola ajustada a la panza de cada fila (el `xo` óptimo con su error), qué celdas son compatibles con el mínimo y cuánto castiga la peor posición |
+| `speeds.py` | 2.3 | `f(v)` en varios instantes exactos, un histograma por bolsa (`N × M` muestras), ajuste de Maxwell-Boltzmann de la estacionaria por el mínimo de `E(kT)` (cuyo ancho da el error del ajuste) y comparación con `m ⟨v²⟩/2` y `m v₀²/2` |
+| `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad, en dos ejes y nada más, desde el barrido propio del ítem (`make densidad`: `xo = r`, las densidades del mapa, 20 realizaciones, cada corrida hasta convertirlas todas). No usa las corridas del 2.1.b: con su `tf = 30 s` fijo la mayoría de las densidades no llega a `Fu = 0,9` y la figura no muestra ninguna densidad óptima |
+| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`: eje `x` con la posición real de los obstáculos, una fila por `N` y escala de colores logarítmica (⟨t90⟩ crece más con `N` que con `xo`; en escala lineal el color lo gobierna la fila y adentro de cada una queda todo del mismo tono). Encima va el `xo` óptimo de cada densidad como una línea negra con opacidad moderada: un punto por fila, el vértice de la parábola ajustada a su panza (no la celda más baja, que entre las del fondo sale sorteada por azar). Por consola salen ese vértice con su error, qué celdas son compatibles con el mínimo y cuánto castiga la peor posición |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
 | `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |
 | `halfstep.py` | 1.1 | prueba de la decisión de Velocity Verlet: verifica contra el motor y mide el orden que da cada una de las 4 maneras de evaluar `a(t+dt)` |

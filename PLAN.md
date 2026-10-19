@@ -308,13 +308,13 @@ es el cambio de color de una partícula, que es parte del estado.
 |---|---|---|
 | `common.py` | — | lectura de las corridas, observables, estilos y `save()` |
 | `oscillator.py` | 1.1, 1.2 | ECM contra `dt` de los cuatro esquemas y la trayectoria |
-| `energy.py` | 2.1.a | `E(t)` por `dt` y deriva relativa máxima contra `dt` |
+| `energy.py` | 2.1.a | error relativo de `E` en % por `dt`, y su máximo contra `dt` |
 | `bench.py` | 2.1.b | tiempo de ejecución contra `N` de los dos paradigmas |
 | `explore.py` | 2.2 | `⟨t90⟩` contra `xo`, una curva por `N` |
 | `conversion.py` | 2.2 | `Fu(t)` de los `xo` típicos en una figura (`--casos`), con `⟨t90⟩ ± σ` marcado |
-| `speeds.py` | 2.3 | `f(v)` por instante, ajuste de Maxwell-Boltzmann y `E(kT)` |
-| `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad |
-| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`, sin marcar la celda más baja: no se resuelve dentro del error |
+| `speeds.py` | 2.3 | `f(v)` por instante (un histograma por bolsa), ajuste de Maxwell-Boltzmann y `E(kT)` |
+| `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad, del barrido propio del ítem |
+| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en `(xo, N)`, con el óptimo de cada fila dibujado encima |
 | `single.py` | 2.4.a | `N = 1`: conversión contra el parámetro de impacto (`make una-particula`) |
 | `halfstep.py` | 1.1 | las 4 maneras de evaluar `a(t+dt)` en Velocity Verlet y el orden de cada una (`make velocity-verlet-variantes`) |
 | `animate.py` | — | animación y cuadro fijo |
@@ -349,9 +349,13 @@ es el cambio de color de una partícula, que es parte del estado.
 
 - `N = 300`, sin obstáculos, `tf = 5 s`, `dt` de `10⁻³` a `10⁻⁵`, el mismo
   `dt2 = 0,01 s` para todos (`make energia`).
-- Observable escalar propuesto: **deriva relativa máxima**
-  `D(dt) = maxₜ |E(t) − E(0)| / E(0)`.
-- Criterio: el `dt` más largo con `D ≤ 10⁻³` (0,1 %), porque es el que da el
+- Lo que se grafica es el **error relativo de la energía en porcentaje**,
+  `eps(t) = 100 (E(t) − E₀)/E₀`, con el cero en el medio de la figura (la
+  cátedra, 19/10: el porcentaje es más ilustrativo que la energía absoluta,
+  porque es el número con el que se justifica el paso elegido).
+- Observable escalar: **el máximo de ese error**,
+  `eps_max(dt) = maxₜ |eps(t)|`.
+- Criterio: el `dt` más largo con `eps_max ≤ 0,1 %`, porque es el que da el
   menor tiempo de ejecución con el error aceptado.
 - Se verifica que el `dt` elegido sigue cumpliendo la cota en la condición más
   exigente del trabajo (`N = 700`, con obstáculos): `make energia-densa`.
@@ -386,9 +390,13 @@ es el cambio de color de una partícula, que es parte del estado.
 
 ### Ítem 2.3 — Distribución de velocidades
 
-- `N = 100`, sin obstáculos, `tmax = 30 s`, `dt2 = 0,05 s`, 10 realizaciones.
+- `N = 100`, sin obstáculos, `tmax = 30 s`, `dt2 = 0,05 s`, 30 realizaciones.
 - `f(v)` en varios instantes desde `t = 0` y la estacionaria (todos los
   cuadros con `t ≥ 10 s` de todas las realizaciones).
+- Cada histograma es **uno solo sobre la bolsa** de `N × M` muestras (y
+  `× cuadros` en el estacionario), sin barras de error (la cátedra, 19/10):
+  el histograma de una realización sola es ruido y promediar `M` curvas
+  ruidosas tapa la forma de `f(v)`.
 - Ajuste de `kT` por el mínimo del error cuadrático medio (Teórica 0) y
   comparación con `m ⟨v²⟩/2 = m v0²/2`.
 
@@ -403,15 +411,20 @@ es el cambio de color de una partícula, que es parte del estado.
   las 40 con `b < 3r`, contra el 13,6 % que predice la distribución de `b`
   para posiciones uniformes y direcciones isótropas; `L` se conserva a
   `6·10⁻¹¹` relativo en 20 s con 21 rebotes. A densidad alta el camino libre
-  se achica y el blanco queda rodeado: por eso `Fu(tf)` es máxima en
-  `N = 30–50`.
+  se achica y el blanco queda rodeado. Las dos cosas juntas dan la U medida:
+  `⟨t90⟩` mínimo en `ρ = 86` (`N = 70`) y creciendo hacia las dos puntas.
 
-- (a) De las corridas del 2.1.b, como pide el enunciado: `⟨t90⟩` y `⟨t100⟩`
-  contra `ρ = N/(πR²)`, con el `N` correspondiente en el eje de arriba. Con
-  los obstáculos en contacto y `tf = 30 s` fijos, por encima de cierta
-  densidad ninguna realización llega a `Fu = 0,9`: ahí el observable deja de
-  existir y lo que se informa es `Fu(tf)`, que va en el eje de la derecha de
-  la misma figura.
+- (a) **Barrido propio** (`make densidad`), con la cátedra de acuerdo (19/10:
+  "no es necesario atenerse a las del 2.1.b"): la misma configuración
+  (`xo = r`) y las mismas densidades que la columna `xo = r` del mapa del
+  2.4.b, 20 realizaciones y cada corrida hasta convertirlas todas. `⟨t90⟩` y
+  `⟨t100⟩` contra `ρ = N/(πR²)`, dos ejes y nada más.
+  Con las corridas del 2.1.b (`tf = 30 s` fijo) la figura era plana en 21 s y
+  después se cortaba: de `N = 200` para arriba ninguna realización llegaba a
+  `Fu = 0,9` y a `N = 5` llegaba una sola de diez, así que no mostraba
+  ninguna densidad óptima, que es justo lo que el ítem pregunta. Con el
+  barrido propio las dos curvas son una U: `⟨t90⟩` mínimo en `ρ = 86`
+  (`N = 70`), 21,8 s, contra 66 s en `ρ = 6` y 54 s en `ρ = 367`.
 - (b) (opcional, se hace) mapa de calor de `⟨t90⟩` en `(xo, N)` con
   `N ∈ {20, 50, 100, 200, 300}` y 6 valores de `xo`, 6 realizaciones por
   punto, con un proceso por `N`.
@@ -552,17 +565,17 @@ nota y con lo que contestamos si nos devuelven la pregunta, está en
    es 0,71 (0,82 con `N = 700`) y la condición inicial al azar del enunciado
    ya no entra. ¿Está bien usar una red triangular por encima de `N = 400`,
    como en el TP3?
-2. El ítem 2.4.a pide tomar las corridas del 2.1.b, que son con los obstáculos
-   en contacto y `tf = 30 s`. Con esa configuración sólo los `N` chicos llegan
-   a `Fu = 0,9` antes de `tf`: a `N = 200` la media es `Fu(tf) = 0,84` y a
-   `N = 700` es `0,01`. Se informa `⟨t90⟩` y `⟨t100⟩` donde existen y `Fu(tf)`
-   en todo el rango, en la misma figura. ¿Alcanza así, o se espera alargar
-   `tf` sólo para este ítem?
+2. ~~El ítem 2.4.a pide tomar las corridas del 2.1.b~~ **RESUELTO (19/10)**: la
+   cátedra dijo que no hace falta atenerse a esas corridas. Con su `tf = 30 s`
+   fijo, de `N = 200` para arriba ninguna realización llegaba a `Fu = 0,9` y a
+   `N = 5` llegaba una sola de diez, así que la figura no mostraba ninguna
+   densidad óptima. El ítem corre ahora su propio barrido (`make densidad`).
 3. Para el sistema 1, ¿se espera la variante predictor-corrector de Beeman
    (diapositiva 20) o la de fuerza independiente de la velocidad
    (diapositiva 19)? Se usó la primera, que es la que corresponde a una
    fuerza con rozamiento.
-4. **Velocity Verlet con la fuerza que depende de la velocidad** (la que
+4. **RESUELTO (19/10): va la velocidad de medio paso.** Velocity Verlet con la
+   fuerza que depende de la velocidad (la que
    decide el resultado del ítem 1.2; ver la decisión 3 de §8). En
    `v(t+dt) = v(t) + (dt/2m)(f(t) + f(t+dt))`, el `f(t+dt)` necesita
    `v(t+dt)`, que es lo que la ecuación está calculando: queda implícita. Dos
