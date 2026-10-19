@@ -314,7 +314,7 @@ es el cambio de color de una partícula, que es parte del estado.
 | `conversion.py` | 2.2 | `Fu(t)` de los `xo` típicos en una figura (`--casos`), con `⟨t90⟩ ± σ` marcado |
 | `speeds.py` | 2.3 | `f(v)` por instante, ajuste de Maxwell-Boltzmann y `E(kT)` |
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad |
-| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)` |
+| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`, sin marcar la celda más baja: no se resuelve dentro del error |
 | `single.py` | 2.4.a | `N = 1`: conversión contra el parámetro de impacto (`make una-particula`) |
 | `halfstep.py` | 1.1 | las 4 maneras de evaluar `a(t+dt)` en Velocity Verlet y el orden de cada una (`make velocity-verlet-variantes`) |
 | `animate.py` | — | animación y cuadro fijo |

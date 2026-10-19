@@ -16,8 +16,11 @@ ajuste de cada una y no necesitan entrada propia (se ve de que serie es cada
 una por el color). El exponente se dice en la charla y esta en esta salida.
 
 El desvio estandar se dibuja igual, pero en una figura que abarca cuatro
-decadas una barra del 4 % mide un pixel: el pie de la figura informa el desvio
-relativo maximo, que es la unica forma de que se lea.
+decadas una barra del 4 % mide un pixel: el rotulo informa el desvio relativo
+maximo, que es la unica forma de que se lea. Dice sigma/<t> y no "del valor"
+a proposito: sigma es el desvio entre realizaciones, no una cota de cuanto se
+aparta la peor. El rango completo (max - min) llega al 12 % en el barrido del
+TP3; este script lo imprime por si lo preguntan.
 
     python3 visualization/bench.py --bench data/bench/hexagonal/tiempos.txt,data/bench/tp3_hexagonal.txt \\
         --labels "paso temporal (TP4),eventos (TP3)"
@@ -141,7 +144,8 @@ def main() -> None:
         # no se ven: cuanto valen va escrito, que es lo que pide el enunciado
         # ("incluyendo su desvío estándar").
         axes.text(0.02, 0.97, f"barras: desvío estándar de {repeats} realizaciones\n"
-                              f"(≤ {100 * spread:.0f} % del valor, menor que el símbolo)",
+                              f"($\\sigma/\\langle t \\rangle \\leq$ {100 * spread:.0f} %, "
+                              "menor que el símbolo)",
                   transform=axes.transAxes, ha="left", va="top", color="#555555",
                   fontsize=plt.rcParams["legend.fontsize"])
         out = out_dir / f"{style['name']}_{suffix}_M{repeats}_log.png"
@@ -151,6 +155,16 @@ def main() -> None:
 
     print(f"M = {repeats} realizaciones por N, más la primera medición, descartada del "
           "promedio (arranque en frío)")
+    # sigma no es una cota de cuanto se aparta la peor realizacion: el rango
+    # completo es bastante mayor y conviene tenerlo a mano por si lo preguntan.
+    for path, (label, *_) in zip(paths, benches):
+        rows = {n: row for n, row in common.read_bench(path).items() if n >= arguments.desde}
+        worst = max((((np.array(row["loop"]) + np.array(row["generation"])).max() -
+                      (np.array(row["loop"]) + np.array(row["generation"])).min()) /
+                     (np.array(row["loop"]) + np.array(row["generation"])).mean(), n)
+                    for n, row in rows.items())
+        print(f"  [{label}] rango completo máximo (máx − mín)/⟨t⟩ = "
+              f"{worst[0]:.1%} (en N = {worst[1]}); σ es bastante menor")
     header = f"{'N':>5}" + "".join(f"{label:>26}" for label, *_ in benches)
     print(header)
     for n in every:

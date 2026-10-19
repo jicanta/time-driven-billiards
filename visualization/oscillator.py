@@ -12,10 +12,12 @@ cada esquema se le ajusta una ley de potencia ECM = c dt^p por cuadrados
 minimos en log-log; el exponente va en la leyenda, porque es el que dice el
 orden del esquema (ECM ~ dt^p con error ~ dt^(p/2)).
 
-Los dt en los que el ECM ya dejo de bajar no se grafican: ahi el error del
-esquema quedo por debajo del ruido de redondeo del doble, asi que el punto
-mide la precision de la aritmetica y no el orden del esquema. Con el barrido
-de este trabajo es uno solo, Verlet original en dt = 1e-5 s.
+Los dt en los que el ECM ya dejo de bajar se dibujan con simbolo hueco y
+quedan fuera del ajuste: ahi el error del esquema quedo por debajo del ruido
+de redondeo del doble, asi que el punto mide la precision de la aritmetica y
+no el orden del esquema. Con el barrido de este trabajo es uno solo, Verlet
+original en dt = 1e-5 s, y es justamente el paso en el que Verlet se separa
+de Beeman en la figura.
 
     python3 visualization/oscillator.py
     python3 visualization/oscillator.py --estilo diapositiva --figures data/figuras_diapositivas
@@ -34,6 +36,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
+from matplotlib.lines import Line2D
 
 import common
 
@@ -65,9 +68,10 @@ def converging(errors: np.ndarray) -> np.ndarray:
     redondeo del doble y el ECM deja de bajar (en Verlet original incluso
     vuelve a subir: la recurrencia resta dos numeros casi iguales). Esos
     puntos no miden el orden del esquema sino la precision de la aritmetica,
-    asi que quedan fuera del ajuste de la ley de potencia Y fuera de la
-    figura; el listado que imprime este script dice cuales son. `errors`
-    viene ordenado por dt creciente."""
+    asi que quedan fuera del ajuste de la ley de potencia, pero SI se
+    dibujan, con simbolo hueco: son mediciones y el paso en el que aparecen
+    es parte del resultado (es donde Verlet original se separa de Beeman).
+    `errors` viene ordenado por dt creciente."""
     keep = np.ones(len(errors), dtype=bool)
     for index in range(len(errors) - 2, -1, -1):
         if not keep[index + 1] or errors[index] >= errors[index + 1]:
@@ -163,6 +167,11 @@ def main() -> None:
         axes.plot(steps[keep], errors[keep], color=color, marker=marker,
                   linestyle="--" if name == "verlet" else "-",
                   label=f"{common.SCHEME_LABEL[name]} ($p$ = {common.decimal(exponent, 1)})")
+        # Los dt saturados se dibujan huecos: son mediciones y marcan donde
+        # el esquema toca el piso de redondeo, pero no entran en el ajuste.
+        if (~keep).any():
+            axes.plot(steps[~keep], errors[~keep], color=color, marker=marker,
+                      linestyle="none", markerfacecolor="white", zorder=5)
         if name not in FOURTH_ORDER:
             continue
         constant = errors[keep] / steps[keep] ** 4
@@ -174,8 +183,13 @@ def main() -> None:
     axes.set_xlabel(common.AXIS_STEP)
     axes.set_ylabel(common.AXIS_ECM)
     # Los puntos suben en diagonal: la esquina superior izquierda queda libre.
-    common.headroom(axes, 0.42)
-    axes.legend(loc="upper left")
+    common.headroom(axes, 0.52)
+    handles, labels = axes.get_legend_handles_labels()
+    if any(dropped for dropped in saturated.values()):
+        handles.append(Line2D([], [], marker="o", color="#777777", linestyle="none",
+                              markerfacecolor="white"))
+        labels.append("piso de redondeo (fuera del ajuste)")
+    axes.legend(handles, labels, loc="upper left")
     out = out_dir / "ECM_vs_dt.png"
     common.save(figure, out)
     plt.close(figure)
@@ -231,8 +245,8 @@ def main() -> None:
     for name, dropped in saturated.items():
         if dropped:
             print(f"  {common.SCHEME_LABEL[name]}: el ECM deja de bajar en dt ≤ "
-                  f"{max(dropped):.0e} s ({len(dropped)} punto(s) fuera de la figura "
-                  f"y del ajuste)")
+                  f"{max(dropped):.0e} s ({len(dropped)} punto(s) dibujados huecos, "
+                  f"fuera del ajuste)")
     for name, dropped in outside_zoom.items():
         if dropped:
             print(f"  {common.SCHEME_LABEL[name]}: fuera de la ampliación en dt ≤ "

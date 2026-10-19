@@ -24,9 +24,11 @@ porque es el que da el menor tiempo de ejecucion con el error aceptado.
 La figura de la energia dibuja un solo panel y solo los dt de --pasos: el
 barrido entero son siete curvas y en una misma escala no se distinguen. El
 mas largo (10^-3 s) explota dos ordenes de magnitud por encima de E0 y aplasta
-a todas las demas contra la recta de E0; los dos mas cortos (2*10^-5 y 10^-5 s)
-caen encima del elegido. Quedan cuatro, que es lo que pide el enunciado
-("distintos valores de dt") y se leen todas en la misma escala. El barrido
+a todas las demas contra la recta de E0; 10^-4 s y los dos mas cortos (2*10^-5
+y 10^-5 s) caen encima del elegido y no se distinguen de el. Quedan tres, que
+es lo que pide el enunciado ("distintos valores de dt") y se leen las tres en
+la misma escala: una que deriva hacia arriba, una hacia abajo y la elegida,
+que no se despega de E0. El barrido
 completo igual se mide: va entero en la tabla, en resumen.csv y en la figura
 de la deriva, que es la que elige el paso y lleva el ajuste de la ley de
 potencia D = c dt^a sobre los pasos estables, con el exponente en la leyenda.
@@ -89,7 +91,7 @@ def main() -> None:
     parser.add_argument("--estable", type=float, default=0.1,
                         help="deriva por encima de la cual se considera que el paso es "
                              "inestable: queda fuera del ajuste de la ley de potencia")
-    parser.add_argument("--pasos", type=str, default="5e-4,2e-4,1e-4,5e-5",
+    parser.add_argument("--pasos", type=str, default="5e-4,2e-4,5e-5",
                         help="los dt (s) que se dibujan en la figura de E(t), separados por "
                              "coma: los representativos, los que se leen en una misma escala")
     common.add_common_arguments(parser)

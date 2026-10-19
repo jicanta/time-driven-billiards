@@ -266,7 +266,7 @@
     \vspace{-0.3em}
     \begin{columns}[t,onlytextwidth]
         \begin{column}{0.44\textwidth}
-            \rotulo{Billar (sistema 2): Verlet original}
+            \rotulo{Billar (sistema 2): Verlet original} \cita{lo pide el enunciado}
             \vspace{-0.4em}
             \[\begin{aligned}
                 \vr(t{+}\dt) &= 2\vr(t) - \vr(t{-}\dt) + \tfrac{\dt^2}{m}\vF(t)\\[0.2em]
@@ -445,8 +445,9 @@
               error $\propto \dt^{2}$. En esta escala se superponen.
         \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$, un
               orden menos. A $\dt = \SI{1e-4}{\second}$, ocho órdenes hasta Beeman.
-        \item \alert{Beeman es el mejor}: menor ECM en 8 de los 9 pasos. Lo que lo
-              separa de Verlet es la constante del error, un \SI{15}{\percent}.
+        \item \alert{Beeman es el mejor}: menor ECM en 8 de los 9 pasos. En
+              $\dt = \SI{1e-5}{\second}$ Verlet ya mide el \textbf{piso de redondeo}
+              (símbolo hueco) y queda 50 veces por encima.
         \cond{$m = \SI{70}{\kilogram}$, $k = \SI{1e4}{\newton\per\meter}$, $\gamma = \SI{100}{\kilogram\per\second}$, $A = \SI{1}{\meter}$, $t_f = \SI{5}{\second}$}
     }
 \end{frame}
@@ -455,12 +456,14 @@
     \figbulw[0.35em]{slide-14-energia-vs-t.png}{%
         \item $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$: el sistema es
               conservativo y se mide cuánto se aparta.
-        \item $\SI{5e-4}{\second}$ deriva un \SI{2.6}{\percent} y
-              $\SI{2e-4}{\second}$ un \SI{0.6}{\percent} (hacia abajo); de
-              $\SI{1e-4}{\second}$ en adelante no se distinguen de $E_0$.
-        \item Fuera de escala, $\dt = \SI{1e-3}{\second}$ explota a \SI{45}{\joule}:
-              el choque dura $\tau = \pi\sqrt{\mu/k} = \SI{3.5}{\milli\second}$ y
-              entran sólo tres pasos.
+        \item $\SI{5e-4}{\second}$ deriva un \SI{2.6}{\percent} hacia arriba y
+              $\SI{2e-4}{\second}$ un \SI{0.6}{\percent} hacia abajo;
+              $\SI{5e-5}{\second}$ no se despega de $E_0$.
+        \item Son 3 de los 7 $\dt$ medidos: $\SI{1e-3}{\second}$ explota a
+              \SI{45}{\joule} y se sale de escala (el choque dura
+              $\tau = \pi\sqrt{\mu/k} = \SI{3.5}{\milli\second}$, entran tres pasos),
+              y de $\SI{1e-4}{\second}$ para abajo caen todas encima de
+              $\SI{5e-5}{\second}$.
         \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$, $\dtd = \SI{0.01}{\second}$}
     }
 \end{frame}
@@ -495,7 +498,7 @@
               choques crecen con $N$.
         \item \alert{Se cruzan en $N \approx 470$}: a $N = 600$ los eventos
               cuestan $2{,}9$ veces más (\SI{42.3}{\second} contra \SI{14.8}{\second}).
-        \cond{$x_o = r$, $t_f = \SI{30}{\second}$, 10 realizaciones; punteadas: ajuste $c\,N^{a}$}
+        \cond{$x_o = r$, $t_f = \SI{30}{\second}$; las punteadas son el ajuste de cada serie}
     }
 \end{frame}
 
@@ -601,14 +604,15 @@
 \end{frame}
 
 \begin{frame}{Posición óptima para cada densidad}
-    \figbul{slide-27-mapa-t90-xo-N.png}{%
-        \item El mínimo cae en $x_o = 0{,}2$--$\SI{0.3}{\meter}$ para las cinco
-              densidades: \alert{no se corre con $N$}.
-        \item Los extremos son siempre los peores, y el castigo crece con la
-              densidad: $1{,}9$ veces el óptimo a $N = 20$ y $2{,}4$ a $N = 300$.
-        \item $\mtnov$ en el óptimo pasa de \SI{11.8}{\second} a
-              \SI{28.9}{\second} entre $N = 20$ y $300$.
-        \cond{$t_{max} = \SI{100}{\second}$, promedio de 6 realizaciones por punto}
+    \figbulw[0.25em]{slide-27-mapa-t90-xo-N.png}{%
+        \item La banda oscura está en $x_o = 0{,}2$--$\SI{0.3}{\meter}$ en las cinco
+              densidades, y ahí el mínimo no se distingue de su vecino dentro del
+              error: \alert{no se resuelve un corrimiento con $N$}.
+        \item Los extremos son los peores, y el castigo crece con la densidad:
+              $1{,}9$ veces el mínimo a $N = 20$ y $2{,}4$ a $N = 300$.
+        \item $\mtnov$ en el mínimo pasa de $11{,}8 \pm \SI{1.9}{\second}$ a
+              $28{,}9 \pm \SI{0.8}{\second}$ entre $N = 20$ y $300$.
+        \cond{$t_{max} = \SI{100}{\second}$, 6 realizaciones; error de la media $0{,}5$--\SI{3.1}{\second}}
     }
 \end{frame}
 

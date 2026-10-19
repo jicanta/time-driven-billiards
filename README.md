@@ -333,7 +333,7 @@ vale `m v0²/2 = 0,0125 J`.
 | `conversion.py` | 2.2 | `--casos`: `Fu(t)` promedio de varios `xo` en una misma figura, con banda de `± σ` entre realizaciones y `⟨t90⟩ ± σ` marcado sobre la línea de `0,9` (es la figura que pide el ítem); `--runs` dibuja corridas sueltas como escalón, para mirar una configuración de cerca |
 | `speeds.py` | 2.3 | `f(v)` en varios instantes y la estacionaria, ajuste de Maxwell-Boltzmann por el mínimo de `E(kT)` y comparación con `m ⟨v²⟩/2` |
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad desde las corridas del 2.1.b, con el `N` en el eje de arriba |
-| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`, con el óptimo de cada `N` marcado con un círculo blanco (la referencia va arriba del mapa: adentro taparía celdas) |
+| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`; la celda más baja de cada fila **no** se marca (con 6 realizaciones casi nunca se distingue de sus vecinas), y por consola van el error de la media y qué celdas son compatibles con el mínimo |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
 | `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |
 | `halfstep.py` | 1.1 | prueba de la decisión de Velocity Verlet: verifica contra el motor y mide el orden que da cada una de las 4 maneras de evaluar `a(t+dt)` |

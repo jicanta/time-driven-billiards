@@ -32,6 +32,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 ## 5. Integración de las ecuaciones de movimiento
 
 - Para el billar, Verlet original: paso fijo Δt, la fuerza depende sólo de las posiciones, el estado se guarda cada Δt2 = n·Δt.
+- Si preguntan "¿por qué Verlet si en la figura gana Beeman?": primero, porque el enunciado del sistema 2 dice textual "utilizar el esquema de Verlet". Y además, la ventaja de Beeman se mide en el oscilador, donde la fuerza depende de la velocidad; en el billar la fuerza es el resorte de contacto y depende **sólo de las posiciones**, así que esa diferencia desaparece. Lo tenemos medido: con γ = 0 las constantes del error de los dos dan 21000 y 21019, iguales dentro del redondeo (`make oscilador-sin-amortiguamiento`).
 - Para el oscilador (sistema 1), además Velocity Verlet, Beeman y Euler predictor-corrector.
 - En el oscilador la fuerza depende de la velocidad: los esquemas difieren en con qué v evalúan a(t + Δt), y de ahí sale el orden de cada uno.
 - Si preguntan por Velocity Verlet (es la pregunta más probable de esta diapositiva): la fórmula de la Teórica es v(t + Δt) = v(t) + (Δt/2m)(f(t) + f(t + Δt)), y f(t + Δt) necesita v(t + Δt), que es lo que la ecuación está calculando. Queda implícita y hay dos salidas razonables.
@@ -82,15 +83,15 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 - Beeman y Verlet original van los dos como ECM ∝ Δt⁴, o sea error de segundo orden, y en diez órdenes de magnitud se superponen. Velocity Verlet y Euler p-c van como Δt², un orden menos, por cómo evalúan a(t + Δt) (ya se explicó en la diapositiva de integración).
 - A Δt = 10⁻⁴ s hay ocho órdenes entre Beeman y Euler p-c. Beeman es el mejor: tiene el menor ECM en 8 de los 9 pasos del barrido.
+- El punto hueco de Verlet en Δt = 10⁻⁵ s es donde se separan: ahí Verlet ya no mide el error del esquema sino el piso de redondeo del doble (su recurrencia resta dos números casi iguales) y queda 50 veces por encima de Beeman. Está dibujado porque es una medición, pero fuera del ajuste, porque no mide el orden.
 - Si preguntan por qué Beeman y no Verlet, que en la figura se superponen: lo que los separa no es la pendiente sino la constante. Dividiendo el ECM por Δt⁴ queda 330 para Beeman y 380 para Verlet, un 15 % más de ECM con el mismo paso (la figura está en `data/figures/1_oscilador/ECM_constante_vs_dt.png`, fuera de la charla porque el enunciado pide una sola diapositiva del sistema 1).
 - Esa diferencia es toda de la fuerza que depende de la velocidad. Con γ = 0 las dos constantes dan 21000 y 21019, iguales dentro del redondeo (`make oscilador-sin-amortiguamiento`).
-- El punto de Verlet en Δt = 10⁻⁵ s no está: ahí su ECM es ruido de redondeo del doble y no el error del esquema.
 
 ## 14. Energía total contra el tiempo — `slide-14-energia-vs-t.png`
 
 - E0 = 3,75 J y el sistema es conservativo: todo lo que se aparta es error del integrador.
 - 5·10⁻⁴ s deriva 2,6 % y 2·10⁻⁴ s un 0,6 % (hacia abajo); de 10⁻⁴ s para abajo no se distinguen de E0.
-- Son 4 de los 7 Δt medidos: los tres que faltan no se leerían en esta escala. Δt = 10⁻³ s se dispara hasta 45 J y aplastaría a todas las demás contra E0 (el choque dura 3,5 ms y entran sólo tres pasos); 2·10⁻⁵ y 10⁻⁵ s caen encima de 5·10⁻⁵. El barrido completo está en la figura de la deriva, que es la que elige el paso.
+- Son 3 de los 7 Δt medidos, los que se leen en una misma escala: uno que deriva hacia arriba, uno hacia abajo y el que se queda sobre E0. Δt = 10⁻³ s se dispara hasta 45 J y aplastaría a todas las demás contra E0 (el choque dura 3,5 ms y entran sólo tres pasos); 10⁻⁴, 2·10⁻⁵ y 10⁻⁵ s caen encima de 5·10⁻⁵ y no se distinguen. El barrido completo está en la figura de la deriva, que es la que elige el paso.
 
 ## 15. Elección del paso: deriva relativa máxima — `slide-15-deriva-vs-dt.png`
 
@@ -109,7 +110,8 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - Paso temporal: siempre 600 000 pasos y costo O(N) por la celda de índice. El ajuste da t ∝ N^0,88 (la recta punteada azul).
 - Eventos (TP3): t ∝ N^3,52 (la recta punteada roja), porque cada choque rehace parte del calendario y los choques crecen con N.
 - Se cruzan cerca de N = 470; a N = 600 los eventos cuestan 2,9 veces más (14,8 s contra 42,3 s).
-- Las barras de desvío están dibujadas pero no se ven: son como mucho el 4 % del valor y la figura abarca cuatro décadas. Dice cuánto valen arriba a la izquierda.
+- Las barras de desvío están dibujadas pero no se ven: la figura abarca cuatro décadas y σ/⟨t⟩ es como mucho el 4 %. Cuánto vale está escrito arriba a la izquierda.
+- Ojo si preguntan: ese 4 % es el **desvío estándar**, no una cota de cuánto se aparta la peor corrida. El rango completo (máx − mín) llega al 7 % en el paso temporal (N = 200) y al 12 % en los eventos (N = 400). Lo imprime `make bench-figuras`.
 
 ## 18. Obstáculos en la posición óptima — `slide-18-animacion-optimo.png`
 
@@ -167,8 +169,8 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 27. Posición óptima para cada densidad — `slide-27-mapa-t90-xo-N.png`
 
-- El círculo blanco de cada fila marca el xo que minimiza ⟨t90⟩ para ese N; está dicho arriba del mapa.
-- El mínimo cae en xo = 0,2–0,3 m para las cinco densidades: no se corre con N.
+- A propósito no marcamos la celda más baja de cada fila: con 6 realizaciones por punto el mínimo casi nunca se distingue de su vecina (a N = 50 son compatibles desde xo = 0,1 hasta 0,4), así que marcarla haría parecer que el óptimo salta entre 0,2 y 0,3 cuando eso es ruido. La lectura la hacemos nosotros.
+- Lo que sí se lee es la banda oscura: está en xo = 0,2–0,3 m en las cinco densidades. Dentro del error no se resuelve un corrimiento con N; el único caso donde el mínimo queda solo es N = 300, en xo = 0,2.
 - Los extremos son siempre los peores, y el castigo crece con la densidad: 1,9 veces el óptimo a N = 20 y 2,4 a N = 300.
 - ⟨t90⟩ en el óptimo pasa de 11,8 s a 28,9 s entre N = 20 y 300.
 

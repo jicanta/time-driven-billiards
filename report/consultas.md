@@ -123,21 +123,40 @@ muestre de las mismas". Las tres juntas es lo único que deja comparar.
 
 Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
 
-### B3. El observable escalar del ítem 2.1.a
+### B3. El observable escalar del 2.1.a y la cota, que el enunciado no fija
 
 > El 2.1.a pide proponer un observable escalar que caracterice la evolución de
 > la energía. Propusimos la **deriva relativa máxima**
-> `D(Δt) = máx_t |E(t) − E₀| / E₀`, y elegimos el `Δt` más largo con
-> `D ≤ 10⁻³`. ¿Les parece bien el observable y la cota?
+> `D(Δt) = máx_t |E(t) − E₀| / E₀`. Pero el enunciado **no da una cota de error
+> objetivo**, así que el criterio lo pusimos nosotros: el `Δt` más largo con
+> `D ≤ 10⁻³` (0,1 %), que es el más barato con el error aceptado. Nos queda
+> `Δt = 5·10⁻⁵ s`, con `D = 3,8·10⁻⁴`. ¿Les parece bien el observable y esa
+> cota, o esperan otro criterio?
 
-### B4. La figura de energía muestra 4 de los 7 `Δt` medidos
+### B4. La figura de energía muestra 3 de los 7 `Δt` medidos
 
-> Medimos 7 pasos pero dibujamos 4: con `Δt = 10⁻³ s` la energía se dispara a
-> 45 J y aplasta a todas las demás contra `E₀`, y `2·10⁻⁵` y `10⁻⁵` caen
-> encima de `5·10⁻⁵`. El barrido completo está en la figura de la deriva, que
-> es la que elige el paso. ¿Está bien mostrar sólo los cuatro?
+> Medimos 7 pasos pero dibujamos 3, los que se leen en una misma escala: uno
+> que deriva hacia arriba (`5·10⁻⁴ s`, 2,6 %), uno hacia abajo (`2·10⁻⁴ s`,
+> 0,6 %) y el elegido (`5·10⁻⁵ s`), que se queda sobre `E₀`. Con
+> `Δt = 10⁻³ s` la energía se dispara a 45 J y aplasta a todas las demás
+> contra `E₀`, y `10⁻⁴`, `2·10⁻⁵` y `10⁻⁵` caen encima de `5·10⁻⁵` y no se
+> distinguen. El barrido completo está en la figura de la deriva, que es la
+> que elige el paso. ¿Está bien mostrar sólo los tres?
 
-### B5. La explicación de la densidad óptima, ¿necesita figura propia?
+### B5. El mapa de calor no resuelve si el óptimo depende de `N`
+
+> En el 2.4.b el barrido tiene 6 valores de `x_o` y 6 realizaciones por punto.
+> Con eso, el mínimo de cada fila **no se distingue de sus vecinos**: a
+> `N = 50` son compatibles dentro del error desde `x_o = 0,1` hasta `0,4`, y
+> sólo a `N = 300` el mínimo queda solo (en `0,2`). O sea que podemos afirmar
+> que el óptimo está en la banda `0,2`–`0,3 m` para las cinco densidades, pero
+> no podemos decir si se corre con `N` o es constante. ¿Alcanza con reportarlo
+> así, o esperan más realizaciones / más valores de `x_o` para resolverlo?
+
+**Por eso sacamos** la marca sobre la celda más baja de cada fila: hacía
+parecer que el óptimo saltaba entre 0,2 y 0,3 cuando eso es ruido.
+
+### B6. La explicación de la densidad óptima, ¿necesita figura propia?
 
 > En el 2.4.a decimos que hay densidad óptima porque sin choques cada
 > partícula conserva el momento angular respecto del centro y no llega a los
@@ -147,14 +166,14 @@ Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
 > que explique lo observado tiene que estar probada y **mostrada en
 > resultados**. ¿Hace falta una figura, o alcanza con decirlo?
 
-### B6. `f(v)` estacionaria: cómo juntamos las muestras
+### B7. `f(v)` estacionaria: cómo juntamos las muestras
 
 > Para la distribución estacionaria juntamos **todos los cuadros con
 > `t ≥ 10 s`** de las 10 realizaciones: 4·10⁵ muestras. Los cuadros de una
 > misma realización están correlacionados entre sí. ¿Está bien juntarlos así,
 > o esperan un solo instante por realización?
 
-### B7. El enunciado dice `m⟨v²⟩/2 = m v₀²/2`, y nos dan distinto
+### B8. El enunciado dice `m⟨v²⟩/2 = m v₀²/2`, y nos dan distinto
 
 > El 2.3 pide comparar el `k_BT` ajustado con `m⟨v²⟩/2 = m v₀²/2`. En la
 > simulación esas dos **no** son iguales: nos da `m⟨v²⟩/2 = 12,32 mJ` contra
@@ -163,7 +182,7 @@ Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
 > la energía total, no la cinética). El ajuste da `k_BT = 12,42 mJ`.
 > ¿Es eso lo que esperan que discutamos?
 
-### B8. Cifras significativas del error
+### B9. Cifras significativas del error
 
 > Escribimos los promedios como `⟨t90⟩ = 26,5 ± 3,4 s`. Por el criterio de la
 > Teórica 0, ¿lo quieren con el error a una cifra significativa
@@ -184,3 +203,8 @@ Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
   criterio para el motor del TP3. ¿Sigue valiendo lo acordado?
 - **Energía total**: cinética más la elástica de los contactos
   (`Σ ½ k ξ²`), incluidos los de pared y obstáculos. ¿Correcto?
+- **Verlet para el billar**: lo usamos porque el enunciado del sistema 2 lo
+  pide textualmente, aunque en el sistema 1 gane Beeman. La ventaja de Beeman
+  es con fuerza dependiente de la velocidad; en el billar la fuerza depende
+  sólo de las posiciones y la diferencia desaparece (con `γ = 0` las dos
+  constantes del error coinciden). ¿Está bien el razonamiento?

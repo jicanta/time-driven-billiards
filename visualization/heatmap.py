@@ -3,10 +3,14 @@
 Lee data/mapa/ (un barrido de `billar explore` sobre el producto de --xos y
 --ns) y dibuja, para cada punto (xo, N), el promedio del tiempo de conversion
 sobre las realizaciones. Las celdas donde alguna realizacion no llega a la
-fraccion pedida antes de tmax quedan en blanco y se informan por consola. En
-cada fila (cada N) se marca con un circulo blanco la posicion optima, que es la
-respuesta del item: si la posicion que minimiza ⟨t90⟩ depende o no de la
-densidad.
+fraccion pedida antes de tmax quedan en blanco y se informan por consola.
+
+La respuesta del item (si la posicion que minimiza ⟨t90⟩ depende o no de la
+densidad) se lee de la banda oscura, no de una marca sobre la celda mas baja:
+con 6 realizaciones por punto el minimo de cada fila casi nunca se distingue
+de sus vecinas, asi que marcarlo haria parecer que salta entre 0,2 y 0,3
+cuando eso es ruido. El listado por consola da el error de la media de cada
+minimo y que celdas son compatibles con el.
 
     python3 visualization/heatmap.py
     python3 visualization/heatmap.py --fraccion 1 --estilo diapositiva --figures data/figuras_diapositivas
@@ -29,6 +33,7 @@ def summarize(root: Path, fraction: float):
     counts = sorted({case["N"] for case in cases.values()})
     offsets = sorted({case["xo"] for case in cases.values()})
     grid = np.full((len(counts), len(offsets)), np.nan)
+    spread = np.full_like(grid, np.nan)
     reached = np.zeros_like(grid)
     for case in cases.values():
         times = [common.conversion_time(run, fraction) for run in case["runs"]]
@@ -36,8 +41,8 @@ def summarize(root: Path, fraction: float):
         row, column = counts.index(case["N"]), offsets.index(case["xo"])
         reached[row, column] = len(valid)
         if len(valid) == len(times):
-            grid[row, column] = float(np.mean(valid))
-    return np.array(counts), np.array(offsets), grid, reached
+            grid[row, column], spread[row, column] = common.mean_std(valid)
+    return np.array(counts), np.array(offsets), grid, spread, reached
 
 
 def main() -> None:
@@ -49,7 +54,7 @@ def main() -> None:
     arguments = parser.parse_args()
     common.use_style(arguments.estilo)
 
-    counts, offsets, grid, reached = summarize(arguments.mapa, arguments.fraccion)
+    counts, offsets, grid, spread, reached = summarize(arguments.mapa, arguments.fraccion)
     out_dir = common.folder("2.4", arguments.figures)
     percent = int(round(100 * arguments.fraccion))
 
@@ -70,27 +75,25 @@ def main() -> None:
                            shading="flat")
     bar = figure.colorbar(mesh, ax=axes)
     bar.set_label(f"$\\langle t_{{{percent}}} \\rangle$ (s)")
-    drawn = False
+    # La celda mas baja de cada fila NO se marca en la figura. Con 6
+    # realizaciones por punto casi nunca se distingue de sus vecinas (a N = 50
+    # son compatibles desde xo = 0,1 hasta 0,4), asi que un circulo sobre una
+    # sola celda afirmaria una precision que la medicion no tiene y haria
+    # parecer que el optimo salta entre 0,2 y 0,3 cuando eso es ruido. El mapa
+    # muestra la banda oscura y la lectura la hacemos nosotros. Por consola si
+    # va, con el error de la media y que celdas son compatibles con el minimo.
     for row, count in enumerate(counts):
         if np.all(np.isnan(grid[row])):
             continue
         best = int(np.nanargmin(grid[row]))
-        axes.plot([best], [row], marker="o", markersize=13, markerfacecolor="none",
-                  markeredgecolor="white", markeredgewidth=2.4, linestyle="none")
-        drawn = True
-        print(f"N = {count}: óptimo en xo = {offsets[best]:.4f} m, "
-              f"<t{percent}> = {grid[row, best]:.1f} s")
-    # Todas las celdas son dato, asi que la referencia del circulo no puede ir
-    # adentro: va escrita ARRIBA del mapa, fuera del area de dibujo. Como
-    # texto y no como leyenda, porque el circulo es blanco y sobre el fondo
-    # blanco de la figura el simbolo de la leyenda no se veria.
-    # No es un titulo (las figuras no llevan): es la referencia del simbolo,
-    # la que en las demas figuras va en la leyenda.
-    if drawn:
-        axes.text(0.0, 1.02, f"círculo blanco: el $x_o$ que minimiza "
-                             f"$\\langle t_{{{percent}}} \\rangle$ en esa fila",
-                  transform=axes.transAxes, ha="left", va="bottom", color="#555555",
-                  fontsize=plt.rcParams["legend.fontsize"])
+        error = spread[row] / np.sqrt(np.maximum(reached[row], 1.0))
+        compatible = [offsets[column] for column in range(len(offsets))
+                      if not np.isnan(grid[row, column])
+                      and grid[row, column] - error[column] <= grid[row, best] + error[best]]
+        print(f"N = {count}: mínimo en xo = {offsets[best]:.4f} m, "
+              f"<t{percent}> = {grid[row, best]:.1f} ± {error[best]:.1f} s; "
+              "compatibles dentro del error: "
+              + ", ".join(f"{value:g}" for value in compatible))
     axes.set_xticks(np.arange(len(offsets)))
     axes.set_xticklabels([common.decimal(round(x, 4)) for x in offsets])
     axes.set_yticks(np.arange(len(counts)))
