@@ -192,14 +192,23 @@ las del fondo sale la más baja es azar: a `N = 50` cae en `0,175 m` y a
 > están correlacionados entre sí. ¿Está bien juntarlos así, o esperan un solo
 > instante por realización?
 
-### B7b. `f(v)`: las barras de error
+### B7b. Las barras de error: ¿desvío estándar o error de la media?
 
-> Las dos figuras del 2.3 son promedios sobre 30 realizaciones, así que les
-> pusimos barra de error por intervalo: el **desvío estándar entre
-> realizaciones**, la misma convención que en las figuras de tiempos. ¿Es lo
-> que esperan en un histograma, o prefieren el error de la media (`σ/√M`)?
+> En **todas** las figuras que promedian sobre realizaciones —`f(v)` intervalo
+> por intervalo, `⟨t90⟩`, el tiempo de ejecución— la barra es el **desvío
+> estándar muestral entre realizaciones** (`ddof = 1`), sin dividir por `√M`.
+> Lo elegimos así porque el enunciado dice "incluyendo su desvío estándar" y
+> porque σ describe la dispersión de **una** corrida, que es lo que se informa
+> junto al promedio. ¿Es lo que esperan, o prefieren el error de la media
+> (`σ/√M`)?
 
-**Lo que da**: en un instante suelto el desvío es del 51 % de cada intervalo
+**Por qué preguntarlo una sola vez para todas:** es la misma convención en
+todo el trabajo, así que la respuesta cambia varias figuras a la vez, no una.
+Con `σ/√M` las barras quedarían entre 3 y 5,5 veces más chicas (`√10` en los
+tiempos y en la densidad, `√30` en `f(v)`), y en la figura de tiempos de
+ejecución, donde ya hoy no se ven, desaparecerían del todo.
+
+**Lo que da en `f(v)`**: en un instante suelto el desvío es del 51 % de cada intervalo
 (cada realización reparte sus 100 partículas en 40 intervalos); en la
 estacionaria, que junta todos los cuadros desde `t = 10 s`, baja al 4,8 %. Las
 dos figuras dibujan la barra con el mismo estilo, justamente para que esa
