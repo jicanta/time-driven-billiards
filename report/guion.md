@@ -73,7 +73,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 - Sistema 1: 4 esquemas, 9 pasos de 5·10⁻³ a 10⁻⁵ s. Paso temporal: N = 300 sin obstáculos, 7 pasos, verificado a N = 700 con obstáculos.
 - Costo: xo = r, N de 50 a 700, 10 realizaciones por N, contra el motor del TP3 en la misma máquina.
-- Posición de los obstáculos: 11 valores de xo con N = 100 y 20, 15 realizaciones. Velocidades: N = 100, 30 realizaciones. Densidad: las corridas del 2.1.b y un barrido (xo, N) de 16 posiciones × 9 densidades con 20 realizaciones por punto (2880 corridas).
+- Posición de los obstáculos: 11 valores de xo con N = 100 y 20, 15 realizaciones. Velocidades: N = 100, 30 realizaciones. Densidad: las corridas del 2.1.b y un barrido (xo, N) de 16 posiciones × 10 densidades con 20 realizaciones por punto (3200 corridas).
 
 ## 12. Resultados (separador)
 
@@ -190,13 +190,15 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 27. Posición óptima para cada densidad — `slide-27-mapa-t90-xo-N.png`
 
-- El barrido es de 16 posiciones × 9 densidades × 20 realizaciones (2880 corridas): hace falta esa resolución para distinguir si el óptimo se corre con N o si es siempre el mismo.
-- El valle azul es ancho y está en el mismo lugar en las nueve filas: entre xo = 0,15 y 0,30 m, ⟨t90⟩ queda dentro del 20 % del mínimo de la fila.
+- El barrido es de 16 posiciones × 10 densidades × 20 realizaciones (3200 corridas): hace falta esa resolución para distinguir si el óptimo se corre con N o si es siempre el mismo.
+- La escala de colores está dada vuelta a propósito: el rojo es la conversión **más rápida**, porque lo que tiene que saltar a la vista es el óptimo y no el peor caso. Y está recortada en 38 s (1,3 veces el más alto de los mínimos de cada fila, la flecha de la barra lo marca): los bordes de las densidades extremas llegan a 70 s y se llevaban media escala ellos solos.
+- La mancha roja **cierra por arriba y por abajo**: hay óptimo en las dos variables. Por eso está la fila de N = 5, que es la que la cierra por abajo.
 - A propósito no marcamos ninguna celda: cuál de las del fondo sale la más baja es en buena parte azar (a N = 50 cae en 0,175 m y a N = 150 en 0,275 m, y las dos tienen el mismo óptimo dentro del error). El número sale de ajustar una parábola a cada fila sobre el mismo tramo, xo = 0,10–0,40 m, y quedarse con el vértice.
-- Esos vértices dan 0,236 ± 0,002 m promediando las nueve densidades, y el corrimiento con la densidad es −0,012 ± 0,008 m por década de N: compatible con cero. **El óptimo no se corre con N**, y no es exactamente 0,2 sino 0,24 m (la mitad del radio del dominio, 0,46 R).
-- La única fila que se aparta es N = 10 (0,350 ± 0,031 m, a 3,7 σ): con tan pocas partículas casi no hay choques y la conversión la decide el parámetro de impacto de cada trayectoria, así que separar los obstáculos cubre más parámetros de impacto. Es el mismo argumento del ítem 2.4.a (con N = 1 sólo convierte si b < 3r).
-- Los extremos son siempre los peores, y cuál de los dos es peor cambia con la densidad: a N = 10 el centro y la pared cuestan lo mismo (30,1 y 29,5 s), y a N = 300 la pared es claramente peor (69,8 contra 54,3 s). El castigo de la pared crece con N: 1,9 veces el mínimo a N = 20 y 2,4 a N = 300.
-- ⟨t90⟩ en el óptimo pasa de 11,0 s (N = 10) a 29,5 s (N = 300).
+- De N = 20 en adelante (ocho densidades) los vértices dan **0,237 ± 0,011 m**: el óptimo no se corre con la densidad en todo ese rango, y no es exactamente 0,2 sino 0,24 m (0,46 R).
+- Las dos densidades más bajas sí se corren hacia afuera: 0,287 ± 0,020 m en N = 5 y 0,350 ± 0,031 m en N = 10 (a 2,5 y 3,7 σ del promedio). Con tan pocas partículas casi no hay choques y la conversión la decide el parámetro de impacto de cada trayectoria, así que separar los obstáculos cubre más parámetros de impacto. Es el mismo argumento del ítem 2.4.a (con N = 1 sólo convierte si b < 3r). Sobre las diez densidades el ajuste da −0,018 ± 0,007 m por década de N, y ese corrimiento lo aportan enteramente esas dos filas.
+- Los extremos son siempre los peores, y cuál de los dos es peor cambia con la densidad: a N = 5 el centro es cuatro veces y media el mínimo, a N = 10 centro y pared cuestan lo mismo (30,1 y 29,5 s), y a N = 300 la pared es claramente peor (69,8 contra 54,3 s). El castigo de la pared crece con N: 1,9 veces el mínimo a N = 20 y 2,4 a N = 300.
+- ⟨t90⟩ en el óptimo pasa de 11,0 s (N = 10) a 29,5 s (N = 300), y vuelve a subir a 14,3 s en N = 5.
+- El barrido del mapa corre con tmax = 300 s, no 100: a N = 5 hay realizaciones que tardan 150 s en convertir las cinco partículas. De N = 10 para arriba no cambia nada, ninguna pasa de 70 s.
 - Si preguntan por qué el barrido corta en Fu = 0,9: el mapa sólo mide t90, y seguir hasta que se convierten todas cuesta el triple de cómputo (a N = 300, t90 ≈ 29 s contra t100 ≈ 98 s de tiempo simulado). Está verificado contra una corrida completa: la conversión número 90 de la misma semilla cae exactamente en el mismo instante.
 
 ## 28. Conclusiones (separador)

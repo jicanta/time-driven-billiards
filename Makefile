@@ -19,7 +19,7 @@
 #   make velocidades-figuras  f(v) por instante, ajuste de Maxwell-Boltzmann y E(kT)
 #   make densidad-figuras   item 2.4.a: <t90> y <t100> vs densidad (usa las corridas de 2.1.b)
 #   make mapa           item 2.4.b: barrido (xo, N) (el enunciado lo da como opcional; se hace)
-#                           9 densidades x 16 posiciones x 20 realizaciones, en paralelo
+#                           10 densidades x 16 posiciones x 20 realizaciones, en paralelo
 #   make mapa-figuras       mapa de calor de <t90> en el plano (xo, N)
 #   make check          corrida de validacion: energia, solapamientos y escapes
 #   make una-particula  N = 1: sin choques solo se convierte si el parametro de impacto es < 3r (item 2.4.a)
@@ -122,17 +122,24 @@ VELOCIDADES := data/velocidades
 
 # --- item 2.4.b ------------------------------------------------------------
 # El item no pone techo al barrido, asi que el mapa se hace con la resolucion
-# que hace falta para contestarlo: 9 densidades y 16 posiciones, mas juntas
+# que hace falta para contestarlo: 10 densidades y 16 posiciones, mas juntas
 # entre 0,05 y 0,30 m, que es donde esta el minimo y donde se decide si se
 # corre con N. 20 realizaciones por punto: con 6 el error de la media era de
 # hasta 3 s sobre 12 y el minimo de cada fila saltaba de columna por ruido.
-NS_MAPA     ?= 10,20,30,50,70,100,150,200,300
+# N = 5 es la fila que cierra la mancha por abajo: ahi casi no hay choques y
+# la conversion se vuelve a hacer lenta.
+NS_MAPA     ?= 5,10,20,30,50,70,100,150,200,300
 XOS_MAPA    ?= 0.0175,0.0500,0.0750,0.1000,0.1250,0.1500,0.1750,0.2000,0.2250,0.2500,0.2750,0.3000,0.3500,0.4000,0.4500,0.4925
 SEEDS_MAPA  ?= 20
-# Procesos simultaneos del barrido del mapa. Son 144 celdas y 2880 corridas:
+# Procesos simultaneos del barrido del mapa. Son 160 celdas y 3200 corridas:
 # en serie no termina mas, y aca no se cronometra nada (los tiempos de
 # ejecucion son los del item 2.1.b), asi que la maquina puede estar cargada.
 JOBS_MAPA   ?= 7
+# El mapa usa su propio tmax, mas largo que el del item 2.2: con N = 5 hay
+# realizaciones que tardan 150 s en convertir las cinco particulas, y si el
+# corte quedara en 100 s esas celdas se perderian. De N = 10 para arriba no
+# cambia nada: ninguna realizacion del barrido pasa de los 70 s.
+TMAX_MAPA   ?= 300
 MAPA        := data/mapa
 
 # --- animaciones y entrega -------------------------------------------------
@@ -323,7 +330,7 @@ densidad-figuras:
 	$(PY) visualization/density.py --figures $(SLIDES) --estilo diapositiva
 
 # Un proceso por celda (N, xo) y los N grandes primero, que son los caros: el
-# barrido son 2880 corridas y en serie no termina mas. heatmap.py junta los
+# barrido son 3200 corridas y en serie no termina mas. heatmap.py junta los
 # index.txt de todas las subcarpetas, asi que partirlo asi se lee igual que si
 # hubiera salido de una sola corrida.
 #
@@ -339,7 +346,7 @@ mapa: build
 	    for x in $(subst $(COMMA), ,$(XOS_MAPA)); do printf '%s %s\n' "$$n" "$$x"; done; \
 	done | sort -k1,1nr | xargs -P $(JOBS_MAPA) -n 2 sh -c \
 	    '$(BILLAR) explore --ns $$0 --xos $$1 --dts $(DT) --seeds $(SEEDS_MAPA) \
-	        --seed $(SEED0) --tmax $(TMAX) --until-all-used --until-fraction 0.9 \
+	        --seed $(SEED0) --tmax $(TMAX_MAPA) --until-all-used --until-fraction 0.9 \
 	        --dir $(MAPA)/n$$0_xo$$1 > /dev/null'
 
 mapa-figuras:

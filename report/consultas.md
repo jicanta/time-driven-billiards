@@ -147,19 +147,19 @@ Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
 
 Era una pregunta cuando el barrido tenía 6 posiciones y 6 realizaciones y el
 mínimo de cada fila no se distinguía de sus vecinos. Se corrió de nuevo con
-**16 posiciones × 9 densidades × 20 realizaciones** (2880 corridas, cortando
+**16 posiciones × 10 densidades × 20 realizaciones** (3200 corridas, cortando
 cada una en `Fu = 0,9`, que es lo único que mide el mapa) y ahora sí se
 resuelve:
 
 - El fondo del valle es ancho: entre `x_o = 0,15` y `0,30 m`, `⟨t90⟩` queda
-  dentro del 20 % del mínimo de su fila, en las nueve densidades.
+  dentro del 20 % del mínimo de su fila.
 - Ajustando una parábola a cada fila **sobre el mismo tramo** (`0,10`–`0,40 m`)
-  y tomando el vértice: `0,236 ± 0,002 m` promediando las nueve densidades, y
-  el corrimiento con la densidad es `−0,012 ± 0,008 m` por década de `N`,
-  compatible con cero. **El óptimo no se corre con `N`.**
-- La única fila que se aparta es `N = 10` (`0,350 ± 0,031 m`, a 3,7 σ), y tiene
-  explicación física: sin choques la conversión la decide el parámetro de
-  impacto, que es el mismo argumento del ítem 2.4.a.
+  y tomando el vértice: de `N = 20` a `N = 300` (ocho densidades) da
+  `0,237 ± 0,011 m`. **En todo ese rango el óptimo no se corre con `N`.**
+- Las dos densidades más bajas sí se corren hacia afuera (`0,287 ± 0,020 m` en
+  `N = 5` y `0,350 ± 0,031 m` en `N = 10`), y tiene explicación física: casi no
+  hay choques y la conversión la decide el parámetro de impacto, que es el
+  mismo argumento del ítem 2.4.a.
 
 Sigue sin marcarse ninguna celda sobre el mapa: el mínimo se lee por la escala
 de colores, y el número fino sale del ajuste, no de la celda más baja (cuál de

@@ -45,12 +45,24 @@ from matplotlib.ticker import FuncFormatter
 
 import common
 
-# turbo recortada: las dos puntas del mapa original son casi negras (violeta
-# abajo, bordo arriba) y con las dos oscuras no se distingue de un vistazo
-# cual es el extremo rapido. Recortadas, el minimo es el azul mas profundo y
-# el maximo el rojo mas vivo, que es la lectura que se quiere.
+# turbo dada vuelta y recortada. Dada vuelta porque lo que tiene que saltar a
+# la vista es el OPTIMO, no el peor caso: con turbo tal cual, el color fuerte
+# (rojo) se lo llevaban los bordes, que son justamente las posiciones que no
+# interesan. Asi, el rojo es la conversion mas rapida y el azul la mas lenta.
+# Recortada porque las dos puntas del mapa original son casi negras (violeta
+# de un lado, bordo del otro) y entre dos oscuros no se distingue cual es
+# cual de un vistazo.
 COLORS = LinearSegmentedColormap.from_list(
-    "turbo-recortada", plt.get_cmap("turbo")(np.linspace(0.10, 0.90, 256)))
+    "turbo-invertida", plt.get_cmap("turbo")(np.linspace(0.90, 0.10, 256)))
+# Hasta donde llega la escala de colores, en unidades del minimo mas alto de
+# todas las filas. Las celdas mas lentas (los bordes de las densidades
+# extremas) valen un factor 6 del minimo del mapa y se llevarian media escala
+# de color ellas solas, dejando sin contraste justo la zona donde esta el
+# optimo. Cortando en 1,3 veces el peor de los minimos, toda fila conserva su
+# gradiente alrededor del propio minimo y lo que satura son los bordes, que
+# es lo que no hace falta distinguir. La barra de color lo dice con la
+# flecha.
+CLIP = 1.3
 
 # Tramo de xo (en metros) sobre el que se ajusta la parabola del minimo. Es
 # el MISMO para todas las filas a proposito: si la ventana se eligiera fila
@@ -163,16 +175,16 @@ def main() -> None:
     # van de 10 a 300 y con eje lineal las filas de N chico se aplastan.
     figure, axes = plt.subplots()
     axes.grid(False)
+    ceiling = CLIP * float(np.nanmax(np.nanmin(grid, axis=1)))
     mesh = axes.pcolormesh(cell_edges(offsets), np.arange(len(counts) + 1) - 0.5, grid,
-                           cmap=COLORS, norm=LogNorm(vmin=np.nanmin(grid),
-                                                      vmax=np.nanmax(grid)),
+                           cmap=COLORS, norm=LogNorm(vmin=np.nanmin(grid), vmax=ceiling),
                            shading="flat")
-    bar = figure.colorbar(mesh, ax=axes)
+    bar = figure.colorbar(mesh, ax=axes, extend="max")
     bar.set_label(f"$\\langle t_{{{percent}}} \\rangle$ (s)")
     # Con escala logaritmica matplotlib rotula 10^1 y nada mas: el mapa abarca
     # una sola decada larga y los valores se quieren leer en segundos.
-    ticks = [t for t in (10, 15, 20, 30, 40, 60, 80, 100, 150)
-             if np.nanmin(grid) <= t <= np.nanmax(grid)]
+    ticks = [t for t in (10, 15, 20, 25, 30, 40, 50, 60, 80, 100, 150)
+             if np.nanmin(grid) <= t <= ceiling]
     bar.set_ticks(ticks)
     bar.ax.yaxis.set_minor_formatter(FuncFormatter(lambda value, _: ""))
     bar.ax.set_yticklabels([common.decimal(t) for t in ticks])
@@ -229,6 +241,17 @@ def main() -> None:
               f"xo = {average:.3f} ± {deviation:.3f} m (dispersión de los vértices "
               f"{centres.std(ddof=1):.3f} m); corrimiento con la densidad: "
               f"{slope:+.3f} ± {np.sqrt(covariance[0, 0]):.3f} m por década de N")
+        # El corrimiento, si lo hay, esta en las densidades mas bajas: de N = 20
+        # para arriba los vertices caen todos en el mismo lugar. Se informan
+        # los dos grupos por separado, que es como se lee el mapa.
+        high = [(n, c) for n, c, _ in best_offsets if n >= 20]
+        if len(high) > 1 and len(high) < len(best_offsets):
+            values = np.array([c for _, c in high])
+            print(f"  de N = {high[0][0]} en adelante ({len(high)} densidades): "
+                  f"xo = {values.mean():.3f} ± {values.std(ddof=1):.3f} m; "
+                  "por debajo: "
+                  + ", ".join(f"N = {n}: {c:.3f} m"
+                              for n, c, _ in best_offsets if n < 20))
         # Que fila se aparta del promedio mas de lo que admite su error: es la
         # forma directa de contestar si el optimo depende de la densidad sin
         # que la respuesta dependa de haber ajustado una recta.
@@ -246,6 +269,11 @@ def main() -> None:
     if missing:
         print(f"celdas sin valor (alguna realización no llega a {percent} %): " +
               ", ".join(f"N = {n}, xo = {x:.4f}" for n, x in missing))
+    saturated = int(np.sum(grid > ceiling))
+    print(f"escala de colores hasta {ceiling:.1f} s ({common.decimal(CLIP)} veces el más "
+          f"alto de los mínimos de cada fila): saturan {saturated} de "
+          f"{int(np.sum(~np.isnan(grid)))} celdas, el máximo del mapa es "
+          f"{np.nanmax(grid):.1f} s")
     print(f"{len(counts)} densidades x {len(offsets)} posiciones x "
           f"{int(reached.max())} realizaciones = {int(reached.sum())} corridas")
     print(out)
