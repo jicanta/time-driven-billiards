@@ -544,6 +544,10 @@ Se cambian si los profesores indican otra cosa.
 
 ## 9. Dudas para plantear a los profesores
 
+La lista con la que se va a la consulta, ordenada por lo que puede costar
+nota y con lo que contestamos si nos devuelven la pregunta, está en
+`report/consultas.md`. Acá quedan las dudas de fondo:
+
 1. El ítem 2.1.b pide llegar a `N > 600`: a esa cantidad la fracción de área
    es 0,71 (0,82 con `N = 700`) y la condición inicial al azar del enunciado
    ya no entra. ¿Está bien usar una red triangular por encima de `N = 400`,
