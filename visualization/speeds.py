@@ -4,9 +4,9 @@ Para el sistema sin obstaculos todas las particulas arrancan con el mismo
 modulo v0, asi que f(v) es una delta en t = 0 y se va ensanchando hasta el
 estado estacionario. La distribucion de un instante se arma juntando los
 |v| de las N particulas de todas las realizaciones en ese cuadro, y la barra
-de error de cada intervalo es el error de la media sobre las realizaciones
-(cada realizacion da su propio histograma; la curva es el promedio de los M y
-la barra, sigma/sqrt(M)).
+de error de cada intervalo es el desvio estandar entre realizaciones (cada
+realizacion da su propio histograma; la curva es el promedio de los M y la
+barra, el desvio), que es la misma convencion que el resto de las figuras.
 
 La figura de la evolucion muestra INSTANTES, cada uno con su t exacto,
 incluido el ultimo: un "t >= algo" no es un instante sino un promedio sobre
@@ -75,21 +75,20 @@ def relative(values: np.ndarray, errors: np.ndarray) -> float:
 
 
 def histograms(samples: np.ndarray, edges: np.ndarray):
-    """(centros, f(v) promedio, error de la media) de un conjunto de muestras
-    con una realizacion por fila.
+    """(centros, f(v) promedio, desvio entre realizaciones) de un conjunto de
+    muestras con una realizacion por fila.
 
     El promedio de los histogramas normalizados de las M realizaciones es el
     histograma de todas juntas (son todas del mismo tamano) y es lo que pide
-    el enunciado: f(v) promediada sobre realizaciones. La barra es el error de
-    ESA media, sigma/sqrt(M), que es lo que dice cuan bien se la conoce. El
-    desvio entre realizaciones a secas (sigma) no serviria aca: en un
-    histograma mide el ruido de contar N particulas en un intervalo, no una
-    propiedad del sistema, y no baja aunque se corran mas realizaciones."""
+    el enunciado: f(v) promediada sobre realizaciones. La barra es el desvio
+    estandar entre realizaciones, la misma convencion que el resto del trabajo
+    (ddof = 1): una barra en una figura se lee como el desvio y no hace falta
+    aclararlo."""
     each = np.array([histogram(row, edges)[1] for row in samples])
     centers = 0.5 * (edges[:-1] + edges[1:])
     if len(each) < 2:
         return centers, each.mean(axis=0), None
-    return centers, each.mean(axis=0), each.std(axis=0, ddof=1) / np.sqrt(len(each))
+    return centers, each.mean(axis=0), each.std(axis=0, ddof=1)
 
 
 def main() -> None:
@@ -126,9 +125,15 @@ def main() -> None:
         if frame > 0:
             ceiling = max(ceiling, density.max())
             last, instant_density, instant_spread = density, density, spread
-        axes.errorbar(centers, density, yerr=spread, color=color, drawstyle="steps-mid",
-                      elinewidth=0.9, capsize=0, linewidth=2.4 if target == targets[-1] else 1.6,
-                      label=f"$t$ = {common.decimal(times[frame], 2)} s")
+        axes.step(centers, density, where="mid", color=color,
+                  linewidth=2.4 if target == targets[-1] else 1.6,
+                  label=f"$t$ = {common.decimal(times[frame], 2)} s")
+        # La barra, aparte y mas tenue que la curva: en un instante suelto el
+        # desvio entre realizaciones es grande (cada una reparte N = 100
+        # particulas en 40 intervalos) y si se dibuja con el mismo peso que la
+        # curva, tapa la forma de f(v), que es lo que la figura muestra.
+        axes.errorbar(centers, density, yerr=spread, color=color, linestyle="none",
+                      elinewidth=0.8, capsize=0, alpha=0.5, label="_nolegend_")
     axes.set_xlabel(common.AXIS_SPEED)
     axes.set_ylabel(common.AXIS_PDF)
     axes.set_xlim(0.0, 2.8 * static["v0"])
@@ -158,8 +163,11 @@ def main() -> None:
     figure, axes = plt.subplots()
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
              edgecolor=common.FRESH, label="simulación")
-    axes.errorbar(centers, density, yerr=spread, color=common.FRESH, linestyle="none",
-                  elinewidth=0.9, capsize=0, label="_nolegend_")
+    # La barra va en un azul bien oscuro sobre el relleno claro y con capucha:
+    # es chica (el desvio entre realizaciones es del orden del 5 % y el
+    # histograma junta un millon de muestras) y sin contraste no se ve.
+    axes.errorbar(centers, density, yerr=spread, color="#0b2d6b", linestyle="none",
+                  elinewidth=1.2, capsize=2.5, capthick=1.2, label="_nolegend_")
     fine = np.linspace(edges[0], edges[-1], 400)
     axes.plot(fine, common.maxwell_boltzmann(fine, thermal, mass), color=common.USED,
               linewidth=2.4, label="Maxwell-Boltzmann")
@@ -168,15 +176,6 @@ def main() -> None:
     axes.set_xlim(0.0, 2.8 * static["v0"])
     axes.set_ylim(0.0, 1.32 * density.max())
     axes.legend(loc="upper right")
-    # Las barras estan dibujadas pero no se ven: juntando todos los cuadros
-    # del estacionario de las M realizaciones el error de la media es de
-    # menos del 1 % en todos los intervalos. Que sean chicas es el resultado,
-    # asi que se dice cuanto valen (igual que en la figura de tiempos).
-    worst = relative(density, spread)
-    axes.text(0.02, 0.97, "barras: error de la media\n"
-                          f"({common.decimal(100 * worst, 1)} % en promedio)",
-              transform=axes.transAxes, ha="left", va="top", color="#555555",
-              fontsize=plt.rcParams["legend.fontsize"])
     fit = out_dir / f"f_v_estacionaria_ajuste_N{count}_M{runs}.png"
     common.save(figure, fit)
     plt.close(figure)
@@ -198,7 +197,7 @@ def main() -> None:
           f"{len(times)} cuadros hasta t = {times[-1]:.1f} s")
     print(f"muestras del estado estacionario (t ≥ {arguments.estacionario:g} s): "
           f"{stationary.size} ({per_run.shape[1]} por realización)")
-    print(f"barra de error relativa media (error de la media, intervalos con "
+    print(f"barra de error relativa media (desvío entre realizaciones, intervalos con "
           f"f(v) > 10 % del máximo): instante suelto "
           f"{relative(instant_density, instant_spread):.1%}, estacionaria "
           f"{relative(density, spread):.1%}")

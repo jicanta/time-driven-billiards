@@ -10,12 +10,10 @@ Convenciones (las mismas en todas las figuras):
 * El estado del sistema 2 se guarda cada dt2 = n dt, con n entero (Teorica 4,
   diapositiva 33): todo lo que se mide son esos estados, no instantes
   intermedios.
-* El valor escalar de un observable promediado sobre realizaciones lleva como
-  barra de error el desvio estandar entre realizaciones (ddof = 1): ahi la
-  dispersion entre realizaciones es parte del resultado. La excepcion es
-  f(v) (item 2.3), que no es un escalar sino un histograma: la barra es el
-  error de la media, sigma/sqrt(M), porque el sigma de un intervalo mide el
-  ruido de contar N particulas y no una propiedad del sistema.
+* Lo que se promedia sobre realizaciones lleva como barra de error el desvio
+  estandar entre realizaciones (ddof = 1), tanto si es un escalar (t90, el
+  tiempo de ejecucion) como si es un histograma (f(v), intervalo por
+  intervalo). Una barra se lee como el desvio: no se aclara en la figura.
 * Los ajustes de un parametro se hacen como en la Teorica 0: se recorre el
   parametro en una grilla y se toma el minimo del error cuadratico medio, que
   se muestra en su propia figura.
@@ -70,7 +68,7 @@ AXIS_WALL = "tiempo de ejecución (s)"
 AXIS_FU = "fracción de usadas $F_u$"
 AXIS_T90 = "$\\langle t_{90} \\rangle$ (s)"
 AXIS_OFFSET = "posición de los obstáculos $x_o$ (m)"
-AXIS_SPEED = "módulo de la velocidad $v$ (m/s)"
+AXIS_SPEED = "$v = |\\vec{v}|$ (m/s)"
 AXIS_PDF = "$f(v)$ (s/m)"
 AXIS_DENSITY = "densidad $\\rho$ (partículas/m$^2$)"
 AXIS_FIT_ERROR = "error cuadrático medio $E$ (s$^2$/m$^2$)"

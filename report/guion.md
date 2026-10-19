@@ -163,14 +163,15 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - A los 0,15 s el pico ya cayó a un tercio y apareció la cola de velocidades bajas; la curva de t = 30 s es el estacionario, y desde 0,5 s las curvas ya no se distinguen entre sí (por eso están éstas tres y no más).
 - Las tres son instantes exactos, cada uno con su t: el estacionario se muestra como el último cuadro guardado, no como un promedio sobre cuadros. Ese promedio se usa en la figura del ajuste, que es donde hace falta la estadística.
 - f(v) se ensancha sin que cambie E: el sistema es conservativo.
-- Las barras son el **error de la media** sobre las 30 realizaciones (σ/√M, intervalo por intervalo). En un instante suelto son del 9 % en promedio: son M·N = 3000 muestras repartidas en 40 intervalos.
+- Las barras son el **desvío estándar entre las 30 realizaciones**, intervalo por intervalo, la misma convención que el resto de las figuras. En un instante suelto son grandes (51 % en promedio) porque cada realización reparte sus 100 partículas en 40 intervalos; por eso están dibujadas más tenues que las curvas.
 
 ## 24. Ajuste de Maxwell-Boltzmann — `slide-24-f-v-ajuste.png`
 
 - Maxwell-Boltzmann en dos dimensiones con kBT como único parámetro libre.
 - kBT = 12,41 mJ contra mv0²/2 = 12,50 mJ: −0,7 %.
 - m⟨v²⟩/2 = 12,32 mJ es un poco menor: en promedio el 1,4 % de E está en los resortes.
-- Acá la estacionaria junta todos los cuadros con t ≥ 10 s de las 30 realizaciones (1,2·10⁶ muestras), así que el error de la media baja al 0,9 % y las barras no se llegan a ver: por eso está escrito cuánto valen.
+- Acá la estacionaria junta todos los cuadros con t ≥ 10 s de las 30 realizaciones (1,2·10⁶ muestras), así que el desvío entre realizaciones baja al 4,8 % y las barras se ven como una marca sobre cada barra.
+- Si preguntan qué son las barras: el desvío estándar entre realizaciones, intervalo por intervalo, igual que en todas las demás figuras.
 
 ## 25. Error cuadrático medio del ajuste — `slide-25-E-vs-kT.png`
 
