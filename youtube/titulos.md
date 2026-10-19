@@ -16,8 +16,8 @@ TP2): cada partícula es un disco azul (fresca) o rojo (usada), los obstáculos
 son negros y la pared circular gris; **un cuadro por estado guardado**, es
 decir cada `dt2 = 800 dt = 0,04 s`, con el instante `t` y las usadas en
 pantalla. A diferencia del TP3 (dirigido por eventos), acá el tiempo entre
-cuadros **es uniforme**: a 30 cuadros por segundo el video corre en tiempo
-real. El código que los arma, `visualization/animate.py`, va en el zip de
+cuadros **es uniforme**: a 25 cuadros por segundo (`FPS` en el Makefile) el
+video corre en tiempo real. El código que los arma, `visualization/animate.py`, va en el zip de
 entrega junto con el motor. Los ejes van en palabras con la unidad y coma
 decimal, como en las diapositivas. El cuadro fijo del PDF es el instante
 `t = 10 s` y tiene el mismo lienzo y la misma tipografía que el video; en el
@@ -31,7 +31,7 @@ primera realización de los barridos), 20 s simulados.
 ## 01 - SdS TP4 G10 - Obstaculos en el centro - N 100.mp4
 
 - **Link**: PENDIENTE-01
-- **Diapositiva**: 15 (Obstáculos en el centro).
+- **Diapositiva**: 16 (Obstáculos en el centro).
 - **Título sugerido**: SdS TP4 G10 — Billar circular, obstáculos en el centro (xo = r)
 - **Sistema**: los dos obstáculos en contacto entre sí, en el centro del dominio.
 - **Descripción**: Simulación de Sistemas (ITBA), TP4 — dinámica molecular regida por el paso temporal. Billar circular de radio R = 0,51 m con N = 100 partículas de radio r = 0,0175 m y masa m = 0,025 kg, que arrancan con rapidez v0 = 1 m/s y dirección al azar e interactúan sólo por contacto, con un resorte lineal normal de constante k = 10⁴ N/m. Los dos obstáculos fijos (negros) están en contacto entre sí, a x0 = ±r del centro. Una partícula azul (fresca) pasa a roja (usada) al tocar por primera vez un obstáculo. Paso de integración dt = 5·10⁻⁵ s con el esquema de Verlet original, un cuadro cada dt2 = 800 dt = 0,04 s: a 25 cuadros por segundo el video corre en tiempo real. 20 s simulados. Grupo 10, comisión S2.
@@ -47,7 +47,7 @@ primera realización de los barridos), 20 s simulados.
 ## 03 - SdS TP4 G10 - Obstaculos en el borde - N 100.mp4
 
 - **Link**: PENDIENTE-03
-- **Diapositiva**: 20 (Obstáculos en el borde).
+- **Diapositiva**: 19 (Obstáculos en el borde).
 - **Título sugerido**: SdS TP4 G10 — Billar circular, obstáculos en el borde (xo = R − r)
 - **Sistema**: los dos obstáculos en contacto con la pared.
 - **Descripción**: Simulación de Sistemas (ITBA), TP4 — dinámica molecular regida por el paso temporal. El mismo billar circular y las mismas N = 100 partículas, con los dos obstáculos en contacto con la pared, en x0 = ±(R − r) = ±0,4925 m. Es la posición de conversión más lenta del barrido: pegados a la pared los obstáculos quedan fuera del camino de casi todas las trayectorias y quedan partículas azules (frescas) mucho más tiempo. Paso de integración dt = 5·10⁻⁵ s (Verlet original), un cuadro cada 0,04 s, 25 cuadros por segundo, 20 s simulados. Grupo 10, comisión S2.
@@ -55,7 +55,7 @@ primera realización de los barridos), 20 s simulados.
 ## 04 - SdS TP4 G10 - Sin obstaculos - N 100.mp4
 
 - **Link**: PENDIENTE-04
-- **Diapositiva**: 23 (Sin obstáculos).
+- **Diapositiva**: 22 (Sin obstáculos).
 - **Título sugerido**: SdS TP4 G10 — Billar circular sin obstáculos
 - **Sistema**: el dominio vacío, el del ítem 2.3.
 - **Descripción**: Simulación de Sistemas (ITBA), TP4 — dinámica molecular regida por el paso temporal. El mismo billar circular con N = 100 partículas pero sin obstáculos: no hay conversión y todas quedan frescas (azules). Es el sistema con el que se elige el paso de integración por conservación de la energía (ítem 2.1.a) y con el que se mide la distribución del módulo de la velocidad (ítem 2.3): las partículas arrancan todas con |v| = v0 = 1 m/s y en medio segundo los choques entre partículas y con la pared llevan f(v) a la distribución de Maxwell-Boltzmann en dos dimensiones. Paso de integración dt = 5·10⁻⁵ s (Verlet original), un cuadro cada 0,04 s, 25 cuadros por segundo, 20 s simulados. Grupo 10, comisión S2.

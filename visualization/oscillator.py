@@ -75,7 +75,7 @@ def converging(errors: np.ndarray) -> np.ndarray:
     return keep
 
 
-def flat(constants: np.ndarray, tolerance: float = 0.10) -> np.ndarray:
+def flat(constant: np.ndarray, tolerance: float = 0.10) -> np.ndarray:
     """Mascara de los dt en los que ECM/dt^4 se mantiene en su valor tipico.
 
     Dividir el ECM por dt^4 saca la pendiente comun a los dos esquemas de
@@ -87,7 +87,7 @@ def flat(constants: np.ndarray, tolerance: float = 0.10) -> np.ndarray:
     la trayectoria en precision extendida), una distorsion del orden de la
     diferencia que se quiere mostrar. Se descartan los dt que se apartan mas
     de `tolerance` de la mediana."""
-    return np.abs(constants / np.median(constants) - 1.0) <= tolerance
+    return np.abs(constant / np.median(constant) - 1.0) <= tolerance
 
 
 def write_csv(schemes: dict, path: Path) -> None:
@@ -136,19 +136,19 @@ def main() -> None:
     out_dir = common.folder("1", arguments.figures)
     write_csv(schemes, arguments.oscilador / "ecm.csv")
 
-    # Dos paneles con el mismo eje de pasos, como la energia contra el tiempo:
-    # arriba los cuatro esquemas, donde se lee el orden de cada uno; abajo la
-    # ampliacion sobre los dos de cuarto orden, que arriba se superponen. En
-    # diez ordenes de magnitud una diferencia del 15 % no se ve: dividir por
-    # dt^4 saca la pendiente que comparten y deja a la vista la constante del
-    # error, que es lo unico que los distingue.
-    width, height = plt.rcParams["figure.figsize"]
-    figure, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(width, 1.55 * height),
-                                         gridspec_kw={"height_ratios": [1.0, 0.68],
-                                                      "hspace": 0.10})
+    # La figura de la diapositiva es UNA sola: ECM contra dt de los cuatro
+    # esquemas en doble logaritmica, que es exactamente lo que pide el
+    # enunciado del sistema 1 ("solo se debe mostrar una diapositiva [...] con
+    # esta ultima figura de ECM vs dt para los 4 metodos [...] ni ninguna otra
+    # informacion"). Lo que distingue a Beeman de Verlet original es la
+    # constante del error, no la pendiente, y en diez ordenes de magnitud una
+    # diferencia del 15 % no se ve: eso va en su propia figura (abajo), que es
+    # material de analisis y no entra en la charla.
+    figure, axes = plt.subplots()
     exponents = {}
     saturated = {}
     constants = {}
+    outside_zoom = {}
     for name in common.SCHEMES:
         if name not in schemes:
             continue
@@ -158,41 +158,53 @@ def main() -> None:
         keep = converging(errors)
         saturated[name] = list(steps[~keep])
         color, marker = common.SCHEME_STYLE[name]
-        exponent, intercept = np.polyfit(np.log(steps[keep]), np.log(errors[keep]), 1)
+        exponent, _ = np.polyfit(np.log(steps[keep]), np.log(errors[keep]), 1)
         exponents[name] = exponent
-        top.plot(steps[keep], errors[keep], color=color, marker=marker,
-                 linestyle="--" if name == "verlet" else "-",
-                 label=f"{common.SCHEME_LABEL[name]} ($p$ = {common.decimal(exponent, 1)})")
+        axes.plot(steps[keep], errors[keep], color=color, marker=marker,
+                  linestyle="--" if name == "verlet" else "-",
+                  label=f"{common.SCHEME_LABEL[name]} ($p$ = {common.decimal(exponent, 1)})")
         if name not in FOURTH_ORDER:
             continue
         constant = errors[keep] / steps[keep] ** 4
         flat_mask = flat(constant)
         constants[name] = (steps[keep][flat_mask], constant[flat_mask])
-        bottom.plot(steps[keep][flat_mask], constant[flat_mask], color=color, marker=marker,
-                    linestyle="--" if name == "verlet" else "-",
-                    label=common.SCHEME_LABEL[name])
-    top.set_xscale("log")
-    top.set_yscale("log")
-    top.set_ylabel(common.AXIS_ECM)
-    common.headroom(top, 0.44)
-    top.legend(loc="upper left")
-    bottom.set_xlabel(common.AXIS_STEP)
-    bottom.set_ylabel(common.AXIS_ECM_CONSTANT)
-    # La ampliacion vive en un rango estrecho (las dos constantes difieren un
-    # 15 %), asi que el limite se fija a mano: las dos rectas separadas, lugar
-    # arriba para el rotulo y lugar a la izquierda para la leyenda, donde
-    # Verlet original todavia no empieza.
-    low = min(constant.min() for _, constant in constants.values())
-    high = max(constant.max() for _, constant in constants.values())
-    span = high - low
-    bottom.set_ylim(low - 0.25 * span, high + 0.50 * span)
-    bottom.legend(loc="center left")
-    bottom.text(0.985, 0.95, "ampliación: los dos de cuarto orden",
-                transform=bottom.transAxes, ha="right", va="top", color="#555555",
-                fontsize=plt.rcParams["legend.fontsize"])
+        outside_zoom[name] = list(steps[keep][~flat_mask])
+    axes.set_xscale("log")
+    axes.set_yscale("log")
+    axes.set_xlabel(common.AXIS_STEP)
+    axes.set_ylabel(common.AXIS_ECM)
+    # Los puntos suben en diagonal: la esquina superior izquierda queda libre.
+    common.headroom(axes, 0.42)
+    axes.legend(loc="upper left")
     out = out_dir / "ECM_vs_dt.png"
     common.save(figure, out)
     plt.close(figure)
+
+    # Figura de analisis, aparte: la constante del error de los dos esquemas de
+    # cuarto orden. Dividir el ECM por dt^4 saca la pendiente que comparten y
+    # deja lo unico que los separa. Escala propia, ajustada a los datos.
+    zoom = None
+    if len(constants) == len(FOURTH_ORDER):
+        figure, axes = plt.subplots()
+        for name, (steps, constant) in constants.items():
+            color, marker = common.SCHEME_STYLE[name]
+            axes.plot(steps, constant, color=color, marker=marker,
+                      linestyle="--" if name == "verlet" else "-",
+                      label=common.SCHEME_LABEL[name])
+        axes.set_xscale("log")
+        axes.set_xlabel(common.AXIS_STEP)
+        axes.set_ylabel(common.AXIS_ECM_CONSTANT)
+        # Las dos rectas son planas y difieren un 15 %: el rango se fija a los
+        # datos mas un margen del 10 % de la separacion arriba y abajo, que es
+        # lo que las deja bien separadas sin dejar la mitad del panel vacio.
+        low = min(constant.min() for _, constant in constants.values())
+        high = max(constant.max() for _, constant in constants.values())
+        span = high - low
+        axes.set_ylim(low - 0.35 * span, high + 0.35 * span)
+        axes.legend(loc="center right")
+        zoom = out_dir / "ECM_constante_vs_dt.png"
+        common.save(figure, zoom)
+        plt.close(figure)
 
     print(f"m = {parameters['m']:g} kg, k = {parameters['k']:g} N/m, "
           f"gamma = {parameters['gamma']:g} kg/s, A = {parameters['A']:g} m, "
@@ -208,18 +220,24 @@ def main() -> None:
     print("ajuste ECM = c dt^p (cuadrados mínimos en log-log, sin los dt que ya están en el "
           "piso de redondeo): " +
           ", ".join(f"{common.SCHEME_LABEL[n]} p = {p:.2f}" for n, p in exponents.items()))
-    if len(constants) == 2:
-        (_, one), (_, other) = (constants[n] for n in FOURTH_ORDER)
-        print(f"constante del error ECM/dt^4 (m²/s⁴): "
-              + ", ".join(f"{common.SCHEME_LABEL[n]} = {np.median(c):.0f}"
-                          for n, (_, c) in constants.items())
-              + f"; Verlet original mide {np.median(other) / np.median(one) - 1:+.0%} "
-                f"de ECM respecto de Beeman con el mismo paso")
-    for name, steps in saturated.items():
-        if steps:
+    if len(constants) == len(FOURTH_ORDER):
+        reference, compared = FOURTH_ORDER
+        median = {name: float(np.median(constants[name][1])) for name in FOURTH_ORDER}
+        print("constante del error ECM/dt^4 (m²/s⁴): "
+              + ", ".join(f"{common.SCHEME_LABEL[n]} = {median[n]:.0f}" for n in FOURTH_ORDER)
+              + f"; {common.SCHEME_LABEL[compared]} mide "
+                f"{median[compared] / median[reference] - 1:+.0%} de ECM respecto de "
+                f"{common.SCHEME_LABEL[reference]} con el mismo paso")
+    for name, dropped in saturated.items():
+        if dropped:
             print(f"  {common.SCHEME_LABEL[name]}: el ECM deja de bajar en dt ≤ "
-                  f"{max(steps):.0e} s ({len(steps)} punto(s) fuera de la figura "
+                  f"{max(dropped):.0e} s ({len(dropped)} punto(s) fuera de la figura "
                   f"y del ajuste)")
+    for name, dropped in outside_zoom.items():
+        if dropped:
+            print(f"  {common.SCHEME_LABEL[name]}: fuera de la ampliación en dt ≤ "
+                  f"{max(dropped):.0e} s ({len(dropped)} punto(s): la constante se "
+                  f"aparta más del 10 % de su mediana, el redondeo ya la corre)")
     wins = {name: sum(1 for k in range(len(series["ecm"]))
                       if all(series["ecm"][k] <= other["ecm"][k] for other in schemes.values()))
             for name, series in schemes.items()}
@@ -227,6 +245,8 @@ def main() -> None:
     print(f"menor ECM: {common.SCHEME_LABEL[best]} en {wins[best]} de "
           f"{len(schemes[best]['ecm'])} pasos del barrido")
     print(out)
+    if zoom is not None:
+        print(zoom)
     print(arguments.oscilador / "ecm.csv")
 
     if arguments.trayectoria > 0:

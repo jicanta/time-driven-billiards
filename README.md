@@ -48,6 +48,8 @@ tp-4/
 ├── slides-images/      # todas las imágenes de la presentación numeradas por diapositiva: figuras (las lee presentacion.tex) y esquemas TikZ renderizados
 └── data/               # salidas de simulación y figuras (ignoradas por git)
     ├── oscilador/      #   sistema 1: una trayectoria por esquema y por dt
+    ├── oscilador_gamma0/ # sistema 1: el control sin amortiguamiento (gamma = 0)
+    ├── una_particula/  #   ítem 2.4.a: N = 1, conversión contra el parámetro de impacto
     ├── energia/        #   ítem 2.1.a: N = 300 sin obstáculos, un barrido de dt con cuadros
     ├── energia_densa/  #   ítem 2.1.a: la misma verificación a N = 700 con obstáculos
     ├── bench/          #   ítem 2.1.b: tiempos contra N (y los del TP3, en la misma computadora)
@@ -68,13 +70,13 @@ make una-particula         # N = 1: sin choques sólo se convierte si el paráme
 make oscilador             # sistema 1: los 4 esquemas y los 9 dt
 make oscilador-figuras     # ECM vs dt (la única figura del sistema 1) y la trayectoria
 make energia               # ítem 2.1.a: N = 300 sin obstáculos, barrido de dt con cuadros
-make energia-figuras       # energía vs t (dos paneles: completa y ampliada) y deriva vs dt con su ajuste
+make energia-figuras       # energía vs t (los 4 dt representativos) y deriva vs dt con su ajuste
 make energia-densa         # verifica el dt elegido en el caso más denso (N = 700 con obstáculos)
 make bench                 # ítem 2.1.b: tiempos contra N (máquina descargada)
 make bench-tp3             # los mismos tiempos con el motor del TP3, en esta computadora
 make bench-figuras         # tiempo de ejecución vs N de los dos paradigmas
 make obstaculos            # ítem 2.2: barrido de xo con N = 100 y N = 20
-make obstaculos-figuras    # ⟨t90⟩ vs xo y Fu(t) de los xo típicos
+make obstaculos-figuras    # ⟨t90⟩ vs xo y Fu(t) de los tres xo típicos, en una sola figura
 make velocidades           # ítem 2.3: N = 100 sin obstáculos, cuadros hasta el estacionario
 make velocidades-figuras   # f(v) por instante, ajuste de Maxwell-Boltzmann y E(kT)
 make densidad-figuras      # ítem 2.4.a: ⟨t90⟩ y ⟨t100⟩ vs densidad (usa las corridas del 2.1.b)
@@ -83,8 +85,11 @@ make mapa-figuras          # mapa de calor de ⟨t90⟩ en el plano (xo, N)
 make animations            # corridas características, videos y cuadro fijo de cada una
 make youtube               # copia los videos con nombres legibles en youtube/
 make oscilador-sin-amortiguamiento  # control: con gamma = 0 Beeman y Verlet dan la misma constante
-make figuras-diapositivas  # todas las figuras de las diapositivas (data/figuras_diapositivas/)
-make slides-images         # todas las imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
+make figuras-diapositivas  # las figuras de las diapositivas (data/figuras_diapositivas/);
+                           # los 4 cuadros fijos de animación salen de make animations
+make slides-images         # las 20 imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
+make todo                  # todas las simulaciones; make all es su alias
+make clean-figures         # borra data/figures/ y data/figuras_diapositivas/
 make slides-images-tikz    # sólo los esquemas TikZ de las diapositivas (report/figuras/*.tikz) renderizados a PNG
 make documentos            # report/presentacion.tex → report/build/presentacion.pdf (lee slides-images/)
 make entrega               # SdS_TP4_2026Q2G10S2_Codigo.zip (motor + animate.py y common.py, < 100 KB) y SdS_TP4_2026Q2G10S2_Presentación.pdf
@@ -205,16 +210,29 @@ tres décadas). Por debajo de `10⁻⁵` el archivo de trayectorias de un solo `
 pasa los 200 MB de texto y los esquemas de segundo orden ya están en el ruido
 de redondeo del doble.
 
-La figura tiene **dos paneles**. Arriba, el ECM de los cuatro esquemas: ahí se
-lee el orden de cada uno, pero Beeman y Verlet original se superponen. Abajo,
-la ampliación sobre esos dos: dividir el ECM por `dt⁴` saca la pendiente que
-comparten y deja la constante del error, y entonces se ve que no son iguales
-(`380` contra `330 m²/s⁴`, un 15 % más de ECM para Verlet con el mismo paso).
-La diferencia sale entera de que la fuerza depende de la velocidad, que es lo
-único en lo que los esquemas difieren: `make oscilador-sin-amortiguamiento`
-rehace el barrido con `gamma = 0` y las dos constantes coinciden. Los `dt` en
-los que la medición ya es ruido de redondeo y no error del esquema quedan
-fuera de la figura y del ajuste; el script los lista al correr.
+La figura que va a la presentación es **una sola**: el ECM de los cuatro
+esquemas en doble logarítmica. Es literalmente lo que pide el enunciado del
+sistema 1 (*«solo se debe mostrar una diapositiva [...] con esta última figura
+de ECM vs dt para los 4 métodos [...] ni ninguna otra información»*), así que
+no lleva paneles de más.
+
+Ahí Beeman y Verlet original se superponen, porque lo que los separa no es la
+pendiente sino la **constante del error**, y una diferencia del 15 % no se ve
+en diez órdenes de magnitud. Esa comparación tiene su propia figura,
+`ECM_constante_vs_dt.png`: dividir el ECM por `dt⁴` saca la pendiente que
+comparten y deja `380` contra `330 m²/s⁴` (un 15 % más de ECM para Verlet con
+el mismo paso). Es material de análisis y queda fuera de la charla; las cifras
+van en la viñeta y en `report/guion.md`, por si las preguntan. La diferencia
+sale entera de que la fuerza depende de la velocidad, que es lo único en lo
+que los esquemas difieren: `make oscilador-sin-amortiguamiento` rehace el
+barrido con `gamma = 0` y las dos constantes coinciden.
+
+Hay dos descartes, y el script lista los dos al correr: los `dt` en los que el
+ECM ya dejó de bajar salen de la figura y del ajuste, porque ahí se mide la
+precisión de la aritmética y no el error del esquema; y de la figura de la
+constante salen además aquellos en los que se aparta más del 10 % de su
+mediana, porque el redondeo ya la corre más que la diferencia que esa figura
+quiere mostrar.
 
 ## Ítem 2.1.a: elección del paso temporal
 
@@ -247,14 +265,14 @@ vale `m v0²/2 = 0,0125 J`.
 | Script | Ítem | Qué hace |
 |---|---|---|
 | `common.py` | — | lectura de las corridas, observables (energía, `Fu`, `t90`, ECM, ajuste de `kT`), estilos `informe`/`diapositiva` y `save()` con coma decimal en los ejes |
-| `oscillator.py` | 1.1, 1.2 | ECM contra `dt` de los cuatro esquemas, en doble logarítmica y con el exponente de `ECM = c dtᵖ` ajustado en log-log; `--trayectoria dt` agrega la figura de posición contra tiempo |
-| `energy.py` | 2.1.a | `E(t)` por `dt` (figura completa y ampliación sobre los pasos estables) y deriva relativa máxima contra `dt`, con el `dt` elegido marcado |
-| `bench.py` | 2.1.b | tiempo de ejecución contra `N` con el desvío entre las 10 realizaciones, una serie por archivo de tiempos, ajuste `t = c Nᵃ` y ejes doble logarítmicos |
+| `oscillator.py` | 1.1, 1.2 | ECM contra `dt` de los cuatro esquemas, en doble logarítmica y con el exponente de `ECM = c dtᵖ` ajustado en log-log (la figura de la presentación), más `ECM/dt⁴` de los dos de cuarto orden como figura aparte; `--trayectoria dt` agrega la figura de posición contra tiempo |
+| `energy.py` | 2.1.a | `E(t)` de los `dt` de `--pasos` (los representativos, los que se leen en una misma escala) y deriva relativa máxima contra `dt` sobre el barrido entero, con el `dt` elegido marcado |
+| `bench.py` | 2.1.b | tiempo de ejecución contra `N` con el desvío entre las 10 realizaciones (dibujado, y escrito en el pie porque en cuatro décadas no se ve), una serie por archivo de tiempos, ajuste `t = c Nᵃ` punteado y sin entrada propia en la leyenda, ejes doble logarítmicos |
 | `explore.py` | 2.2 | `t90` de cada corrida desde el registro de conversiones, `resumen.csv` con `⟨t90⟩ ± σ`, cuántas realizaciones llegan y `Fu(tmax)`; figura `⟨t90⟩` contra `xo` con una curva por `N`; `--fraccion 1` hace lo mismo con `t100` |
-| `conversion.py` | 2.2 | `Fu(t)` como escalón en cada conversión para una o más corridas, con la marca de `t90`; `--realizaciones` las dibuja del mismo color con `⟨t90⟩ ± σ` |
+| `conversion.py` | 2.2 | `--casos`: `Fu(t)` promedio de varios `xo` en una misma figura, con banda de `± σ` entre realizaciones y `⟨t90⟩ ± σ` marcado sobre la línea de `0,9` (es la figura que pide el ítem); `--runs` dibuja corridas sueltas como escalón, para mirar una configuración de cerca |
 | `speeds.py` | 2.3 | `f(v)` en varios instantes y la estacionaria, ajuste de Maxwell-Boltzmann por el mínimo de `E(kT)` y comparación con `m ⟨v²⟩/2` |
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad desde las corridas del 2.1.b, con el `N` en el eje de arriba |
-| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`, con el óptimo de cada `N` marcado |
+| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`, con el óptimo de cada `N` marcado con un círculo blanco (la referencia va arriba del mapa: adentro taparía celdas) |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
 | `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |
 | `check.py` | — | validación desde los estados guardados: deriva de energía, solapamiento máximo con partículas, obstáculos y pared, y escape fuera del dominio |
@@ -267,21 +285,24 @@ con su símbolo (`⟨t90⟩ (s)`, `f(v) (s/m)`), no con la frase entera.
 ## Presentación
 
 `report/presentacion.tex` es la presentación en beamer 16:9 (la que se entrega) y sigue
-`Formato_Presentaciones.pdf`, las devoluciones de la cátedra recogidas en
+la guía de presentaciones de la cátedra (`../tp-2/GuiaPresentaciones.pdf`,
+fuera de este repositorio), las devoluciones recogidas en
 `FEEDBACK.md` y el esquema que funcionó en el TP3: sin diapositiva de
 contenido, sólo separadores de sección; UML del motor sin archivos ni
-post-proceso; tabla de parámetros separada en **fijos y variables**, angosta
-para que el esquema del dominio sea grande; una diapositiva define la
+post-proceso; tabla de parámetros en tres bloques, **fijos, variables y
+simulación**, con símbolo y valor como la del TP3, angosta para que el
+esquema del dominio sea grande; una diapositiva define la
 **conversión** y los observables. El **sistema 1 ocupa una sola diapositiva**,
 con la figura de ECM contra `dt` de los cuatro esquemas y nada más, como pide
 el enunciado. Resultados va un bloque por ítem, cada diapositiva con **el
 gráfico grande más dos o tres viñetas** con lo que se lee en él, y las
-conclusiones son cuatro renglones con cifras que estén en las figuras
-mostradas. La última diapositiva es la **declaración de uso de agentes de IA**
+conclusiones son un punteo corto, una línea por ítem, sólo con cifras que
+estén en las figuras mostradas. La última diapositiva es la **declaración de uso de agentes de IA**
 (ítem 2.5).
 
 Los esquemas de las diapositivas de introducción e implementación (sistema,
-pared como partícula imagen, UML del motor y dominio) están en
+pared como partícula imagen, UML del motor, bucle del paso temporal y
+dominio) están en
 `report/figuras/*.tikz`; `presentacion.tex` los lee con `\input` y
 `make slides-images-tikz` los renderiza sueltos a PNG en `slides-images/`,
 con la misma tipografía y colores (`report/comun.tex`), así que en

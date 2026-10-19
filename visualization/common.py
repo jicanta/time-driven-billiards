@@ -30,7 +30,6 @@ from matplotlib.ticker import FuncFormatter, ScalarFormatter
 
 ROOT = Path(__file__).resolve().parent.parent
 DATA = ROOT / "data"
-RUNS = DATA / "runs"
 BENCH = DATA / "bench"
 OSCILLATOR = DATA / "oscilador"
 ENERGY = DATA / "energia"
@@ -38,7 +37,6 @@ EXPLORE = DATA / "explore"
 SPEEDS = DATA / "velocidades"
 MAP = DATA / "mapa"
 FIGURES = DATA / "figures"
-SLIDES = DATA / "figuras_diapositivas"
 
 FOLDER_NAME = {
     "1": "1_oscilador",
@@ -67,12 +65,10 @@ AXIS_COUNT = "número de partículas $N$"
 AXIS_WALL = "tiempo de ejecución (s)"
 AXIS_FU = "fracción de usadas $F_u$"
 AXIS_T90 = "$\\langle t_{90} \\rangle$ (s)"
-AXIS_T100 = "$\\langle t_{100} \\rangle$ (s)"
 AXIS_OFFSET = "posición de los obstáculos $x_o$ (m)"
 AXIS_SPEED = "módulo de la velocidad $v$ (m/s)"
 AXIS_PDF = "densidad de probabilidad $f(v)$ (s/m)"
 AXIS_DENSITY = "densidad $\\rho$ (partículas/m$^2$)"
-AXIS_KT = "energía térmica $k_B T$ (J)"
 AXIS_FIT_ERROR = "error cuadrático medio $E$ (s$^2$/m$^2$)"
 
 SCHEME_LABEL = {
@@ -440,14 +436,6 @@ def read_bench(path: Path, discarded: bool = False) -> dict:
         rows[int(n)]["generation"].append(float(generation))
         rows[int(n)]["loop"].append(float(loop))
     return dict(sorted(rows.items()))
-
-
-def read_tp3_bench(path: Path, discarded: bool = False) -> dict:
-    """bench.txt del TP3 (dinamica regida por eventos), con el mismo formato
-    de columnas: 'N seed eventos t_final ms_generacion ms_simulacion
-    descartada'. Se incluye en la figura del item 2.1.b para comparar los dos
-    paradigmas sobre la misma computadora."""
-    return read_bench(path, discarded)
 
 
 def maxwell_boltzmann(speed: np.ndarray, thermal: float, mass: float) -> np.ndarray:

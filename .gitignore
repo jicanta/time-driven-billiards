@@ -14,6 +14,8 @@ data/*
 # LaTeX
 report/build/
 report/.check/
+# temporales de make slides-images-tikz (se borran solos salvo que falle tectonic)
+report/figuras/_*.tex
 report/*.pdf
 report/*.log
 report/*.aux

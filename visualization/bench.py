@@ -7,11 +7,17 @@ de columnas y se corren en la misma computadora. Grafica el tiempo total
 (generacion de la condicion inicial + bucle de integracion o de eventos)
 contra N, con el desvio estandar entre las M realizaciones como barra de
 error, y le ajusta a cada serie una ley de potencia t = c N^a por cuadrados
-minimos en log-log; el exponente va en la leyenda, porque es como escala el
-costo de cada paradigma. Por acuerdo con la catedra no se cuenta la escritura
-de archivos. La primera medicion de cada N (marcada como descartada por el
-motor) no entra en el promedio ni en el desvio: paga el arranque en frio del
-proceso.
+minimos en log-log. Por acuerdo con la catedra no se cuenta la escritura de
+archivos. La primera medicion de cada N (marcada como descartada por el motor)
+no entra en el promedio ni en el desvio: paga el arranque en frio del proceso.
+
+La leyenda nombra solo las dos series medidas: las rectas punteadas son el
+ajuste de cada una y no necesitan entrada propia (se ve de que serie es cada
+una por el color). El exponente se dice en la charla y esta en esta salida.
+
+El desvio estandar se dibuja igual, pero en una figura que abarca cuatro
+decadas una barra del 4 % mide un pixel: el pie de la figura informa el desvio
+relativo maximo, que es la unica forma de que se lea.
 
     python3 visualization/bench.py --bench data/bench/hexagonal/tiempos.txt,data/bench/tp3_hexagonal.txt \\
         --labels "paso temporal (TP4),eventos (TP3)"
@@ -112,22 +118,32 @@ def main() -> None:
     for key, style in FIGURES.items():
         figure, axes = plt.subplots()
         handles = []
+        spread = 0.0
         for (label, counts, series, _), (color, marker) in zip(benches, STYLES):
             means = np.array([m for m, _ in series[key]])
             stds = np.array([s for _, s in series[key]])
+            spread = max(spread, float((stds / means).max()))
             handles.append(axes.errorbar(counts, means, yerr=stds, color=color, marker=marker,
                                          linestyle="none", label=label))
             exponent, intercept = np.polyfit(np.log(counts), np.log(means), 1)
             line = np.linspace(counts.min(), counts.max(), 200)
-            handles += axes.plot(line, np.exp(intercept) * line ** exponent, color=color,
-                                 linestyle="--", linewidth=1.6,
-                                 label=f"ajuste $c\\,N^{{a}}$, $a$ = {common.decimal(exponent, 2)}")
+            # La recta punteada es el ajuste de la serie de su mismo color: no
+            # lleva entrada en la leyenda (el exponente se dice en la charla).
+            axes.plot(line, np.exp(intercept) * line ** exponent, color=color,
+                      linestyle="--", linewidth=1.6, label="_nolegend_")
             print(f"{style['name']} [{label}]: t = c N^a, a = {exponent:.2f}, "
                   f"c = {np.exp(intercept):.3g} s")
         axes.set_xlabel(common.AXIS_COUNT)
         axes.set_ylabel(style["ylabel"])
         log_axes(axes, np.array(every))
         axes.legend(handles=handles, loc="lower right")
+        # Las barras de desvio estan dibujadas, pero en cuatro decadas de eje
+        # no se ven: cuanto valen va escrito, que es lo que pide el enunciado
+        # ("incluyendo su desvío estándar").
+        axes.text(0.02, 0.97, f"barras: desvío estándar de {repeats} realizaciones\n"
+                              f"(≤ {100 * spread:.0f} % del valor, menor que el símbolo)",
+                  transform=axes.transAxes, ha="left", va="top", color="#555555",
+                  fontsize=plt.rcParams["legend.fontsize"])
         out = out_dir / f"{style['name']}_{suffix}_M{repeats}_log.png"
         common.save(figure, out)
         plt.close(figure)

@@ -20,7 +20,8 @@
 | Nicolás Rivas | 64292 | nrivas@itba.edu.ar |
 
 **Fecha límite:** 23/10/2026, 13:00 h (campus). Presentación oral de **13
-minutos** con las secciones de `Formato_Presentaciones.pdf`.
+minutos** con las secciones de la guía de presentaciones de la cátedra
+(`../tp-2/GuiaPresentaciones.pdf`, fuera de este repositorio).
 
 **Entregables** (este TP **no lleva informe**; el zip no lleva README ni
 documentación extra y debe pesar **menos de 100 KB**):
@@ -258,6 +259,8 @@ tp-4/
 ├── youtube/            # titulos.md (los .mp4 no se versionan)
 ├── slides-images/      # todas las imágenes de la presentación numeradas por diapositiva: figuras (las lee presentacion.tex) y esquemas TikZ renderizados
 └── data/               # salidas de simulación y figuras (ignoradas por git)
+                        #   oscilador[_gamma0]/, energia[_densa]/, bench/, explore/,
+                        #   velocidades/, mapa/, una_particula/, runs/, figures*/
 ```
 
 ---
@@ -308,10 +311,11 @@ es el cambio de color de una partícula, que es parte del estado.
 | `energy.py` | 2.1.a | `E(t)` por `dt` y deriva relativa máxima contra `dt` |
 | `bench.py` | 2.1.b | tiempo de ejecución contra `N` de los dos paradigmas |
 | `explore.py` | 2.2 | `⟨t90⟩` contra `xo`, una curva por `N` |
-| `conversion.py` | 2.2 | `Fu(t)` de las realizaciones de un caso, con `t90` marcado |
+| `conversion.py` | 2.2 | `Fu(t)` de los `xo` típicos en una figura (`--casos`), con `⟨t90⟩ ± σ` marcado |
 | `speeds.py` | 2.3 | `f(v)` por instante, ajuste de Maxwell-Boltzmann y `E(kT)` |
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad |
 | `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)` |
+| `single.py` | 2.4.a | `N = 1`: conversión contra el parámetro de impacto (`make una-particula`) |
 | `animate.py` | — | animación y cuadro fijo |
 | `check.py` | — | validación: deriva de energía, solapamientos y escapes |
 
@@ -326,13 +330,16 @@ es el cambio de color de una partícula, que es parte del estado.
   200 MB de texto y los esquemas de segundo orden ya están en el ruido de
   redondeo del doble.
 - Figura: ECM contra `dt` en doble logarítmica, con el exponente `p` de
-  `ECM = c dtᵖ` ajustado por cuadrados mínimos en log-log en la leyenda. Va en
-  **dos paneles**: arriba los cuatro esquemas y abajo la ampliación sobre
-  Beeman y Verlet original, que arriba se superponen. La ampliación grafica
-  `ECM/dt⁴`, que saca la pendiente común y deja la constante del error: `330`
-  contra `380 m²/s⁴`, un 15 % más de ECM para Verlet con el mismo paso. La
-  diferencia sale de que la fuerza depende de la velocidad y se verifica con
-  `make oscilador-sin-amortiguamiento` (`gamma = 0`: las constantes coinciden).
+  `ECM = c dtᵖ` ajustado por cuadrados mínimos en log-log en la leyenda. Es
+  **un solo panel**, con los cuatro esquemas y nada más: el enunciado pide una
+  diapositiva con esa figura y «ninguna otra información».
+- Beeman y Verlet original se superponen ahí, porque lo que los separa es la
+  constante del error y no la pendiente. Eso va en una figura **aparte**,
+  `ECM_constante_vs_dt.png`, que grafica `ECM/dt⁴`: `330` contra `380 m²/s⁴`,
+  un 15 % más de ECM para Verlet con el mismo paso. No entra en la charla (las
+  cifras sí, en la viñeta). La diferencia sale de que la fuerza depende de la
+  velocidad y se verifica con `make oscilador-sin-amortiguamiento`
+  (`gamma = 0`: las constantes coinciden).
 - Los `dt` en los que la medición ya es ruido de redondeo del doble y no error
   del esquema quedan fuera de la figura y del ajuste.
 - **Es la única diapositiva del sistema 1** (lo pide el enunciado).
@@ -367,9 +374,12 @@ es el cambio de color de una partícula, que es parte del estado.
 - `N = 100`, `tmax = 100 s`, 11 valores de `xo` de `r` a `R − r`, 15
   realizaciones cada uno (el enunciado pide al menos 5); y lo mismo con
   `N = 20` (densidad menor).
-- Figuras: `Fu(t)` de las 15 realizaciones para tres `xo` típicos (centro,
-  `xo = 0,20 m` que es el mínimo medido, y borde) y `⟨t90⟩ ± σ` contra `xo`
-  con una curva por `N`.
+- Figuras: `Fu(t)` de los tres `xo` típicos (centro, `xo = 0,20 m` que es el
+  mínimo medido, y borde) **en una sola figura**, que es como lo pide el
+  enunciado («graficar `Fu(t)` para pocos valores típicos de `xo`»): una curva
+  por `xo`, promedio de las 15 realizaciones, con banda de `± σ` y `⟨t90⟩ ± σ`
+  marcado sobre la línea de `0,9`. Y `⟨t90⟩ ± σ` contra `xo` con una curva por
+  `N`.
 - Si alguna realización no llega a `Fu = 0,9` antes de `tmax`, el punto va con
   símbolo hueco y se informa `Fu(tmax)`.
 
@@ -414,12 +424,13 @@ usados y de qué manera.
 
 ## 7. Presentación (13 min)
 
-Secciones de `Formato_Presentaciones.pdf`, con el esquema que funcionó en el
-TP3: Introducción (sistema y parámetros), Implementación (UML del motor,
-esquema de Verlet, `dt` contra `dt2`), Simulaciones (observables y casos),
+Secciones de la guía de presentaciones de la cátedra, con el esquema que funcionó en el
+TP3: Introducción (sistema y parámetros), Implementación (esquema de Verlet,
+UML del motor y el bucle del paso temporal, como el bucle de eventos del TP3),
+Simulaciones (observables y casos),
 Resultados (un bloque por ítem, cada diapositiva con la figura grande y dos o
-tres viñetas) y Conclusiones (cuatro renglones). Entre Introducción y
-Resultados va la **única diapositiva del sistema 1**. Al final, la
+tres viñetas) y Conclusiones (un punteo corto, una línea por ítem). La
+**única diapositiva del sistema 1** abre Resultados. Al final, la
 declaración de uso de IA.
 
 ---
@@ -454,7 +465,7 @@ Se cambian si los profesores indican otra cosa.
 4. **`dt = 5·10⁻⁵ s` para todo el sistema 2**, elegido en el ítem 2.1.a con la
    cota de deriva de 0,1 %: da `D = 3,8·10⁻⁴` a `N = 300` sin obstáculos y
    `2,6·10⁻⁴` a `N = 700` con los obstáculos en contacto (`make energia-densa`),
-   con un solapamiento máximo del 26 % de `r` y ninguna partícula fuera del
+   con un solapamiento máximo del 23 % de `r` y ninguna partícula fuera del
    dominio (`visualization/check.py`).
 5. **Condición inicial.** La del enunciado (adición secuencial al azar con
    rechazo) hasta `N = 400`; por encima de `N ≈ 450` la fracción de área pasa

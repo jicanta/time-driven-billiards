@@ -1,8 +1,9 @@
 % =========================================================
 % TP4 -- Dinamica molecular regida por el paso temporal: billar circular
-% Presentacion (entregable b). Formato segun ../tp-2/GuiaPresentaciones.pdf,
-% Formato_Presentaciones.pdf y las devoluciones de la catedra recogidas en
-% FEEDBACK.md (TP2, y 18/09 y 26/09 sobre el borrador del TP3):
+% Presentacion (entregable b). Formato segun la guia de presentaciones de la
+% catedra (../tp-2/GuiaPresentaciones.pdf, fuera de este repositorio) y las
+% devoluciones recogidas en FEEDBACK.md (TP2, y 18/09 y 26/09 sobre el
+% borrador del TP3):
 %   * sin diapositiva de contenido ni caratulas de bloque: solo separadores
 %   * poco detalle al inicio; cada concepto se explica UNA vez donde hace falta
 %   * lo importante ocupa la pantalla: figura grande, texto minimo, sin huecos
@@ -20,15 +21,20 @@
 %   * conclusiones como punteo corto, solo con cifras de las figuras mostradas
 % y el enunciado del TP4:
 %   * el sistema 1 ocupa UNA sola diapositiva, con la figura de ECM vs dt de
-%     los cuatro esquemas y nada mas (sin animaciones ni introduccion). La
-%     figura lleva dos paneles, como la de la energia: arriba los cuatro
-%     esquemas y abajo la ampliacion sobre los dos de cuarto orden, que en la
-%     escala completa se superponen
+%     los cuatro esquemas y nada mas: ni animaciones, ni introduccion, ni
+%     "ninguna otra informacion". Por eso la figura es un solo panel. Lo que
+%     separa a Beeman de Verlet original es la constante del error y no la
+%     pendiente, asi que no se ve en diez ordenes de magnitud: esa comparacion
+%     va en data/figures/1_oscilador/ECM_constante_vs_dt.png, que es material
+%     de analisis y queda fuera de la charla (las cifras, en la vineta)
 %   * diapositiva final con la declaracion de uso de agentes de IA (item 2.5)
 %
 % Las figuras se leen de slides-images/ (make slides-images), numeradas con la
 % diapositiva en la que van: son las mismas de data/figuras_diapositivas/, el
-% analisis de data/figures/ con tipografia de presentacion.
+% analisis de data/figures/ con tipografia de presentacion. Los cinco
+% esquemas (sistema, pared imagen, UML, bucle y dominio) NO entran por ahi: se
+% dibujan con \input{figuras/*.tikz}, y make slides-images-tikz los renderiza
+% ademas a PNG en slides-images/ para que ahi este toda imagen de la charla.
 %
 %   make documentos        -> report/build/presentacion.pdf
 % =========================================================
@@ -313,14 +319,22 @@
     \begin{minipage}{0.92\textwidth}
         \footnotesize\sloppy
         \begin{itemize}\setlength{\itemsep}{0.35em}
-            \item \texttt{step()}: desplazar posiciones, rearmar la grilla, sumar fuerzas
-                  (pares vecinos, obstáculos, imagen de la pared), Verlet y conversión.
             \item El contacto alcanza a $2r$: la \textbf{celda de índice} deja el costo de
                   un paso en $O(N)$ y permite llegar a $N = 700$.
             \item El motor \textbf{no calcula observables}: escribe el estado cada $\dtd$
                   y el instante de cada conversión; todo lo demás sale de esos archivos.
         \end{itemize}
     \end{minipage}
+\end{frame}
+
+\begin{frame}{El bucle del paso temporal}
+    \vspace{0.2em}
+    \begin{center}
+        \input{figuras/bucle-paso-temporal.tikz}
+    \end{center}
+    \vspace{-0.1em}
+    \centering
+    {\small El paso es \alert{fijo}: el bucle no decide cuándo avanzar, siempre avanza $\dt$.}
 \end{frame}
 
 % =========================================================
@@ -425,34 +439,33 @@
 % =========================================================
 
 \begin{frame}{Sistema 1: error cuadrático medio contra el paso}
-    \figbulw[0.2em]{slide-12-ECM-vs-dt.png}{%
+    \figbulw[0.2em]{slide-13-ECM-vs-dt.png}{%
         \item \textbf{Beeman} y \textbf{Verlet original}: ECM $\propto \dt^{4}$, o sea
-              error $\propto \dt^{2}$. Se superponen, pero Verlet mide
-              \alert{15\,\% más} (ampliación).
-        \item Es por la fuerza que depende de $\vv$: con $\gamma = 0$ las dos
-              constantes coinciden. \textbf{Beeman} es el mejor.
+              error $\propto \dt^{2}$. En esta escala se superponen.
         \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$, un
               orden menos. A $\dt = \SI{1e-4}{\second}$, ocho órdenes hasta Beeman.
-        \cond{$m = \SI{70}{\kilogram}$, $k = \SI{1e4}{\newton\per\meter}$, $\gamma = \SI{100}{\kilogram\per\second}$, $A = \SI{1}{\meter}$, $t_f = \SI{5}{\second}$; sin el $\dt = \SI{1e-5}{\second}$ de Verlet (redondeo)}
+        \item \alert{Beeman es el mejor}: menor ECM en 8 de los 9 pasos. Lo que lo
+              separa de Verlet es la constante del error, un \SI{15}{\percent}.
+        \cond{$m = \SI{70}{\kilogram}$, $k = \SI{1e4}{\newton\per\meter}$, $\gamma = \SI{100}{\kilogram\per\second}$, $A = \SI{1}{\meter}$, $t_f = \SI{5}{\second}$}
     }
 \end{frame}
 
 \begin{frame}{Energía total contra el tiempo}
-    \figbul{slide-13-energia-vs-t.png}{%
+    \figbulw[0.35em]{slide-14-energia-vs-t.png}{%
         \item $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$: el sistema es
               conservativo y se mide cuánto se aparta.
-        \item Con $\dt = \SI{1e-3}{\second}$ explota hasta \SI{45}{\joule}: el choque
-              dura $\tau = \pi\sqrt{\mu/k} = \SI{3.5}{\milli\second}$ y entran sólo
-              tres pasos.
-        \item Ampliación: $\SI{5e-4}{\second}$ deriva un \SI{2.6}{\percent} y
+        \item $\SI{5e-4}{\second}$ deriva un \SI{2.6}{\percent} y
               $\SI{2e-4}{\second}$ un \SI{0.6}{\percent} (hacia abajo); de
               $\SI{1e-4}{\second}$ en adelante no se distinguen de $E_0$.
+        \item Fuera de escala, $\dt = \SI{1e-3}{\second}$ explota a \SI{45}{\joule}:
+              el choque dura $\tau = \pi\sqrt{\mu/k} = \SI{3.5}{\milli\second}$ y
+              entran sólo tres pasos.
         \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$, $\dtd = \SI{0.01}{\second}$}
     }
 \end{frame}
 
 \begin{frame}{Elección del paso: deriva relativa máxima}
-    \figbul{slide-14-deriva-vs-dt.png}{%
+    \figbul{slide-15-deriva-vs-dt.png}{%
         \item Observable escalar: la deriva relativa máxima $D(\dt)$. Sobre los
               pasos estables ajusta $D \propto \dt^{2,0}$: el segundo orden de Verlet.
         \item Criterio: el $\dt$ \textbf{más largo} con $D \leq 10^{-3}$, el de menor
@@ -464,7 +477,7 @@
 \end{frame}
 
 \begin{frame}{Obstáculos en el centro}
-    \animbul{slide-15-animacion-centro.png}{https://youtu.be/PENDIENTE-01}{%
+    \animbul{slide-16-animacion-centro.png}{https://youtu.be/PENDIENTE-01}{%
         $x_o = r = \SI{0.0175}{\meter}$, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Los dos obstáculos se tocan: forman un solo blanco de $4r$ de ancho
               en el centro del dominio.
@@ -474,24 +487,14 @@
 \end{frame}
 
 \begin{frame}{Tiempo de ejecución contra $N$}
-    \figbul{slide-16-tiempo-ejecucion-vs-N.png}{%
-        \item \textbf{Paso temporal}: $t \propto N^{0,91}$. Los pasos son 600\,000
-              siempre y la celda de índice deja el costo de uno en $O(N)$.
-        \item \textbf{Eventos} (TP3): $t \propto N^{3,52}$. Cada choque rehace
-              parte del calendario, y los choques crecen con $N$.
-        \item \alert{Se cruzan en $N \approx 490$}: a $N = 600$ los eventos
-              cuestan $2{,}3$ veces más.
-        \cond{$x_o = r$, $t_f = \SI{30}{\second}$, promedio de 10 realizaciones}
-    }
-\end{frame}
-
-\begin{frame}{Fracción de usadas: obstáculos en el centro}
-    \figbul{slide-17-Fu-vs-t-centro.png}{%
-        \item Las 15 realizaciones casi se superponen: la mitad de las
-              partículas se convierte en \SI{7.6}{\second}, pero la cola es larga.
-        \item $\mtnov = 26{,}5 \pm \SI{3.4}{\second}$: los dos obstáculos se tapan entre
-              sí y el blanco efectivo es poco más que el de uno solo.
-        \cond{$N = 100$, $x_o = r$, $t_{max} = \SI{100}{\second}$, 15 realizaciones}
+    \figbul{slide-17-tiempo-ejecucion-vs-N.png}{%
+        \item \textbf{Paso temporal}: los pasos son 600\,000 siempre y la celda de
+              índice deja el costo de uno en $O(N)$.
+        \item \textbf{Eventos} (TP3): cada choque rehace parte del calendario, y los
+              choques crecen con $N$.
+        \item \alert{Se cruzan en $N \approx 470$}: a $N = 600$ los eventos
+              cuestan $2{,}9$ veces más (\SI{42.3}{\second} contra \SI{14.8}{\second}).
+        \cond{$x_o = r$, $t_f = \SI{30}{\second}$, 10 realizaciones; punteadas: ajuste $c\,N^{a}$}
     }
 \end{frame}
 
@@ -505,18 +508,8 @@
     }
 \end{frame}
 
-\begin{frame}{Fracción de usadas: posición óptima}
-    \figbul{slide-19-Fu-vs-t-optimo.png}{%
-        \item La misma forma corrida a la izquierda: la mitad se convierte en
-              \SI{4.7}{\second} y $\mtnov = 14{,}8 \pm \SI{1.7}{\second}$.
-        \item \alert{Casi la mitad del tiempo} que con los obstáculos juntos, y con la
-              mitad de dispersión entre realizaciones.
-        \cond{$N = 100$, $x_o = \SI{0.20}{\meter}$, $t_{max} = \SI{100}{\second}$, 15 realizaciones}
-    }
-\end{frame}
-
 \begin{frame}{Obstáculos en el borde}
-    \animbul{slide-20-animacion-borde.png}{https://youtu.be/PENDIENTE-03}{%
+    \animbul{slide-19-animacion-borde.png}{https://youtu.be/PENDIENTE-03}{%
         $x_o = R - r = \SI{0.4925}{\meter}$, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Pegados a la pared, los obstáculos quedan fuera del camino de casi
               todas las trayectorias.
@@ -524,18 +517,21 @@
     }
 \end{frame}
 
-\begin{frame}{Fracción de usadas: obstáculos en el borde}
-    \figbul{slide-21-Fu-vs-t-borde.png}{%
-        \item $\mtnov = 31{,}2 \pm \SI{3.1}{\second}$: la posición \textbf{más lenta}
-              del barrido, $2{,}1$ veces el óptimo.
-        \item En las tres posiciones $\mtcien \approx 2{,}3\,\mtnov$ y con mucho
-              más desvío: la última partícula es la que tarda.
-        \cond{$N = 100$, $x_o = R - r$, $t_{max} = \SI{100}{\second}$, 15 realizaciones}
+\begin{frame}{Fracción de usadas: los tres $x_o$ típicos}
+    \figbul{slide-20-Fu-vs-t-xo-tipicos.png}{%
+        \item Misma forma, corrida en el tiempo: el \alert{óptimo} llega a $0{,}9$ en
+              \SI{14.8}{\second}, el centro en \SI{26.5}{\second} y el borde en
+              \SI{31.2}{\second}.
+        \item La banda es $\pm 1$ desvío entre las 15 realizaciones: el óptimo también
+              es el de \textbf{menos dispersión} ($\pm \SI{1.7}{\second}$).
+        \item La cola es larga en los tres: $\mtcien \approx 2{,}3\,\mtnov$. Todas las
+              realizaciones llegan a $\Fu = 1$ antes de $t_{max}$.
+        \cond{$N = 100$, $t_{max} = \SI{100}{\second}$, 15 realizaciones por $x_o$}
     }
 \end{frame}
 
 \begin{frame}{$\mtnov$ contra la posición de los obstáculos}
-    \figbul{slide-22-t90-vs-xo.png}{%
+    \figbul{slide-21-t90-vs-xo.png}{%
         \item \alert{Sí hay posición óptima}: $\mtnov$ cae de \SI{26.5}{\second}
               en $x_o = r$ a \SI{14.8}{\second} en \SI{0.20}{\meter} y sube a
               \SI{31.2}{\second} contra la pared.
@@ -549,7 +545,7 @@
 \end{frame}
 
 \begin{frame}{Sin obstáculos}
-    \animbul{slide-23-animacion-sin-obstaculos.png}{https://youtu.be/PENDIENTE-04}{%
+    \animbul{slide-22-animacion-sin-obstaculos.png}{https://youtu.be/PENDIENTE-04}{%
         sin obstáculos, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Sin conversión: todas quedan frescas. Es el sistema con el que se eligió
               el paso y el de la distribución de velocidades.
@@ -559,7 +555,7 @@
 \end{frame}
 
 \begin{frame}{Distribución del módulo de la velocidad}
-    \figbul{slide-24-f-v-vs-t.png}{%
+    \figbul{slide-23-f-v-vs-t.png}{%
         \item En $t = 0$ todas tienen $|\vv| = v_0$: $f(v)$ es una \textbf{delta}
               que se sale de la figura.
         \item A los \SI{0.5}{\second} ya es indistinguible de la estacionaria.
@@ -569,7 +565,7 @@
 \end{frame}
 
 \begin{frame}{Ajuste de Maxwell-Boltzmann}
-    \figbul{slide-25-f-v-ajuste.png}{%
+    \figbul{slide-24-f-v-ajuste.png}{%
         \item $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$, con $k_BT$ como
               \textbf{único parámetro libre}.
         \item $k_BT = \SI{12.42}{\milli\joule}$ contra
@@ -581,7 +577,7 @@
 \end{frame}
 
 \begin{frame}{Error cuadrático medio del ajuste}
-    \figbul{slide-26-E-vs-kT.png}{%
+    \figbul{slide-25-E-vs-kT.png}{%
         \item Método de la Teórica 0: se recorre $k_BT$ en una grilla y se toma el
               \textbf{mínimo} del error cuadrático medio $E(k_BT)$.
         \item El error se duplica ya en $k_BT = 12{,}2$ y $\SI{12.7}{\milli\joule}$:
@@ -591,7 +587,7 @@
 \end{frame}
 
 \begin{frame}{Efecto de la densidad}
-    \figbulw{slide-27-t90-t100-vs-densidad.png}{%
+    \figbulw{slide-26-t90-t100-vs-densidad.png}{%
         \item $\mtnov \approx \SI{21}{\second}$ de $N = 10$ a $50$ y \SI{23.7}{\second}
               en $N = 100$; desde $N = 200$ ninguna llega a $0{,}9$ en \SI{30}{\second}.
         \item \alert{Sí hay densidad óptima}: $\Fu(t_f)$ es máxima en $N = 30$--$50$
@@ -604,7 +600,7 @@
 \end{frame}
 
 \begin{frame}{Posición óptima para cada densidad}
-    \figbul{slide-28-mapa-t90-xo-N.png}{%
+    \figbul{slide-27-mapa-t90-xo-N.png}{%
         \item El mínimo cae en $x_o = 0{,}2$--$\SI{0.3}{\meter}$ para las cinco
               densidades: \alert{no se corre con $N$}.
         \item Los extremos son siempre los peores, y el castigo crece con la
@@ -626,8 +622,9 @@
               y Euler p-c: $\propto \dt^{2}$. Beeman es el mejor para el oscilador.
         \item Por conservación de la energía, $\dt = \SI{5e-5}{\second}$: deriva
               $3{,}8\cdot10^{-4}$ a $N = 300$ y $2{,}6\cdot10^{-4}$ a $N = 700$.
-        \item El paso temporal escala como $N^{0,91}$ y los eventos como $N^{3,52}$:
-              se cruzan cerca de $N = 490$.
+        \item El costo del paso temporal crece casi lineal con $N$ y el de los eventos
+              mucho más rápido: se cruzan cerca de $N = 470$ y a $N = 600$ los eventos
+              cuestan $2{,}9$ veces más.
         \item Hay un $x_o$ \alert{óptimo} en $0{,}2$--$\SI{0.3}{\meter}$:
               \SI{14.8}{\second} contra \SI{31.2}{\second} en la pared; es el mismo
               de $N = 20$ a $300$.

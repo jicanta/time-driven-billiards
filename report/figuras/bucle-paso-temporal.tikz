@@ -1,0 +1,32 @@
+% El bucle del paso temporal, el equivalente del "bucle de eventos" del TP3:
+% que hace Simulation::step() una vez, en el orden en que lo hace. El paso es
+% fijo, asi que el bucle no decide cuando avanzar (eso es lo que lo separa de
+% la dinamica regida por eventos): siempre avanza dt.
+\begin{tikzpicture}[
+    font=\small,
+    paso/.style={draw=azul!55, fill=azul!6, rounded corners=2pt, align=left,
+                 inner sep=5pt, text width=124mm},
+    fl/.style={-{Stealth[length=2mm]}, azul, thick}]
+    \node[paso, fill=grisclaro, draw=gris!60] (e0)
+        {Arranque: $\vr(-\dt)$ con Euler en $-\dt$, y $\vF(0)$};
+    \node[paso, below=2.0mm of e0] (p1)
+        {\textbf{1.} Correr las posiciones: $\vr(t{-}\dt) \leftarrow \vr(t)$,
+         $\vr(t) \leftarrow \vr(t{+}\dt)$};
+    \node[paso, below=2.0mm of p1] (p2)
+        {\textbf{2.} Rearmar la {\color{acento}\bfseries celda de índice} (celdas de $2r$)};
+    \node[paso, below=2.0mm of p2] (p3)
+        {\textbf{3.} Sumar $\vF(t)$: pares vecinos, obstáculos e imagen de la pared};
+    \node[paso, below=2.0mm of p3] (p4)
+        {\textbf{4.} Verlet: $\vr(t{+}\dt)$ y $\vv(t)$ por diferencia centrada};
+    \node[paso, below=2.0mm of p4] (p5)
+        {\textbf{5.} Conversión: fresca que solapa un obstáculo $\rightarrow$ usada, y se anota $t$};
+    \node[paso, below=2.0mm of p5, fill=grisclaro, draw=gris!60] (p6)
+        {\textbf{6.} Cada $\dtd = n\,\dt$: escribir el estado};
+    \draw[fl] (e0) -- (p1);
+    \draw[fl] (p1) -- (p2);
+    \draw[fl] (p2) -- (p3);
+    \draw[fl] (p3) -- (p4);
+    \draw[fl] (p4) -- (p5);
+    \draw[fl] (p5) -- (p6);
+    \draw[fl, gris] (p6.east) -- ++(6mm,0) |- ($(p1.east)+(6mm,0)$) -- (p1.east);
+\end{tikzpicture}%

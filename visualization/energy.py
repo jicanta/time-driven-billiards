@@ -21,11 +21,15 @@ porque es el que da el menor tiempo de ejecucion con el error aceptado.
     python3 visualization/energy.py
     python3 visualization/energy.py --estilo diapositiva --figures data/figuras_diapositivas
 
-La figura de la energia tiene dos paneles con el mismo eje de tiempos: toda la
-escala (donde se ve que el paso mas largo explota) y la ampliacion sobre los
-pasos estables, como las dos vistas de la Teorica 4 (diapositiva 38). La de la
-deriva lleva el ajuste de la ley de potencia D = c dt^a sobre los pasos
-estables, con el exponente en la leyenda.
+La figura de la energia dibuja un solo panel y solo los dt de --pasos: el
+barrido entero son siete curvas y en una misma escala no se distinguen. El
+mas largo (10^-3 s) explota dos ordenes de magnitud por encima de E0 y aplasta
+a todas las demas contra la recta de E0; los dos mas cortos (2*10^-5 y 10^-5 s)
+caen encima del elegido. Quedan cuatro, que es lo que pide el enunciado
+("distintos valores de dt") y se leen todas en la misma escala. El barrido
+completo igual se mide: va entero en la tabla, en resumen.csv y en la figura
+de la deriva, que es la que elige el paso y lleva el ajuste de la ley de
+potencia D = c dt^a sobre los pasos estables, con el exponente en la leyenda.
 """
 
 from __future__ import annotations
@@ -40,7 +44,6 @@ import numpy as np
 import common
 
 COLORS = ["#d62728", "#ff7f0e", "#2ca02c", "#1f5fbf", "#9467bd", "#8c564b", "#17becf"]
-MARKERS = ["o", "s", "^", "D", "v", "P", "X"]
 
 
 def summarize(root: Path) -> list[dict]:
@@ -85,7 +88,10 @@ def main() -> None:
                         help="tolerancia de la deriva relativa para elegir el paso")
     parser.add_argument("--estable", type=float, default=0.1,
                         help="deriva por encima de la cual se considera que el paso es "
-                             "inestable: queda fuera de la ampliacion y del ajuste")
+                             "inestable: queda fuera del ajuste de la ley de potencia")
+    parser.add_argument("--pasos", type=str, default="5e-4,2e-4,1e-4,5e-5",
+                        help="los dt (s) que se dibujan en la figura de E(t), separados por "
+                             "coma: los representativos, los que se leen en una misma escala")
     common.add_common_arguments(parser)
     arguments = parser.parse_args()
     common.use_style(arguments.estilo)
@@ -95,35 +101,27 @@ def main() -> None:
     count = rows[0]["N"]
     write_csv(rows, arguments.energia / "resumen.csv")
 
-    # Dos vistas de la misma curva, como en la Teorica 4 (diapositiva 38), en
-    # una sola figura: arriba toda la escala, donde se ve que el paso mas largo
-    # explota; abajo la ampliacion sobre los pasos que si conservan la energia,
-    # donde se ordenan de mayor a menor dt. Comparten el eje de tiempos.
-    stable_rows = [row for row in rows if row["deriva"] <= arguments.estable]
-    width, height = plt.rcParams["figure.figsize"]
-    figure, (top, bottom) = plt.subplots(2, 1, sharex=True, figsize=(width, 1.55 * height),
-                                         gridspec_kw={"height_ratios": [1.0, 1.0],
-                                                      "hspace": 0.08})
-    for row, color in zip(rows, COLORS):
-        label = f"$\\Delta t = {common.scientific(row['dt'])}$ s"
-        top.plot(row["t"], row["E"], color=color, label=label)
-        if row in stable_rows:
-            bottom.plot(row["t"], row["E"], color=color, label=label)
-    for axes in (top, bottom):
-        axes.axhline(rows[0]["E0"], color="#111111", linestyle="--", linewidth=1.2,
-                     label=f"$E_0$ = {common.decimal(rows[0]['E0'], 2)} J" if axes is top else None)
-        axes.set_ylabel(common.AXIS_ENERGY)
-    bottom.set_xlabel(common.AXIS_TIME)
-    common.headroom(top, 0.30)
-    top.legend(loc="upper left", ncol=2)
-    # La ampliacion muestra lo que la escala completa aplasta: el rango es el
-    # de los pasos estables (la deriva puede ser hacia arriba o hacia abajo),
-    # con un margen arriba para el rotulo.
-    low = min(row["E"].min() for row in stable_rows)
-    high = max(row["E"].max() for row in stable_rows)
-    bottom.set_ylim(low - 0.08 * (high - low), high + 0.18 * (high - low))
-    bottom.text(0.985, 0.95, "ampliación", transform=bottom.transAxes, ha="right", va="top",
-                color="#555555", fontsize=plt.rcParams["legend.fontsize"])
+    # Un solo panel y una sola escala, con los dt de --pasos: los que se leen
+    # juntos. El resto del barrido no se pierde, sigue en la tabla, en
+    # resumen.csv y en la figura de la deriva.
+    wanted = [float(value) for value in arguments.pasos.split(",") if value]
+    shown = [row for row in rows if any(np.isclose(row["dt"], value) for value in wanted)]
+    missing = [value for value in wanted
+               if not any(np.isclose(row["dt"], value) for row in rows)]
+    if missing:
+        raise SystemExit("no hay corrida con dt = " + ", ".join(f"{v:g}" for v in missing))
+    figure, axes = plt.subplots()
+    for row, color in zip(shown, COLORS):
+        axes.plot(row["t"], row["E"], color=color,
+                  label=f"$\\Delta t = {common.scientific(row['dt'])}$ s")
+    axes.axhline(rows[0]["E0"], color="#111111", linestyle="--", linewidth=1.2,
+                 label=f"$E_0$ = {common.decimal(rows[0]['E0'], 2)} J")
+    axes.set_ylabel(common.AXIS_ENERGY)
+    axes.set_xlabel(common.AXIS_TIME)
+    # Las curvas ocupan todo el ancho: la leyenda va arriba, en el hueco que
+    # deja el margen, y en dos columnas para no robarle alto a la figura.
+    common.headroom(axes, 0.34)
+    axes.legend(loc="upper left", ncol=2)
     energy_figure = out_dir / f"energia_vs_t_N{count}.png"
     common.save(figure, energy_figure)
     plt.close(figure)
@@ -167,6 +165,8 @@ def main() -> None:
     for row in rows:
         print(f"{row['dt']:10.1e} {row['cuadros']:8d} {row['deriva']:16.3e} "
               f"{row['deriva_final']:14.3e}")
+    print("dt en la figura de E(t): " + ", ".join(f"{row['dt']:g} s" for row in shown)
+          + f" (de los {len(rows)} del barrido; el resto no se distingue en esa escala)")
     print(f"ajuste deriva = c dt^a sobre los pasos estables: a = {exponent:.2f}")
     print(f"dt elegido (deriva ≤ {arguments.cota:g}): {chosen:g} s" if chosen
           else "ningún dt del barrido queda por debajo de la cota")

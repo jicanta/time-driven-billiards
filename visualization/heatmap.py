@@ -4,7 +4,7 @@ Lee data/mapa/ (un barrido de `billar explore` sobre el producto de --xos y
 --ns) y dibuja, para cada punto (xo, N), el promedio del tiempo de conversion
 sobre las realizaciones. Las celdas donde alguna realizacion no llega a la
 fraccion pedida antes de tmax quedan en blanco y se informan por consola. En
-cada fila (cada N) se marca con un circulo la posicion optima, que es la
+cada fila (cada N) se marca con un circulo blanco la posicion optima, que es la
 respuesta del item: si la posicion que minimiza ⟨t90⟩ depende o no de la
 densidad.
 
@@ -70,14 +70,27 @@ def main() -> None:
                            shading="flat")
     bar = figure.colorbar(mesh, ax=axes)
     bar.set_label(f"$\\langle t_{{{percent}}} \\rangle$ (s)")
+    drawn = False
     for row, count in enumerate(counts):
         if np.all(np.isnan(grid[row])):
             continue
         best = int(np.nanargmin(grid[row]))
         axes.plot([best], [row], marker="o", markersize=13, markerfacecolor="none",
                   markeredgecolor="white", markeredgewidth=2.4, linestyle="none")
+        drawn = True
         print(f"N = {count}: óptimo en xo = {offsets[best]:.4f} m, "
               f"<t{percent}> = {grid[row, best]:.1f} s")
+    # Todas las celdas son dato, asi que la referencia del circulo no puede ir
+    # adentro: va escrita ARRIBA del mapa, fuera del area de dibujo. Como
+    # texto y no como leyenda, porque el circulo es blanco y sobre el fondo
+    # blanco de la figura el simbolo de la leyenda no se veria.
+    # No es un titulo (las figuras no llevan): es la referencia del simbolo,
+    # la que en las demas figuras va en la leyenda.
+    if drawn:
+        axes.text(0.0, 1.02, f"círculo blanco: el $x_o$ que minimiza "
+                             f"$\\langle t_{{{percent}}} \\rangle$ en esa fila",
+                  transform=axes.transAxes, ha="left", va="bottom", color="#555555",
+                  fontsize=plt.rcParams["legend.fontsize"])
     axes.set_xticks(np.arange(len(offsets)))
     axes.set_xticklabels([common.decimal(round(x, 4)) for x in offsets])
     axes.set_yticks(np.arange(len(counts)))

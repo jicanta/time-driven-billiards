@@ -98,7 +98,7 @@ def main() -> None:
             axes.plot(density[~complete], means[~complete], marker=marker, linestyle="none",
                       color=color, markerfacecolor="white", zorder=5,
                       label=None if incomplete_labelled
-                      else "alguna realización no llega antes de $t_f$")
+                      else "hueco: no llegan todas")
             incomplete_labelled = True
         best = shown[int(np.nanargmin(means))]
         print(f"{key}: mínimo en N = {best['N']} (rho = {best['densidad']:.0f} 1/m²), "
@@ -115,7 +115,7 @@ def main() -> None:
     right.set_ylabel("fracción de usadas $F_u(t_f)$")
     # Las dos series quedan en los dos tercios de abajo para que la leyenda
     # entre arriba sin tapar nada (el eje derecho solo se rotula hasta 1).
-    right.set_ylim(0.0, 1.7)
+    right.set_ylim(0.0, 1.8)
     right.set_yticks([0.0, 0.25, 0.5, 0.75, 1.0])
     # El barrido de N cubre dos decadas de densidad y los puntos donde t90
     # existe estan todos en la primera: con eje lineal quedan amontonados
@@ -126,9 +126,14 @@ def main() -> None:
     axes.set_xlabel(common.AXIS_DENSITY)
     axes.set_ylabel("tiempo de conversión (s)")
     common.headroom(axes, 0.33)
+    # Arriba a la DERECHA: ahi no hay nada dibujado (<t90> y <t100> dejan de
+    # existir pasado rho ~ 130 y la curva de Fu(tf) ya viene bajando), asi que
+    # la leyenda no tapa ningun dato. Arriba a la izquierda rozaba los puntos
+    # de <t100> y el maximo de Fu(tf). Sin marco, para que no corte la grilla.
     handles = axes.get_legend_handles_labels()
     extra = right.get_legend_handles_labels()
-    axes.legend(handles[0] + extra[0], handles[1] + extra[1], loc="upper left")
+    axes.legend(handles[0] + extra[0], handles[1] + extra[1], loc="upper right",
+                frameon=False, labelspacing=0.35, handletextpad=0.5, borderaxespad=0.4)
 
     # Eje de arriba con el N que corresponde a cada densidad.
     top = axes.secondary_xaxis("top", functions=(lambda d: d * np.pi * domain ** 2,

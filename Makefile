@@ -2,31 +2,36 @@
 #
 #   make build          compila el motor (engine/build/billar)
 #   make oscilador      sistema 1: integra el oscilador con los 4 esquemas y todos los dt
-#   make oscilador-figuras  ECM vs dt (la unica figura del sistema 1) y la trayectoria
+#   make oscilador-figuras  ECM vs dt (la unica figura del sistema 1), la constante
+#                           del error de los dos de cuarto orden y la trayectoria
 #   make oscilador-sin-amortiguamiento  control: con gamma = 0 Beeman y Verlet dan la misma constante
 #   make energia        item 2.1.a: N = 300 sin obstaculos, un barrido de dt con cuadros
-#   make energia-figuras    energia vs t (completa y ampliada, dos paneles) y deriva vs dt
+#   make energia-figuras    energia vs t (los 4 dt representativos) y deriva vs dt
 #   make energia-densa  verifica el dt elegido en el caso mas denso (N = 700 con obstaculos)
 #   make bench          item 2.1.b: tiempos contra N (maquina descargada)
 #   make bench-tp3      los mismos tiempos con el motor del TP3 (dirigido por eventos)
 #   make bench-figuras      tiempo de ejecucion vs N de los dos paradigmas
 #   make obstaculos     item 2.2: barrido de xo con N = 100 y N = 20
-#   make obstaculos-figuras <t90> vs xo y Fu(t) de los xo tipicos
+#   make obstaculos-figuras <t90> vs xo y Fu(t) de los tres xo tipicos, en una figura
 #   make velocidades    item 2.3: N = 100 sin obstaculos, cuadros hasta el estacionario
 #   make velocidades-figuras  f(v) por instante, ajuste de Maxwell-Boltzmann y E(kT)
 #   make densidad-figuras   item 2.4.a: <t90> y <t100> vs densidad (usa las corridas de 2.1.b)
-#   make mapa           item 2.4.b (opcional): barrido (xo, N)
+#   make mapa           item 2.4.b: barrido (xo, N) (el enunciado lo da como opcional; se hace)
 #   make mapa-figuras       mapa de calor de <t90> en el plano (xo, N)
 #   make check          corrida de validacion: energia, solapamientos y escapes
 #   make una-particula  N = 1: sin choques solo se convierte si el parametro de impacto es < 3r (item 2.4.a)
 #   make animations     corridas caracteristicas, videos y cuadro fijo de cada una
 #   make youtube        copia los videos con nombres legibles en youtube/
-#   make figuras-diapositivas  todas las figuras de las diapositivas (data/figuras_diapositivas)
-#   make slides-images      copia las figuras de la presentacion numeradas por diapositiva
+#   make figuras-diapositivas  las figuras de las diapositivas (data/figuras_diapositivas);
+#                           los 4 cuadros fijos de animacion salen de make animations
+#   make slides-images      las 20 imagenes de la presentacion numeradas por diapositiva:
+#                           copia las 15 figuras y renderiza los 5 esquemas TikZ
 #   make slides-images-tikz renderiza a PNG los esquemas TikZ de las diapositivas (report/figuras)
 #   make documentos     compila report/presentacion.tex (la presentación, lee slides-images/)
 #   make entrega        SdS_TP4_2026Q2G10S2_Codigo.zip (< 100 KB) y ..._Presentación.pdf (la beamer)
 #   make todo           oscilador + energia(+densa) + bench + obstaculos + velocidades + mapa
+#   make all            alias de todo
+#   make clean-figures  borra data/figures y data/figuras_diapositivas
 #
 # Las variables se pueden pisar: make bench NS=100,200 REPEATS=5
 #                                make obstaculos XOS=0.0175,0.25 SEEDS=3
@@ -95,10 +100,9 @@ XOS         ?= 0.0175,0.0500,0.1000,0.1500,0.2000,0.2500,0.3000,0.3500,0.4000,0.
 NS_XO       ?= 100,20
 TMAX        ?= 100
 EXPLORE     := data/explore/2.2
-# Los tres xo que llevan figura de Fu(t) y animacion: el centro, el optimo y
-# el borde.
-# Las tres figuras de Fu(t) comparten este limite del eje de tiempos, para que
-# se puedan comparar entre si (la conversion mas tardia de las tres es 96 s).
+# Los tres xo tipicos, los que van juntos en la figura de Fu(t) y tienen
+# animacion: el centro, el optimo y el borde. El eje de tiempos de esa figura
+# llega al tmax del item (la conversion mas tardia de las tres es 96 s).
 TMAX_FU     ?= 100
 XO_CENTRO   ?= xo0.0175
 XO_OPTIMO   ?= xo0.2000
@@ -258,19 +262,20 @@ obstaculos: build
 	$(BILLAR) explore --ns $(NS_XO) --xos $(XOS) --dts $(DT) --seeds $(SEEDS) \
 	    --seed $(SEED0) --tmax $(TMAX) --until-all-used --dir $(EXPLORE)
 
-RUN_IDS := $(shell seq -s , $(SEED0) $$(( $(SEED0) + $(SEEDS) - 1 )))
+# Fu(t) de los xo tipicos va en UNA sola figura, con las tres curvas juntas:
+# es lo que pide el enunciado del item 2.2 ("graficar Fu(t) para pocos valores
+# tipicos de xo"), y es la unica forma de leer como se corre la curva al mover
+# los obstaculos. Cada curva es el promedio de las SEEDS realizaciones del
+# caso, con su banda de +-1 desvio.
+CASOS_FU := $(EXPLORE)/n100_$(XO_CENTRO),$(EXPLORE)/n100_$(XO_OPTIMO),$(EXPLORE)/n100_$(XO_BORDE)
 obstaculos-figuras:
 	$(PY) visualization/explore.py --explore $(EXPLORE)
 	$(PY) visualization/explore.py --explore $(EXPLORE) --fraccion 1
 	$(PY) visualization/explore.py --explore $(EXPLORE) --figures $(SLIDES) --estilo diapositiva
-	@for caso in n100_$(XO_CENTRO) n100_$(XO_OPTIMO) n100_$(XO_BORDE); do \
-	    runs=$$(for k in $(subst $(COMMA), ,$(RUN_IDS)); do printf "$(EXPLORE)/$$caso/s%s," $$k; done); \
-	    $(PY) visualization/conversion.py --runs $${runs%,} --realizaciones \
-	        --tmax $(TMAX_FU) --name Fu_vs_t_$$caso.png | tail -2; \
-	    $(PY) visualization/conversion.py --runs $${runs%,} --realizaciones \
-	        --tmax $(TMAX_FU) --name Fu_vs_t_$$caso.png --figures $(SLIDES) \
-	        --estilo diapositiva | tail -1; \
-	done
+	$(PY) visualization/conversion.py --casos $(CASOS_FU) --tmax $(TMAX_FU) \
+	    --name Fu_vs_t_n100_xo_tipicos.png
+	$(PY) visualization/conversion.py --casos $(CASOS_FU) --tmax $(TMAX_FU) \
+	    --name Fu_vs_t_n100_xo_tipicos.png --figures $(SLIDES) --estilo diapositiva
 
 # --------------------------------------------------------------------------
 # Item 2.3: distribucion de velocidades
@@ -314,7 +319,7 @@ mapa-figuras:
 # Sin choques, la particula conserva el momento angular respecto del centro
 # (la fuerza de la pared es radial) y solo se convierte si su parametro de
 # impacto es menor que 3r. Se guarda un solo cuadro (el de t = 0) por corrida.
-SEEDS_UNA   ?= 200
+SEEDS_UNA   ?= 300
 TMAX_UNA    ?= 60
 UNA         := data/una_particula
 una-particula: build
@@ -375,30 +380,29 @@ clean-figures:
 # el numero es el del pie de la diapositiva.
 slides-images:
 	rm -rf $(FIGS) && mkdir -p $(FIGS)
-	cp $(SLIDES)/1_oscilador/ECM_vs_dt.png                                          $(FIGS)/slide-12-ECM-vs-dt.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/energia_vs_t_N$(N_ENERGIA).png                  $(FIGS)/slide-13-energia-vs-t.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/deriva_vs_dt_N$(N_ENERGIA).png                  $(FIGS)/slide-14-deriva-vs-dt.png
-	cp $(SLIDES)/animaciones/cuadro_centro_t$(CUADRO).png                           $(FIGS)/slide-15-animacion-centro.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/tiempo_total_vs_N_paradigmas_M$(REPEATS)_log.png $(FIGS)/slide-16-tiempo-ejecucion-vs-N.png
-	cp $(SLIDES)/2.2_obstaculos/Fu_vs_t_n100_$(XO_CENTRO).png                       $(FIGS)/slide-17-Fu-vs-t-centro.png
+	cp $(SLIDES)/1_oscilador/ECM_vs_dt.png                                          $(FIGS)/slide-13-ECM-vs-dt.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/energia_vs_t_N$(N_ENERGIA).png                  $(FIGS)/slide-14-energia-vs-t.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/deriva_vs_dt_N$(N_ENERGIA).png                  $(FIGS)/slide-15-deriva-vs-dt.png
+	cp $(SLIDES)/animaciones/cuadro_centro_t$(CUADRO).png                           $(FIGS)/slide-16-animacion-centro.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/tiempo_total_vs_N_paradigmas_M$(REPEATS)_log.png $(FIGS)/slide-17-tiempo-ejecucion-vs-N.png
 	cp $(SLIDES)/animaciones/cuadro_optimo_t$(CUADRO).png                           $(FIGS)/slide-18-animacion-optimo.png
-	cp $(SLIDES)/2.2_obstaculos/Fu_vs_t_n100_$(XO_OPTIMO).png                       $(FIGS)/slide-19-Fu-vs-t-optimo.png
-	cp $(SLIDES)/animaciones/cuadro_borde_t$(CUADRO).png                            $(FIGS)/slide-20-animacion-borde.png
-	cp $(SLIDES)/2.2_obstaculos/Fu_vs_t_n100_$(XO_BORDE).png                        $(FIGS)/slide-21-Fu-vs-t-borde.png
-	cp $(SLIDES)/2.2_obstaculos/t90_vs_xo_N20-100_M$(SEEDS).png                     $(FIGS)/slide-22-t90-vs-xo.png
-	cp $(SLIDES)/animaciones/cuadro_sin_obstaculos_t$(CUADRO).png                   $(FIGS)/slide-23-animacion-sin-obstaculos.png
-	cp $(SLIDES)/2.3_velocidades/f_v_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png               $(FIGS)/slide-24-f-v-vs-t.png
-	cp $(SLIDES)/2.3_velocidades/f_v_estacionaria_ajuste_N$(N_VEL)_M$(SEEDS_VEL).png $(FIGS)/slide-25-f-v-ajuste.png
-	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-26-E-vs-kT.png
-	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(REPEATS).png                  $(FIGS)/slide-27-t90-t100-vs-densidad.png
-	cp $(SLIDES)/2.4_densidad/mapa_t90_xo_N.png                                     $(FIGS)/slide-28-mapa-t90-xo-N.png
+	cp $(SLIDES)/animaciones/cuadro_borde_t$(CUADRO).png                            $(FIGS)/slide-19-animacion-borde.png
+	cp $(SLIDES)/2.2_obstaculos/Fu_vs_t_n100_xo_tipicos.png                         $(FIGS)/slide-20-Fu-vs-t-xo-tipicos.png
+	cp $(SLIDES)/2.2_obstaculos/t90_vs_xo_N20-100_M$(SEEDS).png                     $(FIGS)/slide-21-t90-vs-xo.png
+	cp $(SLIDES)/animaciones/cuadro_sin_obstaculos_t$(CUADRO).png                   $(FIGS)/slide-22-animacion-sin-obstaculos.png
+	cp $(SLIDES)/2.3_velocidades/f_v_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png               $(FIGS)/slide-23-f-v-vs-t.png
+	cp $(SLIDES)/2.3_velocidades/f_v_estacionaria_ajuste_N$(N_VEL)_M$(SEEDS_VEL).png $(FIGS)/slide-24-f-v-ajuste.png
+	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-25-E-vs-kT.png
+	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(REPEATS).png                  $(FIGS)/slide-26-t90-t100-vs-densidad.png
+	cp $(SLIDES)/2.4_densidad/mapa_t90_xo_N.png                                     $(FIGS)/slide-27-mapa-t90-xo-N.png
 	$(MAKE) slides-images-tikz
 	@ls $(FIGS) | wc -l
 
 # Los esquemas TikZ de las diapositivas de introduccion e implementacion
 # (report/figuras/*.tikz, los mismos que \input presentacion.tex) renderizados
 # sueltos a PNG con la misma tipografia y colores, numerados por diapositiva.
-TIKZ_FIGS := 02-sistema 03-modelo-pared-imagen 06-motor-uml 08-parametros-dominio
+TIKZ_FIGS := 02-sistema 03-modelo-pared-imagen 06-motor-uml 07-bucle-paso-temporal \
+             09-parametros-dominio
 slides-images-tikz:
 	mkdir -p $(DOCS)/figuras $(FIGS)
 	for f in $(TIKZ_FIGS); do \

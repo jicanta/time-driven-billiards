@@ -70,7 +70,11 @@ def main() -> None:
     parser.add_argument("--run", type=Path, required=True)
     parser.add_argument("--frames", type=int, default=0,
                         help="cuadros del video (0 = todos los guardados)")
-    parser.add_argument("--fps", type=int, default=30)
+    parser.add_argument("--fps", type=int, default=30,
+                        help="cuadros por segundo; para que el video corra en tiempo "
+                             "real tiene que ser 1/dt2 (con el dt2 = 0,04 s de las "
+                             "animaciones del trabajo da 25, que es el que pasa el "
+                             "Makefile en FPS)")
     parser.add_argument("--snapshots", type=str, default="",
                         help="instantes (s) de los cuadros sueltos, separados por coma")
     parser.add_argument("--cuadro", type=float, default=-1.0,
