@@ -34,6 +34,9 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - Para el billar, Verlet original: paso fijo Δt, la fuerza depende sólo de las posiciones, el estado se guarda cada Δt2 = n·Δt.
 - Para el oscilador (sistema 1), además Velocity Verlet, Beeman y Euler predictor-corrector.
 - En el oscilador la fuerza depende de la velocidad: los esquemas difieren en con qué v evalúan a(t + Δt), y de ahí sale el orden de cada uno.
+- Si preguntan por Velocity Verlet: la Teórica (diapositiva 17) lo escribe con los dos pasos intermedios sobre la velocidad, pero no dice con qué v se evalúa a(t + Δt), porque no escribe el caso con fuerza dependiente de v. Entre los dos pasos intermedios la única velocidad que existe es la de medio paso, y es la que usamos.
+- Está medido qué cuesta (`make velocity-verlet-variantes`): con la de medio paso el ECM va como Δt^2,04 (orden 1); despejando v(t + Δt) o prediciéndola con Euler, Δt^4,00 (orden 2). El error de v(t + Δt/2) respecto de v(t + Δt) es O(Δt) y entra en a(t + Δt) multiplicado por Δt/2. Beeman no lo pierde porque su predictor es de O(Δt²).
+- Y despejarla no daría un esquema nuevo: la recurrencia que queda es Verlet original (coinciden dentro del 0,2 % de su propio error mientras el redondeo no mande). O sea que la variante de medio paso es la que mantiene a Velocity Verlet como uno de los cuatro esquemas distintos que pide el enunciado.
 
 ## 6. Motor de simulación — `slide-06-motor-uml.png`
 

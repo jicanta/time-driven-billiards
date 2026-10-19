@@ -201,9 +201,47 @@ Teórica 4 la trata de una manera distinta; esa diferencia es el resultado del
   implícita en `r(t+dt)`; para esta fuerza es lineal y se despeja de forma
   exacta. Con la posición anterior de Euler en `−dt`, la diferencia centrada
   devuelve exactamente `v(0)`.
-- **Velocity Verlet** y **Beeman** usan las variantes que la propia teórica da
-  para fuerzas que dependen de `v` (paso intermedio a medio paso,
-  diapositiva 17, y predictor-corrector, diapositiva 20).
+- **Velocity Verlet**: la diapositiva 17 lo escribe con dos pasos intermedios
+  sobre la velocidad, `v(t+dt/2) = v(t) + a(t) dt/2` y
+  `v(t+dt) = v(t+dt/2) + a(t+dt) dt/2`. Con una fuerza que no depende de `v`
+  eso es sólo partir la patada en dos mitades. Acá `a(t+dt)` necesita
+  `v(t+dt)`, que es lo que el segundo paso está por calcular, y la diapositiva
+  **no dice** con qué velocidad evaluarla porque no escribe ese caso: entre
+  los dos pasos intermedios la única que existe es la de medio paso, y es la
+  que usa el motor. Ver abajo qué cuesta esa elección.
+- **Beeman**: la variante **predictor-corrector** de la diapositiva 20, que
+  es la que la teórica da explícitamente para fuerzas que dependen de `v`.
+  Ahí sí la diapositiva dice qué velocidad entra en `a(t+dt)`: la predicha.
+
+### Qué cuesta evaluar `a(t+dt)` con la velocidad de medio paso
+
+`make velocity-verlet-variantes` (`visualization/halfstep.py`) reimplementa el
+oscilador en Python y corre el mismo barrido de `dt` con las cuatro maneras
+posibles de evaluar `a(t+dt)`, que es lo único en lo que se diferencian.
+Primero verifica que la variante de medio paso reproduce las trayectorias que
+escribió el motor en C++ (máxima diferencia `5·10⁻¹⁵ m` en los nueve `dt`), así
+que lo que compara es el esquema que efectivamente corre:
+
+| velocidad con la que se evalúa `a(t+dt)` | `ECM ∝ dtᵖ` | orden |
+|---|---|---|
+| `v(t+dt/2)`, la de medio paso (**el motor**) | `p = 2,04` | 1 |
+| `v(t+dt)` exacta, despejada | `p = 4,00` | 2 |
+| `v(t) + a(t) dt`, predicción de Euler | `p = 4,00` | 2 |
+| `v(t)`, congelada | `p = 2,02` | 1 |
+
+La pérdida de orden es del predictor: `v(t+dt/2)` se aparta de `v(t+dt)` en
+`O(dt)`, y ese error entra en `a(t+dt)` multiplicado por `dt/2`, así que el
+error global queda en `O(dt)` en vez de `O(dt²)`. Beeman no lo pierde porque
+su predictor es una extrapolación de `O(dt²)`. **Es una propiedad del esquema
+con esta fuerza, no un error de código**, y es el resultado del ítem.
+
+Despejar `v(t+dt)` tampoco sería "la versión correcta" de Velocity Verlet: la
+recurrencia que queda es la de **Verlet original**. El script lo comprueba
+contra las trayectorias del motor: mientras el error del esquema domine
+(`dt ≥ 10⁻⁴ s`) las dos coinciden dentro del `0,2 %` de ese error, y por
+debajo la comparación ya es ruido de redondeo del doble. Implementado así,
+Velocity Verlet dejaría de ser uno de los cuatro esquemas distintos que pide
+el enunciado.
 
 El barrido va de `dt = 5·10⁻³` a `10⁻⁵ s` con espaciado 1-2-5 (nueve valores,
 tres décadas). Por debajo de `10⁻⁵` el archivo de trayectorias de un solo `dt`
@@ -275,6 +313,7 @@ vale `m v0²/2 = 0,0125 J`.
 | `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`, con el óptimo de cada `N` marcado con un círculo blanco (la referencia va arriba del mapa: adentro taparía celdas) |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
 | `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |
+| `halfstep.py` | 1.1 | prueba de la decisión de Velocity Verlet: verifica contra el motor y mide el orden que da cada una de las 4 maneras de evaluar `a(t+dt)` |
 | `check.py` | — | validación desde los estados guardados: deriva de energía, solapamiento máximo con partículas, obstáculos y pared, y escape fuera del dominio |
 
 Todas las figuras llevan los ejes en palabras con la unidad **en una sola

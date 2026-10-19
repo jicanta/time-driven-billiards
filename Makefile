@@ -5,6 +5,8 @@
 #   make oscilador-figuras  ECM vs dt (la unica figura del sistema 1), la constante
 #                           del error de los dos de cuarto orden y la trayectoria
 #   make oscilador-sin-amortiguamiento  control: con gamma = 0 Beeman y Verlet dan la misma constante
+#   make velocity-verlet-variantes  por que Velocity Verlet pierde un orden: las 4 maneras
+#                           de evaluar a(t+dt) y el orden que da cada una
 #   make energia        item 2.1.a: N = 300 sin obstaculos, un barrido de dt con cuadros
 #   make energia-figuras    energia vs t (los 4 dt representativos) y deriva vs dt
 #   make energia-densa  verifica el dt elegido en el caso mas denso (N = 700 con obstaculos)
@@ -143,6 +145,7 @@ ENTREGA     := SdS_TP4_2026Q2G$(GRUPO)$(COMISION)
 ZIP         := $(ENTREGA)_Codigo.zip
 
 .PHONY: all todo build oscilador oscilador-figuras oscilador-sin-amortiguamiento \
+        velocity-verlet-variantes \
         energia energia-figuras energia-densa \
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
@@ -182,6 +185,16 @@ oscilador-sin-amortiguamiento: build
 	$(BILLAR) oscillator --methods verlet,beeman --dts $(DTS_OSC0) --tf $(TF_OSC) \
 	    --gamma 0 --dir $(OSC0)
 	$(PY) visualization/oscillator.py --oscilador $(OSC0) --figures $(OSC0)/figuras
+
+# Por que Velocity Verlet pierde un orden (diapositiva 5). La Teorica escribe
+# sus dos pasos intermedios sobre la velocidad pero no dice con que v se
+# evalua a(t+dt) cuando la fuerza depende de v: entre los dos pasos la unica
+# que hay es la de medio paso, y esa usa el motor. Esto mide que cuesta: corre
+# el mismo barrido con las cuatro maneras posibles de evaluarla y ajusta el
+# orden de cada una. Necesita data/oscilador (make oscilador) para verificar
+# antes que la variante de medio paso reproduce lo que corrio en C++.
+velocity-verlet-variantes:
+	$(PY) visualization/halfstep.py --figura
 
 # --------------------------------------------------------------------------
 # Item 2.1.a: eleccion del paso temporal

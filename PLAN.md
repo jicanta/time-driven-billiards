@@ -316,6 +316,7 @@ es el cambio de color de una partícula, que es parte del estado.
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad |
 | `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)` |
 | `single.py` | 2.4.a | `N = 1`: conversión contra el parámetro de impacto (`make una-particula`) |
+| `halfstep.py` | 1.1 | las 4 maneras de evaluar `a(t+dt)` en Velocity Verlet y el orden de cada una (`make velocity-verlet-variantes`) |
 | `animate.py` | — | animación y cuadro fijo |
 | `check.py` | — | validación: deriva de energía, solapamientos y escapes |
 
@@ -451,17 +452,32 @@ Se cambian si los profesores indican otra cosa.
    forma exacta. La alternativa (evaluar la fuerza con una velocidad predicha
    hacia atrás) le quitaría un orden de convergencia al esquema por una
    decisión de implementación, no por el esquema.
-3. **Velocity Verlet y Beeman con las variantes de la teórica.** Las
-   diapositivas 17 y 20 dan explícitamente cómo tratar la dependencia con la
-   velocidad (paso intermedio a medio paso y predictor-corrector); se usan tal
-   cual. Que eso le cueste un orden a Velocity Verlet es parte del resultado,
-   no un error de implementación. **Verificado** con una implementación
-   independiente en Python del oscilador: evaluando `a(t+dt)` con la velocidad
-   de medio paso el ECM escala como `dt^2,04`; si en cambio se evalúa con la
-   velocidad predicha por Euler, `v(t) + a(t) dt`, escala como `dt^4,00` y
-   el ECM coincide con el de Beeman (5,9·10⁻⁹ contra 5,3·10⁻⁹ en
-   `dt = 2·10⁻³ s`). La pérdida de orden es del predictor de medio paso, cuyo
-   error respecto de `v(t+dt)` es `O(dt)`, no de un error de código.
+3. **Velocity Verlet con la velocidad de medio paso.** La diapositiva 17
+   escribe el esquema con dos pasos intermedios sobre la velocidad
+   (`v(t+dt/2)` y después `v(t+dt)`), pero **no dice** con qué velocidad se
+   evalúa `a(t+dt)` cuando la fuerza depende de `v`, porque no escribe ese
+   caso: con una fuerza que sólo depende de la posición no hay nada que
+   elegir. Acá sí: `a(t+dt)` necesita `v(t+dt)`, que es lo que el segundo paso
+   está por calcular, y entre los dos pasos intermedios la **única velocidad
+   que existe** es la de medio paso. Es la que usa el motor. Beeman, en
+   cambio, sí tiene la variante explícita (diapositiva 20, predictor-corrector)
+   y se usa tal cual.
+   **Verificado** con `make velocity-verlet-variantes`
+   (`visualization/halfstep.py`), que reimplementa el oscilador en Python,
+   comprueba primero que la variante de medio paso reproduce las trayectorias
+   del motor en C++ (diferencia máxima `5·10⁻¹⁵ m` en los nueve `dt`) y corre
+   el mismo barrido con las cuatro maneras de evaluar `a(t+dt)`:
+   `v(t+dt/2)` da `ECM ∝ dt^2,04` (orden 1), `v(t+dt)` despejada y la
+   predicción de Euler `v(t) + a(t) dt` dan `dt^4,00` (orden 2), y `v(t)`
+   congelada `dt^2,02` (orden 1). La pérdida de orden es del predictor de
+   medio paso, cuyo error respecto de `v(t+dt)` es `O(dt)` y entra en
+   `a(t+dt)` multiplicado por `dt/2`; no es un error de código, y es el
+   resultado del ítem.
+   Despejar `v(t+dt)` tampoco sería la versión "correcta": la recurrencia que
+   queda **es Verlet original**. El mismo script lo comprueba contra las
+   trayectorias del motor: mientras el error del esquema domine (`dt ≥ 10⁻⁴ s`)
+   coinciden dentro del `0,2 %` de ese error. Implementado así, Velocity
+   Verlet dejaría de ser uno de los cuatro esquemas distintos del enunciado.
 4. **`dt = 5·10⁻⁵ s` para todo el sistema 2**, elegido en el ítem 2.1.a con la
    cota de deriva de 0,1 %: da `D = 3,8·10⁻⁴` a `N = 300` sin obstáculos y
    `2,6·10⁻⁴` a `N = 700` con los obstáculos en contacto (`make energia-densa`),

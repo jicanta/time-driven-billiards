@@ -302,12 +302,13 @@
             \end{aligned}\]}
         \end{column}
     \end{columns}
-    \vspace{0.1em}
+    \vspace{-0.1em}
     {\footnotesize
-    En el oscilador $\vF = -k\vr - \gamma\vv$ \textbf{depende de la velocidad} y los
-    esquemas difieren en con qué $\vv$ evalúan $\va(t{+}\dt)$: Verlet original, la
-    diferencia centrada (implícita, se despeja); Beeman, la predicha, $O(\dt^2)$;
-    Velocity Verlet, la de medio paso, $O(\dt)$; Euler p-c, la de Euler.}
+    En el oscilador $\vF = -k\vr - \gamma\vv$ \textbf{depende de la velocidad}:
+    $\va(t{+}\dt)$ necesita $\vv(t{+}\dt)$, y hay que elegir con qué $\vv$ evaluarla.
+    Verlet original la despeja; Beeman, la predicha, $O(\dt^2)$; \textbf{Velocity
+    Verlet}, la única que hay entre sus dos pasos intermedios: la de medio paso,
+    $O(\dt)$, y \alert{pierde un orden}; Euler p-c, la de Euler.}
 \end{frame}
 
 

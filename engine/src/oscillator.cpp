@@ -45,8 +45,29 @@ void verlet(const OscillatorParameters& oscillator, double step, long steps,
 }
 
 // Velocity Verlet (diapositiva 17), con los dos pasos intermedios sobre la
-// velocidad: la aceleracion en t+dt se evalua con la velocidad a medio paso,
-// que es lo que permite usarlo con fuerzas que dependen de v.
+// velocidad que da la propia diapositiva:
+//
+//   v(t + dt/2) = v(t) + a(t) dt/2
+//   v(t + dt)   = v(t + dt/2) + a(t + dt) dt/2
+//
+// Con una fuerza que depende solo de la posicion eso es partir la patada en
+// dos mitades y no hay nada que decidir: a(t + dt) sale de r(t + dt). Aca la
+// fuerza es f = -k r - gamma v, asi que a(t + dt) necesita v(t + dt), que es
+// justo lo que el segundo paso esta por calcular: la recurrencia queda
+// implicita y hay que elegir con que velocidad se evalua. La diapositiva no
+// lo dice porque no escribe el caso con fuerza dependiente de v; entre los
+// dos pasos intermedios la unica velocidad que existe es la de medio paso, y
+// es la que se usa aca.
+//
+// Eso le cuesta un orden: v(t + dt/2) se aparta de v(t + dt) en O(dt) y ese
+// error entra en a(t + dt) multiplicado por dt/2, asi que el error global
+// queda en O(dt) y no en O(dt^2). Es una propiedad del esquema con esta
+// fuerza y es el resultado del item 1.2, no un atajo: `make
+// velocity-verlet-variantes` corre el mismo barrido con las cuatro maneras
+// posibles de evaluar a(t + dt) y mide el orden de cada una. Despejar
+// v(t + dt) de forma exacta tampoco seria "la version correcta": la
+// recurrencia que queda es la de Verlet original, que ya es otro de los
+// cuatro esquemas pedidos.
 void velocityVerlet(const OscillatorParameters& oscillator, double step, long steps,
                     long saveEvery, const Emit& emit) {
   double x = oscillator.amplitude;
