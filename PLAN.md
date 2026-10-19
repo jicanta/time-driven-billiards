@@ -452,32 +452,63 @@ Se cambian si los profesores indican otra cosa.
    forma exacta. La alternativa (evaluar la fuerza con una velocidad predicha
    hacia atrás) le quitaría un orden de convergencia al esquema por una
    decisión de implementación, no por el esquema.
-3. **Velocity Verlet con la velocidad de medio paso.** La diapositiva 17
-   escribe el esquema con dos pasos intermedios sobre la velocidad
-   (`v(t+dt/2)` y después `v(t+dt)`), pero **no dice** con qué velocidad se
-   evalúa `a(t+dt)` cuando la fuerza depende de `v`, porque no escribe ese
-   caso: con una fuerza que sólo depende de la posición no hay nada que
-   elegir. Acá sí: `a(t+dt)` necesita `v(t+dt)`, que es lo que el segundo paso
-   está por calcular, y entre los dos pasos intermedios la **única velocidad
-   que existe** es la de medio paso. Es la que usa el motor. Beeman, en
-   cambio, sí tiene la variante explícita (diapositiva 20, predictor-corrector)
-   y se usa tal cual.
-   **Verificado** con `make velocity-verlet-variantes`
-   (`visualization/halfstep.py`), que reimplementa el oscilador en Python,
-   comprueba primero que la variante de medio paso reproduce las trayectorias
-   del motor en C++ (diferencia máxima `5·10⁻¹⁵ m` en los nueve `dt`) y corre
-   el mismo barrido con las cuatro maneras de evaluar `a(t+dt)`:
-   `v(t+dt/2)` da `ECM ∝ dt^2,04` (orden 1), `v(t+dt)` despejada y la
-   predicción de Euler `v(t) + a(t) dt` dan `dt^4,00` (orden 2), y `v(t)`
-   congelada `dt^2,02` (orden 1). La pérdida de orden es del predictor de
-   medio paso, cuyo error respecto de `v(t+dt)` es `O(dt)` y entra en
-   `a(t+dt)` multiplicado por `dt/2`; no es un error de código, y es el
-   resultado del ítem.
-   Despejar `v(t+dt)` tampoco sería la versión "correcta": la recurrencia que
-   queda **es Verlet original**. El mismo script lo comprueba contra las
-   trayectorias del motor: mientras el error del esquema domine (`dt ≥ 10⁻⁴ s`)
-   coinciden dentro del `0,2 %` de ese error. Implementado así, Velocity
-   Verlet dejaría de ser uno de los cuatro esquemas distintos del enunciado.
+3. **Velocity Verlet con la velocidad de medio paso.** ⚠️ **Decisión abierta,
+   consultada a la cátedra** (duda 4 de §9). La diapositiva 17 escribe
+   `v(t+dt) = v(t) + (dt/2m)(f(t) + f(t+dt))` y, aparte, los dos pasos
+   intermedios `v(t+dt/2)` y `v(t+dt)`. Con una fuerza que sólo depende de la
+   posición no hay nada que elegir. Acá `f` depende de `v`, así que `f(t+dt)`
+   necesita `v(t+dt)`, que es lo que la propia ecuación está calculando: queda
+   **implícita** y hay dos lecturas, las dos defendibles:
+   - **(a) la de medio paso**, la que corre hoy: evaluar `f(t+dt)` con
+     `v(t+dt/2)`, que es la única velocidad que aparece entre los dos pasos
+     intermedios de la diapositiva.
+   - **(b) despejar `v(t+dt)`**, que se puede porque `f` es lineal en `v`, y es
+     lo mismo que se hizo con Verlet original (decisión 2). Es la fórmula
+     principal de la diapositiva al pie de la letra.
+
+   Beeman no tiene esta ambigüedad: la diapositiva 20 da la variante
+   predictor-corrector explícitamente para fuerzas que dependen de `v`.
+
+   **Qué da cada una** (`make velocity-verlet-variantes`,
+   `visualization/halfstep.py`, que antes de comparar verifica que la variante
+   (a) reproduce las trayectorias del motor en C++ con `5·10⁻¹⁵ m` de
+   diferencia máxima en los nueve `dt`):
+
+   | `f(t+dt)` evaluada con | `ECM ∝ dtᵖ` | orden | ¿distinto de Verlet original? |
+   |---|---|---|---|
+   | **(a)** `v(t+dt/2)` | `p = 2,04` | 1 | sí |
+   | **(b)** `v(t+dt)` despejada | `p = 4,00` | 2 | **no, es el mismo esquema** |
+   | `v(t) + a(t) dt` (Euler) | `p = 4,00` | 2 | sí |
+   | `v(t)` congelada | `p = 2,02` | 1 | sí |
+
+   El orden que pierde (a) es del predictor: `v(t+dt/2)` se aparta de `v(t+dt)`
+   en `O(dt)` y ese error entra en `f(t+dt)` multiplicado por `dt/2`. No es un
+   error de código.
+
+   Que (b) **sea** Verlet original sale de sumar pasos consecutivos de las dos
+   fórmulas de Velocity Verlet:
+
+   ```
+   r(t+dt) − r(t)  = dt v(t)   + (dt²/2m) f(t)
+   r(t) − r(t−dt)  = dt v(t−dt) + (dt²/2m) f(t−dt)
+   v(t) = v(t−dt) + (dt/2m)(f(t−dt) + f(t))
+   ⟹ r(t+dt) − 2r(t) + r(t−dt) = (dt²/m) f(t)   y   v(t) = (r(t+dt) − r(t−dt))/(2dt)
+   ```
+
+   La cuenta no usa de qué depende `f`, así que vale también con fuerza
+   dependiente de la velocidad, siempre que `f(t)` sea consistente con el
+   propio `v(t)` del esquema: justo lo que impone el despeje. Comprobado
+   numéricamente: con (b) el residuo de la recurrencia de Verlet original es
+   `2·10⁻¹⁶` (redondeo) y `v(t)` coincide con la diferencia centrada en
+   `10⁻¹³`; con (a) el residuo escala como `dt²`.
+
+   **El trade-off, entonces**: (b) respeta la fórmula principal al pie de la
+   letra y da segundo orden, pero deja 3 esquemas distintos en vez de 4 (en la
+   figura de ECM vs `dt` se superpone con Verlet original); (a) mantiene los 4
+   esquemas separados, que es lo que el enunciado pide comparar, al precio de
+   un orden. Mientras no haya respuesta queda (a). Pasar a (b) es una línea en
+   `velocityVerlet()` más rehacer el barrido y las figuras, y pediría una
+   viñeta en la diapositiva del sistema 1 explicando por qué hay 3 curvas.
 4. **`dt = 5·10⁻⁵ s` para todo el sistema 2**, elegido en el ítem 2.1.a con la
    cota de deriva de 0,1 %: da `D = 3,8·10⁻⁴` a `N = 300` sin obstáculos y
    `2,6·10⁻⁴` a `N = 700` con los obstáculos en contacto (`make energia-densa`),
@@ -527,3 +558,19 @@ Se cambian si los profesores indican otra cosa.
    (diapositiva 20) o la de fuerza independiente de la velocidad
    (diapositiva 19)? Se usó la primera, que es la que corresponde a una
    fuerza con rozamiento.
+4. **Velocity Verlet con la fuerza que depende de la velocidad** (la que
+   decide el resultado del ítem 1.2; ver la decisión 3 de §8). En
+   `v(t+dt) = v(t) + (dt/2m)(f(t) + f(t+dt))`, el `f(t+dt)` necesita
+   `v(t+dt)`, que es lo que la ecuación está calculando: queda implícita. Dos
+   salidas, las dos defendibles:
+   - despejar `v(t+dt)` (se puede, `f` es lineal en `v`), que es lo mismo que
+     se hizo con Verlet original. Da segundo orden, pero el esquema que queda
+     **es Verlet original**: las recurrencias coinciden exactamente, así que
+     en la figura de ECM vs `dt` se superponen y quedan 3 esquemas distintos
+     en vez de 4;
+   - evaluar `f(t+dt)` con la velocidad de medio paso `v(t+dt/2)`, la que
+     aparece en los pasos intermedios de la diapositiva 17. Velocity Verlet
+     queda distinto de Verlet original, pero pierde un orden
+     (`ECM ∝ dt^2,04`).
+
+   ¿Cuál de las dos se espera? Mientras tanto corre la segunda.

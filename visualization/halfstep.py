@@ -9,15 +9,19 @@ Velocity Verlet (diapositiva 17) con dos pasos intermedios sobre la velocidad:
 Con una fuerza que NO depende de la velocidad eso es solo partir la patada en
 dos mitades y no hay nada mas que decidir: a(t + dt) sale de r(t + dt). Pero
 la del oscilador es f = -k r - gamma v, asi que a(t + dt) necesita v(t + dt),
-que es justamente lo que el paso 2 esta por calcular: la recurrencia queda
-implicita y hay que elegir con que velocidad se evalua. La diapositiva no dice
-cual, porque no escribe el caso con fuerza dependiente de v; entre los dos
-pasos intermedios la unica velocidad que existe es la de medio paso, y esa es
-la que usa el motor.
+que es justamente lo que la ecuacion esta calculando: queda implicita y hay
+que elegir como resolverla. La diapositiva no escribe ese caso, y hay DOS
+lecturas, las dos defendibles:
 
-Este script mide que cuesta esa eleccion. Reimplementa el oscilador en Python
-y corre el mismo barrido de dt con cuatro variantes, que se diferencian SOLO
-en con que velocidad evaluan a(t + dt):
+    (a) evaluar a(t + dt) con v(t + dt/2), la unica velocidad que aparece
+        entre los dos pasos intermedios. Es la que corre en el motor.
+    (b) despejar v(t + dt), que se puede porque f es lineal en v, igual que
+        se hizo con Verlet original.
+
+Ninguna es "la correcta" y esta consultado a la catedra (PLAN.md, seccion 9,
+duda 4). Este script mide que da cada una, para poder decidir con datos.
+Reimplementa el oscilador en Python y corre el mismo barrido de dt con cuatro
+variantes, que se diferencian SOLO en con que velocidad evaluan a(t + dt):
 
     medio-paso   v(t + dt/2)            la del motor (y la que deja la Teorica)
     implicita    v(t + dt) exacta       se despeja: la fuerza es lineal en v
@@ -26,7 +30,9 @@ en con que velocidad evaluan a(t + dt):
 
 y le ajusta a cada una la ley de potencia ECM = c dt^p. Primero verifica que
 la variante `medio-paso` reproduce las trayectorias que escribio el motor en
-C++, para que lo que se compare sea lo que efectivamente corre.
+C++, para que lo que se compare sea lo que efectivamente corre; al final mide
+cuanto se aparta cada lectura de la recurrencia de Verlet original, que es lo
+que decide si (b) es un esquema distinto o el mismo.
 
     python3 visualization/halfstep.py
     python3 visualization/halfstep.py --figura
@@ -66,8 +72,10 @@ def trajectory(parameters: dict, step: float, steps: int, variant: str):
     x = parameters["A"]
     v = -parameters["A"] * damping / (2.0 * mass)
     positions = np.empty(steps + 1)
+    speeds = np.empty(steps + 1)
     for n in range(steps + 1):
         positions[n] = x
+        speeds[n] = v
         a = acceleration(x, v)
         next_x = x + step * v + 0.5 * step * step * a
         half = v + 0.5 * step * a
@@ -83,11 +91,11 @@ def trajectory(parameters: dict, step: float, steps: int, variant: str):
         else:
             v = half + 0.5 * step * acceleration(next_x, v)
         x = next_x
-    return positions
+    return positions, speeds
 
 
 def squared_error(parameters: dict, step: float, steps: int, variant: str) -> float:
-    positions = trajectory(parameters, step, steps, variant)
+    positions, _ = trajectory(parameters, step, steps, variant)
     times = np.arange(steps + 1) * step
     return float(np.mean((positions - common.analytic_position(parameters, times)) ** 2))
 
@@ -104,7 +112,7 @@ def engine_check(parameters: dict, root: Path, tolerance: float = 1e-12) -> list
             continue
         t, x, _ = common.read_trajectory(path)
         steps = int(round(parameters["tf"] / step))
-        mine = trajectory(parameters, step, steps, "medio-paso")
+        mine, _ = trajectory(parameters, step, steps, "medio-paso")
         # El motor guarda uno de cada save_every pasos: se comparan esos.
         taken = np.rint(t / step).astype(int)
         gap = float(np.abs(mine[taken] - x).max())
@@ -113,26 +121,38 @@ def engine_check(parameters: dict, root: Path, tolerance: float = 1e-12) -> list
     return lines
 
 
-def against_verlet(parameters: dict, root: Path) -> list[str]:
-    """Compara la variante `implicita` contra Verlet original del motor.
+def verlet_residual(parameters: dict, step: float, steps: int, variant: str):
+    """Cuanto se aparta una variante de la recurrencia de Verlet original.
 
-    Las dos integran la misma recurrencia exacta, asi que la variante
-    implicita deja de ser un esquema distinto: es el argumento de por que la
-    eleccion de medio paso no es solo una aproximacion mas barata."""
+    Sumando pasos consecutivos de las dos formulas de Velocity Verlet sale
+
+        r(t+dt) - 2 r(t) + r(t-dt) = (dt^2/m) f(t)    y
+        v(t) = (r(t+dt) - r(t-dt)) / (2 dt),
+
+    que es exactamente Verlet original. La cuenta no usa de que depende f, asi
+    que vale tambien con fuerza dependiente de la velocidad siempre que f(t)
+    sea consistente con el propio v(t) del esquema: justo lo que impone el
+    despeje. Si el residuo da redondeo, la variante ES Verlet original; si
+    escala con dt, es un esquema distinto. Devuelve (residuo de la
+    recurrencia, diferencia entre v(t) y la velocidad centrada)."""
+    mass, stiffness, damping = parameters["m"], parameters["k"], parameters["gamma"]
+    positions, speeds = trajectory(parameters, step, steps, variant)
+    force = -stiffness * positions[1:-1] - damping * speeds[1:-1]
+    residual = (positions[2:] - 2.0 * positions[1:-1] + positions[:-2] -
+                step * step * force / mass)
+    centred = (positions[2:] - positions[:-2]) / (2.0 * step)
+    return float(np.abs(residual).max()), float(np.abs(speeds[1:-1] - centred).max())
+
+
+def against_verlet(parameters: dict) -> list[str]:
+    """Residuo de la recurrencia de Verlet original para las dos lecturas."""
     lines = []
     for step in STEPS:
-        path = root / "verlet" / f"dt{step:.1e}.txt"
-        if not path.exists():
-            continue
-        t, x, _ = common.read_trajectory(path)
         steps = int(round(parameters["tf"] / step))
-        mine = trajectory(parameters, step, steps, "implicita")
-        taken = np.rint(t / step).astype(int)
-        gap = float(np.abs(mine[taken] - x).max())
-        error = np.sqrt(squared_error(parameters, step, steps, "implicita"))
-        lines.append(f"  dt = {step:7.1e}: |implícita − Verlet original| ≤ {gap:.1e} m, "
-                     f"contra un error del esquema de {error:.1e} m "
-                     f"({gap / error:.1e} veces)")
+        for variant in ("implicita", "medio-paso"):
+            residual, centred = verlet_residual(parameters, step, steps, variant)
+            lines.append(f"  dt = {step:7.1e} {variant:>11}: |residuo| ≤ {residual:.1e} m, "
+                         f"|v(t) − centrada| ≤ {centred:.1e} m/s")
     return lines
 
 
@@ -180,8 +200,9 @@ def main() -> None:
         print(f"  {variant:>12}: p = {exponent:.2f}   "
               f"(orden del esquema: {exponent / 2:.1f})")
 
-    print("\ndespejar v(t + dt) no da un esquema nuevo: es Verlet original")
-    for line in against_verlet(parameters, arguments.oscilador):
+    print("\ncuánto se aparta cada lectura de la recurrencia de Verlet original")
+    print("(redondeo = es Verlet original; si escala con dt, es otro esquema):")
+    for line in against_verlet(parameters):
         print(line)
 
     if arguments.figura:

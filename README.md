@@ -201,26 +201,30 @@ Teórica 4 la trata de una manera distinta; esa diferencia es el resultado del
   implícita en `r(t+dt)`; para esta fuerza es lineal y se despeja de forma
   exacta. Con la posición anterior de Euler en `−dt`, la diferencia centrada
   devuelve exactamente `v(0)`.
-- **Velocity Verlet**: la diapositiva 17 lo escribe con dos pasos intermedios
-  sobre la velocidad, `v(t+dt/2) = v(t) + a(t) dt/2` y
+- **Velocity Verlet**: la diapositiva 17 escribe
+  `v(t+dt) = v(t) + (dt/2m)(f(t) + f(t+dt))` y, aparte, los dos pasos
+  intermedios `v(t+dt/2) = v(t) + a(t) dt/2` y
   `v(t+dt) = v(t+dt/2) + a(t+dt) dt/2`. Con una fuerza que no depende de `v`
   eso es sólo partir la patada en dos mitades. Acá `a(t+dt)` necesita
-  `v(t+dt)`, que es lo que el segundo paso está por calcular, y la diapositiva
-  **no dice** con qué velocidad evaluarla porque no escribe ese caso: entre
-  los dos pasos intermedios la única que existe es la de medio paso, y es la
-  que usa el motor. Ver abajo qué cuesta esa elección.
+  `v(t+dt)`, que es lo que la propia ecuación está calculando: queda
+  **implícita**, y la diapositiva no escribe ese caso. Hay **dos lecturas y
+  las dos se defienden** —evaluar `f(t+dt)` con la velocidad de medio paso, o
+  despejar `v(t+dt)` como se hizo con Verlet original—, con consecuencias
+  distintas. Cuál va está **consultado a la cátedra** (`PLAN.md` §9, duda 4);
+  mientras tanto corre la de medio paso. Ver abajo.
 - **Beeman**: la variante **predictor-corrector** de la diapositiva 20, que
   es la que la teórica da explícitamente para fuerzas que dependen de `v`.
   Ahí sí la diapositiva dice qué velocidad entra en `a(t+dt)`: la predicha.
 
-### Qué cuesta evaluar `a(t+dt)` con la velocidad de medio paso
+### Las dos lecturas de Velocity Verlet y qué da cada una
 
 `make velocity-verlet-variantes` (`visualization/halfstep.py`) reimplementa el
 oscilador en Python y corre el mismo barrido de `dt` con las cuatro maneras
 posibles de evaluar `a(t+dt)`, que es lo único en lo que se diferencian.
 Primero verifica que la variante de medio paso reproduce las trayectorias que
 escribió el motor en C++ (máxima diferencia `5·10⁻¹⁵ m` en los nueve `dt`), así
-que lo que compara es el esquema que efectivamente corre:
+que lo que compara es el esquema que efectivamente corre; al final mide cuánto
+se aparta cada lectura de la recurrencia de Verlet original:
 
 | velocidad con la que se evalúa `a(t+dt)` | `ECM ∝ dtᵖ` | orden |
 |---|---|---|
@@ -229,19 +233,38 @@ que lo que compara es el esquema que efectivamente corre:
 | `v(t) + a(t) dt`, predicción de Euler | `p = 4,00` | 2 |
 | `v(t)`, congelada | `p = 2,02` | 1 |
 
-La pérdida de orden es del predictor: `v(t+dt/2)` se aparta de `v(t+dt)` en
-`O(dt)`, y ese error entra en `a(t+dt)` multiplicado por `dt/2`, así que el
-error global queda en `O(dt)` en vez de `O(dt²)`. Beeman no lo pierde porque
-su predictor es una extrapolación de `O(dt²)`. **Es una propiedad del esquema
-con esta fuerza, no un error de código**, y es el resultado del ítem.
+La pérdida de orden de la primera es del predictor: `v(t+dt/2)` se aparta de
+`v(t+dt)` en `O(dt)`, y ese error entra en `a(t+dt)` multiplicado por `dt/2`,
+así que el error global queda en `O(dt)` en vez de `O(dt²)`. Beeman no lo
+pierde porque su predictor es una extrapolación de `O(dt²)`. **Es una
+propiedad del esquema con esta fuerza, no un error de código.**
 
-Despejar `v(t+dt)` tampoco sería "la versión correcta" de Velocity Verlet: la
-recurrencia que queda es la de **Verlet original**. El script lo comprueba
-contra las trayectorias del motor: mientras el error del esquema domine
-(`dt ≥ 10⁻⁴ s`) las dos coinciden dentro del `0,2 %` de ese error, y por
-debajo la comparación ya es ruido de redondeo del doble. Implementado así,
-Velocity Verlet dejaría de ser uno de los cuatro esquemas distintos que pide
-el enunciado.
+Despejar `v(t+dt)` es perfectamente posible —`f` es lineal en `v`, igual que
+en Verlet original— y respeta la fórmula principal de la diapositiva al pie
+de la letra. Lo que hay que saber antes de elegirla es que **el esquema que
+queda es Verlet original**, no una variante suya. Sale de sumar pasos
+consecutivos de las dos fórmulas de Velocity Verlet:
+
+```
+r(t+dt) − r(t)  = dt v(t)    + (dt²/2m) f(t)
+r(t) − r(t−dt)  = dt v(t−dt) + (dt²/2m) f(t−dt)
+v(t) = v(t−dt) + (dt/2m)(f(t−dt) + f(t))
+⟹ r(t+dt) − 2r(t) + r(t−dt) = (dt²/m) f(t)   y   v(t) = (r(t+dt) − r(t−dt))/(2dt)
+```
+
+La cuenta no usa de qué depende `f`, así que vale también con fuerza
+dependiente de la velocidad, siempre que `f(t)` sea consistente con el propio
+`v(t)` del esquema: justo lo que impone el despeje. Numéricamente, con el
+despeje el residuo de la recurrencia de Verlet original es `2·10⁻¹⁶` (puro
+redondeo) y `v(t)` coincide con la diferencia centrada en `10⁻¹³`; con la de
+medio paso el residuo escala como `dt²`.
+
+**El trade-off**: despejar respeta la fórmula al pie de la letra y da segundo
+orden, pero deja 3 esquemas distintos en vez de 4 (en la figura de ECM vs
+`dt` se superpone con Verlet original); la de medio paso mantiene los cuatro
+separados, que es lo que el enunciado pide comparar, al precio de un orden.
+Ninguna es "la correcta": está consultado a la cátedra (`PLAN.md` §9, duda 4)
+y mientras tanto corre la de medio paso.
 
 El barrido va de `dt = 5·10⁻³` a `10⁻⁵ s` con espaciado 1-2-5 (nueve valores,
 tres décadas). Por debajo de `10⁻⁵` el archivo de trayectorias de un solo `dt`

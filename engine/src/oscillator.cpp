@@ -53,21 +53,29 @@ void verlet(const OscillatorParameters& oscillator, double step, long steps,
 // Con una fuerza que depende solo de la posicion eso es partir la patada en
 // dos mitades y no hay nada que decidir: a(t + dt) sale de r(t + dt). Aca la
 // fuerza es f = -k r - gamma v, asi que a(t + dt) necesita v(t + dt), que es
-// justo lo que el segundo paso esta por calcular: la recurrencia queda
-// implicita y hay que elegir con que velocidad se evalua. La diapositiva no
-// lo dice porque no escribe el caso con fuerza dependiente de v; entre los
-// dos pasos intermedios la unica velocidad que existe es la de medio paso, y
-// es la que se usa aca.
+// justo lo que la ecuacion esta calculando: queda implicita y hay que elegir
+// como resolverla. La diapositiva no escribe ese caso, y hay DOS lecturas:
 //
-// Eso le cuesta un orden: v(t + dt/2) se aparta de v(t + dt) en O(dt) y ese
-// error entra en a(t + dt) multiplicado por dt/2, asi que el error global
-// queda en O(dt) y no en O(dt^2). Es una propiedad del esquema con esta
-// fuerza y es el resultado del item 1.2, no un atajo: `make
-// velocity-verlet-variantes` corre el mismo barrido con las cuatro maneras
-// posibles de evaluar a(t + dt) y mide el orden de cada una. Despejar
-// v(t + dt) de forma exacta tampoco seria "la version correcta": la
-// recurrencia que queda es la de Verlet original, que ya es otro de los
-// cuatro esquemas pedidos.
+//   (a) evaluar a(t + dt) con v(t + dt/2), la unica velocidad que aparece
+//       entre los dos pasos intermedios. Es la que corre aca.
+//   (b) despejar v(t + dt), que se puede porque f es lineal en v, igual que
+//       en Verlet original (ver arriba).
+//
+// Lo que las separa esta medido en `make velocity-verlet-variantes`:
+//   (a) da ECM ~ dt^2,04, o sea primer orden: v(t + dt/2) se aparta de
+//       v(t + dt) en O(dt) y ese error entra en a(t + dt) multiplicado por
+//       dt/2. No es un atajo ni un error de codigo, es lo que le cuesta al
+//       esquema tratar de forma explicita una fuerza que depende de v, y es
+//       el resultado del item 1.2.
+//   (b) da ECM ~ dt^4,00, segundo orden, pero el esquema que queda ES Verlet
+//       original: sumando pasos consecutivos de las dos formulas de arriba se
+//       llega a r(t+dt) - 2r(t) + r(t-dt) = (dt^2/m) f(t) y a
+//       v(t) = (r(t+dt) - r(t-dt)) / (2 dt), sin usar de que depende f. O sea
+//       que quedarian 3 esquemas distintos en vez de los 4 del enunciado.
+//
+// Ninguna de las dos es "la correcta": se consulto a la catedra (PLAN.md,
+// seccion 9, duda 4) y mientras tanto corre (a). Pasar a (b) es reemplazar la
+// linea marcada abajo por el despeje.
 void velocityVerlet(const OscillatorParameters& oscillator, double step, long steps,
                     long saveEvery, const Emit& emit) {
   double x = oscillator.amplitude;
@@ -79,6 +87,7 @@ void velocityVerlet(const OscillatorParameters& oscillator, double step, long st
     const double a = acceleration(oscillator, x, v);
     const double nextX = x + step * v + 0.5 * step * step * a;
     const double half = v + 0.5 * step * a;
+    // Lectura (a): a(t + dt) evaluada con la velocidad de medio paso.
     v = half + 0.5 * step * acceleration(oscillator, nextX, half);
     x = nextX;
   }

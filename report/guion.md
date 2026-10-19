@@ -34,9 +34,10 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - Para el billar, Verlet original: paso fijo Δt, la fuerza depende sólo de las posiciones, el estado se guarda cada Δt2 = n·Δt.
 - Para el oscilador (sistema 1), además Velocity Verlet, Beeman y Euler predictor-corrector.
 - En el oscilador la fuerza depende de la velocidad: los esquemas difieren en con qué v evalúan a(t + Δt), y de ahí sale el orden de cada uno.
-- Si preguntan por Velocity Verlet: la Teórica (diapositiva 17) lo escribe con los dos pasos intermedios sobre la velocidad, pero no dice con qué v se evalúa a(t + Δt), porque no escribe el caso con fuerza dependiente de v. Entre los dos pasos intermedios la única velocidad que existe es la de medio paso, y es la que usamos.
-- Está medido qué cuesta (`make velocity-verlet-variantes`): con la de medio paso el ECM va como Δt^2,04 (orden 1); despejando v(t + Δt) o prediciéndola con Euler, Δt^4,00 (orden 2). El error de v(t + Δt/2) respecto de v(t + Δt) es O(Δt) y entra en a(t + Δt) multiplicado por Δt/2. Beeman no lo pierde porque su predictor es de O(Δt²).
-- Y despejarla no daría un esquema nuevo: la recurrencia que queda es Verlet original (coinciden dentro del 0,2 % de su propio error mientras el redondeo no mande). O sea que la variante de medio paso es la que mantiene a Velocity Verlet como uno de los cuatro esquemas distintos que pide el enunciado.
+- Si preguntan por Velocity Verlet (es la pregunta más probable de esta diapositiva): la fórmula de la Teórica es v(t + Δt) = v(t) + (Δt/2m)(f(t) + f(t + Δt)), y f(t + Δt) necesita v(t + Δt), que es lo que la ecuación está calculando. Queda implícita y hay dos salidas razonables.
+- Una es despejar v(t + Δt) —se puede, f es lineal en v, igual que en Verlet original—. Da segundo orden, pero el esquema que queda **es** Verlet original: sumando pasos consecutivos de las dos fórmulas se llega a la recurrencia de Verlet y a su velocidad centrada, sin usar de qué depende f. O sea que quedarían 3 esquemas distintos en vez de 4.
+- La otra, la que corre, es evaluar f(t + Δt) con v(t + Δt/2), la única velocidad que aparece entre los dos pasos intermedios de la diapositiva 17. Mantiene los cuatro esquemas separados y cuesta un orden: ECM ∝ Δt^2,04 en vez de Δt⁴, porque v(t + Δt/2) se aparta de v(t + Δt) en O(Δt) y ese error entra en f(t + Δt) multiplicado por Δt/2. Beeman no lo pierde porque su predictor es de O(Δt²).
+- Honestidad: ninguna de las dos es "la correcta", y está consultado a la cátedra. Si preguntan, se dice así. Las dos están medidas (`make velocity-verlet-variantes`).
 
 ## 6. Motor de simulación — `slide-06-motor-uml.png`
 
