@@ -351,10 +351,14 @@ vale `m v0²/2 = 0,0125 J`.
 | `halfstep.py` | 1.1 | prueba de la decisión de Velocity Verlet: verifica contra el motor y mide el orden que da cada una de las 4 maneras de evaluar `a(t+dt)` |
 | `check.py` | — | validación desde los estados guardados: deriva de energía, solapamiento máximo con partículas, obstáculos y pared, y escape fuera del dominio |
 
-Todas las figuras llevan los ejes en palabras con la unidad **en una sola
-línea** (`common.fit_axis_labels()` achica el nombre del eje hasta que entre),
-coma decimal y la leyenda adentro sin tapar datos; los observables van al eje
-con su símbolo (`⟨t90⟩ (s)`, `f(v) (s/m)`), no con la frase entera.
+El nombre de cada eje es el **símbolo del enunciado con su unidad** (`N`,
+`ρ (1/m²)`, `x_o (m)`, `⟨t90⟩ (s)`, `f(v) (s/m)`), no la frase que lo
+describe: el símbolo está definido en las diapositivas de observables y de
+parámetros, y así el rótulo no se come el ancho del eje. Sólo van en palabras
+los que no tienen símbolo (el tiempo de ejecución, el ECM del ajuste). El
+nombre entra siempre en **una sola línea** (`common.fit_axis_labels()` lo
+achica hasta que entre), los números llevan coma decimal y la leyenda va
+adentro del gráfico sin tapar datos.
 
 ## Presentación
 

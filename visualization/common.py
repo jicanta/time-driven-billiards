@@ -19,6 +19,11 @@ Convenciones (las mismas en todas las figuras):
   se muestra en su propia figura.
 * Las figuras no llevan titulo: los parametros van en el nombre del archivo y
   al costado de la figura en la diapositiva.
+* El nombre de cada eje es el simbolo del enunciado con su unidad (N, rho,
+  x_o, t, f(v), ...), no la frase que lo describe: el simbolo esta definido en
+  las diapositivas de observables y de parametros, y asi el rotulo no se come
+  el ancho del eje. Solo van en palabras los que no tienen simbolo (el tiempo
+  de ejecucion, el ECM del ajuste).
 """
 
 from __future__ import annotations
@@ -56,21 +61,21 @@ def folder(item: str, root: Path = FIGURES) -> Path:
     return path
 
 
-AXIS_TIME = "tiempo $t$ (s)"
-AXIS_STEP = "paso de integración $\\Delta t$ (s)"
+AXIS_TIME = "$t$ (s)"
+AXIS_STEP = "$\\Delta t$ (s)"
 AXIS_ECM = "ECM (m$^2$)"
 AXIS_ECM_CONSTANT = "ECM / $\\Delta t^4$ (m$^2$/s$^4$)"
-AXIS_POSITION = "posición $r$ (m)"
-AXIS_ENERGY = "energía total $E$ (J)"
+AXIS_POSITION = "$r$ (m)"
+AXIS_ENERGY = "$E$ (J)"
 AXIS_DRIFT = "$\\max_t |E(t) - E_0| / E_0$"
-AXIS_COUNT = "número de partículas $N$"
+AXIS_COUNT = "$N$"
 AXIS_WALL = "tiempo de ejecución (s)"
-AXIS_FU = "fracción de usadas $F_u$"
+AXIS_FU = "$F_u$"
 AXIS_T90 = "$\\langle t_{90} \\rangle$ (s)"
-AXIS_OFFSET = "posición de los obstáculos $x_o$ (m)"
+AXIS_OFFSET = "$x_o$ (m)"
 AXIS_SPEED = "$v = |\\vec{v}|$ (m/s)"
 AXIS_PDF = "$f(v)$ (s/m)"
-AXIS_DENSITY = "densidad $\\rho$ (partículas/m$^2$)"
+AXIS_DENSITY = "$\\rho$ (1/m$^2$)"
 AXIS_FIT_ERROR = "error cuadrático medio $E$ (s$^2$/m$^2$)"
 
 SCHEME_LABEL = {
