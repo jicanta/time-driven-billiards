@@ -81,6 +81,7 @@ AXIS_T90 = "$\\langle t_{90} \\rangle$ (s)"
 AXIS_OFFSET = "$x_o$ (m)"
 AXIS_SPEED = "$v = |\\vec{v}|$ (m/s)"
 AXIS_PDF = "$f(v)$ (s/m)"
+AXIS_MEAN_SPEED = "$\\langle |\\vec{v}| \\rangle$ (m/s)"
 AXIS_DENSITY = "$\\rho$ (partículas/m$^2$)"
 AXIS_THERMAL = "$k_B T$ (mJ)"
 # E(kBT) es el error cuadratico medio del ajuste de f(v) (Teorica 0): el

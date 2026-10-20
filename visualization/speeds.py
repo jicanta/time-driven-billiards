@@ -28,8 +28,16 @@ ajuste: la estacionaria junta todos los cuadros con t >= --estacionario
 ensamble) y asi tiene estadistica suficiente: su bolsa tiene 400 veces mas
 muestras que la de un instante suelto.
 
-La estacionaria se ajusta con la distribucion de Maxwell-Boltzmann en dos
-dimensiones
+Antes de la bolsa del estacionario va la rapidez media contra el tiempo: un
+escalar por cuadro (la media de |v| de la bolsa de ese instante, con el desvio
+entre realizaciones como banda) que dice cuando empieza el estacionario y, por
+lo tanto, desde donde se arma la gran bolsa. Con el kT ajustado,
+Maxwell-Boltzmann predice <|v|> = sqrt(pi kT / 2m): es una verificacion
+independiente del ajuste.
+
+La estacionaria (LA GRAN BOLSA: todos los cuadros con t >= --estacionario de
+todas las realizaciones, en un solo histograma) se ajusta con la distribucion
+de Maxwell-Boltzmann en dos dimensiones
 
     f(v) = (m v / kT) exp(-m v^2 / 2 kT),
 
@@ -164,9 +172,10 @@ def main() -> None:
     common.save(figure, evolution)
     plt.close(figure)
 
-    # Para el ajuste si se promedia sobre cuadros: cada realizacion aporta
-    # todos sus cuadros con t >= --estacionario, que es lo que le da al
-    # histograma la estadistica que un instante suelto no tiene.
+    # LA GRAN BOLSA: para el ajuste se juntan todos los cuadros con
+    # t >= --estacionario de todas las realizaciones en un solo histograma
+    # (runs x cuadros x N muestras), que es lo que le da la estadistica que un
+    # instante suelto no tiene.
     per_run = speeds[:, times >= arguments.estacionario, :].reshape(runs, -1)
     stationary = per_run.ravel()
     frames = int((times >= arguments.estacionario).sum())
@@ -176,13 +185,54 @@ def main() -> None:
     thermal, grid, error = common.fit_thermal_energy(centers, density, mass)
     reference = 0.5 * mass * float((stationary ** 2).mean())
     initial = 0.5 * mass * static["v0"] ** 2
+    # Rapidez media que predice Maxwell-Boltzmann en 2D con el kT ajustado:
+    # <|v|> = sqrt(pi kT / 2m). Es una verificacion independiente del ajuste,
+    # porque el ajuste usa la forma de f(v) y esto un solo momento.
+    predicted_mean = float(np.sqrt(np.pi * thermal / (2.0 * mass)))
+
+    # Rapidez media contra el tiempo: un escalar por cuadro (la media de la
+    # bolsa de ese instante, con el desvio entre realizaciones como banda) que
+    # dice CUANDO empieza el estacionario, y por lo tanto desde donde se arma
+    # la gran bolsa. Arranca en v0 y baja mientras f(v) se ensancha a energia
+    # constante (la media de |v| no es la raiz de la media de v^2). El eje t
+    # es logaritmico porque el transitorio dura un segundo y la corrida 30.
+    per_frame = speeds.mean(axis=2)                       # (M, F)
+    mean_speed = per_frame.mean(axis=0)
+    spread_speed = per_frame.std(axis=0, ddof=1) if runs > 1 else np.zeros_like(mean_speed)
+    shown = times > 0.0
+    figure, axes = plt.subplots()
+    axes.plot(times[shown], mean_speed[shown], color=common.FRESH,
+              label="$\\langle |\\vec{v}| \\rangle$ por instante")
+    axes.fill_between(times[shown], (mean_speed - spread_speed)[shown],
+                      (mean_speed + spread_speed)[shown], color=common.FRESH, alpha=0.15,
+                      linewidth=0)
+    axes.axhline(static["v0"], color="#555555", linestyle=":", linewidth=1.4,
+                 label="$v_0$")
+    # La formula sqrt(pi kT / 2m) va en la vineta; en la leyenda, el numero.
+    axes.axhline(predicted_mean, color=common.USED, linestyle="--", linewidth=1.8,
+                 label=f"Maxwell-Boltzmann: {common.decimal(predicted_mean, 3)} m/s")
+    axes.axvline(arguments.estacionario, color="#111111", linestyle="-.", linewidth=1.4,
+                 label=f"gran bolsa: $t \\geq$ {common.decimal(arguments.estacionario)} s")
+    axes.set_xscale("log")
+    axes.set_xticks([0.1, 1.0, 10.0])
+    axes.set_xticklabels(["0,1", "1", "10"])
+    axes.set_xlabel(common.AXIS_TIME)
+    axes.set_ylabel(common.AXIS_MEAN_SPEED)
+    low = min(mean_speed.min(), predicted_mean)
+    axes.set_ylim(low - 0.2 * (static["v0"] - low), static["v0"] + 0.18 * (static["v0"] - low))
+    # La leyenda, en el hueco entre v0 y el estacionario, a la derecha del
+    # transitorio: ahi no hay nada dibujado.
+    axes.legend(loc="upper right", bbox_to_anchor=(0.99, 0.93))
+    mean_figure = out_dir / f"v_medio_vs_t_N{count}_M{runs}.png"
+    common.save(figure, mean_figure)
+    plt.close(figure)
 
     # La barra es la simulacion y la curva el ajuste: en la leyenda va solo el
     # nombre de cada una. El valor de kT no, porque es EL resultado del item y
     # se dice en la diapositiva, no escondido en un rotulo de la figura.
     figure, axes = plt.subplots()
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
-             edgecolor=common.FRESH, label="simulación")
+             edgecolor=common.FRESH, label="simulación: la gran bolsa")
     fine = np.linspace(edges[0], edges[-1], 400)
     axes.plot(fine, common.maxwell_boltzmann(fine, thermal, mass), color=common.USED,
               linewidth=2.4, label="Maxwell-Boltzmann")
@@ -191,7 +241,7 @@ def main() -> None:
     axes.set_xlim(0.0, 2.8 * static["v0"])
     axes.set_ylim(0.0, 1.32 * density.max())
     axes.legend(loc="upper right")
-    fit = out_dir / f"f_v_estacionaria_ajuste_N{count}_M{runs}.png"
+    fit = out_dir / f"f_v_gran_bolsa_ajuste_N{count}_M{runs}.png"
     common.save(figure, fit)
     plt.close(figure)
 
@@ -228,7 +278,14 @@ def main() -> None:
           f"{100 * (thermal - reference) / reference:+.1f} %)")
     print(f"m v0^2 / 2         = {initial:.6f} J  (diferencia "
           f"{100 * (thermal - initial) / initial:+.1f} %)")
+    first_flat = times[np.argmax(np.abs(mean_speed - mean_speed[times >= arguments.estacionario].mean())
+                                 <= spread_speed)]
+    print(f"<|v|> estacionario = {float(mean_speed[times >= arguments.estacionario].mean()):.4f} m/s "
+          f"(desvío entre realizaciones {float(spread_speed[times >= arguments.estacionario].mean()):.4f}); "
+          f"Maxwell-Boltzmann con el kT ajustado predice sqrt(pi kT / 2m) = {predicted_mean:.4f} m/s; "
+          f"entra en la banda del estacionario desde t = {first_flat:.2f} s")
     print(evolution)
+    print(mean_figure)
     print(fit)
     print(error_figure)
 

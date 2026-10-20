@@ -16,7 +16,8 @@
 #   make obstaculos     item 2.2: barrido de xo con N = 100 y N = 20
 #   make obstaculos-figuras <t90> vs xo y Fu(t) de los tres xo tipicos, en una figura
 #   make velocidades    item 2.3: N = 100 sin obstaculos, cuadros hasta el estacionario
-#   make velocidades-figuras  f(v) por instante, ajuste de Maxwell-Boltzmann y E(kT)
+#   make velocidades-figuras  rapidez media vs t, f(v) por instante, la gran bolsa con el
+#                           ajuste de Maxwell-Boltzmann y E(kT)
 #   make densidad       item 2.4.a: barrido de N con xo = r y tmax largo, sin corte
 #   make densidad-figuras   item 2.4.a: <t90> y <t100> vs densidad
 #   make mapa           item 2.4.b: barrido (xo, N) (el enunciado lo da como opcional; se hace)
@@ -29,8 +30,8 @@
 #   make gifs           los mismos cuatro videos como GIF en gif/ (para embeber en la presentacion en vivo)
 #   make figuras-diapositivas  las figuras de las diapositivas (data/figuras_diapositivas);
 #                           los 4 cuadros fijos de animacion salen de make animations
-#   make slides-images      las 20 imagenes de la presentacion numeradas por diapositiva:
-#                           copia las 15 figuras y renderiza los 5 esquemas TikZ
+#   make slides-images      las 22 imagenes de la presentacion numeradas por diapositiva:
+#                           copia las 16 figuras y renderiza los 6 esquemas TikZ
 #   make slides-images-tikz renderiza a PNG los esquemas TikZ de las diapositivas (report/figuras)
 #   make documentos     compila report/presentacion.tex (la presentación, lee slides-images/)
 #   make capturas       PNG de diapositivas sueltas (la tabla de parametros) en capturas/
@@ -485,11 +486,12 @@ slides-images:
 	cp $(SLIDES)/2.2_obstaculos/Fu_vs_t_n100_xo_tipicos.png                         $(FIGS)/slide-20-Fu-vs-t-xo-tipicos.png
 	cp $(SLIDES)/2.2_obstaculos/t90_vs_xo_N20-100_M$(SEEDS).png                     $(FIGS)/slide-21-t90-vs-xo.png
 	cp $(SLIDES)/animaciones/cuadro_sin_obstaculos_t$(CUADRO).png                   $(FIGS)/slide-22-animacion-sin-obstaculos.png
-	cp $(SLIDES)/2.3_velocidades/f_v_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png               $(FIGS)/slide-23-f-v-vs-t.png
-	cp $(SLIDES)/2.3_velocidades/f_v_estacionaria_ajuste_N$(N_VEL)_M$(SEEDS_VEL).png $(FIGS)/slide-24-f-v-ajuste.png
-	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-25-E-vs-kT.png
-	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(SEEDS_DENSIDAD).png           $(FIGS)/slide-26-t90-t100-vs-densidad.png
-	cp $(SLIDES)/2.4_densidad/mapa_t90_xo_N.png                                     $(FIGS)/slide-27-mapa-t90-xo-N.png
+	cp $(SLIDES)/2.3_velocidades/v_medio_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png            $(FIGS)/slide-23-v-medio-vs-t.png
+	cp $(SLIDES)/2.3_velocidades/f_v_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png               $(FIGS)/slide-24-f-v-vs-t.png
+	cp $(SLIDES)/2.3_velocidades/f_v_gran_bolsa_ajuste_N$(N_VEL)_M$(SEEDS_VEL).png  $(FIGS)/slide-25-f-v-gran-bolsa-ajuste.png
+	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-26-E-vs-kT.png
+	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(SEEDS_DENSIDAD).png           $(FIGS)/slide-27-t90-t100-vs-densidad.png
+	cp $(SLIDES)/2.4_densidad/mapa_t90_xo_N.png                                     $(FIGS)/slide-28-mapa-t90-xo-N.png
 	$(MAKE) slides-images-tikz
 	@ls $(FIGS) | wc -l
 

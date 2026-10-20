@@ -384,9 +384,10 @@
               $\varepsilon_{\max}(\dt) = \max_t |\varepsilon(t)|$.
         \item \rotulo{Distribución del módulo de la velocidad}: $f(v)$, histograma
               de $|\vv|$ en 40 intervalos (área 1) sobre \textbf{una sola bolsa}
-              con los $|\vv|$ de las $N$ partículas de las $M$ realizaciones; el
-              estacionario suma además todos los cuadros con
-              $t \ge \SI{10}{\second}$.
+              con los $|\vv|$ de las $N$ partículas de las $M$ realizaciones; la
+              \textbf{gran bolsa} del estacionario suma además todos los cuadros con
+              $t \ge \SI{10}{\second}$. La rapidez media $\langle |\vv| \rangle$ de
+              la bolsa de cada instante dice desde cuándo es estacionario.
         \item \rotulo{Sistema 1}: $\displaystyle \mathrm{ECM}(\dt) = \frac{1}{n}
               \sum_{j=1}^{n}\left[r_{\text{num}}(t_j) - r_{\text{an}}(t_j)\right]^2$
               sobre los $n$ pasos de integración.
@@ -550,46 +551,62 @@
     }
 \end{frame}
 
+\begin{frame}{Rapidez media contra el tiempo}
+    \figbulw[0.3em]{slide-23-v-medio-vs-t.png}{%
+        \item Un escalar por instante: $\langle |\vv| \rangle$ de la bolsa de ese
+              instante, banda $\pm 1$ desvío entre realizaciones.
+        \item Baja desde $v_0$ mientras $f(v)$ se ensancha a $E$ constante;
+              \alert{desde \SI{0.4}{\second} ya es estacionario}. La
+              \textbf{gran bolsa} toma $t \geq \SI{10}{\second}$, con margen.
+        \item Verificación: con el $k_BT$ ajustado, Maxwell-Boltzmann da
+              $\langle |\vv| \rangle = \sqrt{\pi k_BT / 2m} = \SI{0.883}{\meter\per\second}$;
+              medido, $0{,}881$.
+        \cond{$N = 100$, sin obstáculos, 30 realizaciones}
+    }
+\end{frame}
+
 \begin{frame}{Distribución del módulo de la velocidad}
-    \figbulw[0.45em]{slide-23-f-v-vs-t.png}{%
+    \figbulw[0.45em]{slide-24-f-v-vs-t.png}{%
         \item En $t = 0$ todas tienen $|\vv| = v_0$: $f(v)$ es una \textbf{delta}
               que se sale de la figura.
         \item A los \SI{0.15}{\second} el pico ya cayó a un tercio y apareció la cola;
               desde \SI{0.5}{\second} las curvas no se distinguen de la de
               \SI{30}{\second}.
         \item Cada curva es \textbf{un solo histograma} de la bolsa de ese
-              instante, y el sistema es conservativo: $f(v)$ se ensancha sin que
-              cambie $E$.
+              instante ($N \times M$ muestras), y el sistema es conservativo: $f(v)$
+              se ensancha sin que cambie $E$.
         \cond{$N = 100$, sin obstáculos; bolsa de un instante: $30 \times 100 = \num{3000}$ muestras}
     }
 \end{frame}
 
-\begin{frame}{Ajuste de Maxwell-Boltzmann}
-    \figbulw[0.45em]{slide-24-f-v-ajuste.png}{%
-        \item $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$, con $k_BT$ como
+\begin{frame}{La gran bolsa: ajuste de Maxwell-Boltzmann}
+    \figbulw[0.45em]{slide-25-f-v-gran-bolsa-ajuste.png}{%
+        \item \textbf{Un solo histograma} con todos los $|\vv|$ del estacionario de
+              todas las realizaciones, ajustado con
+              $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$ y $k_BT$ como
               \textbf{único parámetro libre}.
         \item \alert{$k_BT = \SI{12.41}{\milli\joule}$} contra
               $m v_0^2/2 = \SI{12.50}{\milli\joule}$: \SI{-0.7}{\percent}.
         \item $m\langle v^2\rangle/2 = \SI{12.32}{\milli\joule}$ es un poco menor:
               en promedio el \SI{1.4}{\percent} de $E$ está en los resortes.
-        \cond{bolsa del estacionario: $30 \times 401$ cuadros ($t \geq \SI{10}{\second}$) $\times\,100 = 1{,}2\cdot10^{6}$ muestras, un histograma de 40 intervalos}
+        \cond{la gran bolsa: $30 \times 401$ cuadros ($t \geq \SI{10}{\second}$) $\times\,100 = 1{,}2\cdot10^{6}$ muestras, un histograma de 40 intervalos}
     }
 \end{frame}
 
 \begin{frame}{Error cuadrático medio del ajuste}
-    \figbul{slide-25-E-vs-kT.png}{%
+    \figbul{slide-26-E-vs-kT.png}{%
         \item Método de la Teórica 0: se recorre $k_BT$ en una grilla y se toma el
               \textbf{mínimo} del error cuadrático medio $E(k_BT)$.
         \item El \textbf{ancho del mínimo es el error del ajuste}: $E$ se duplica
               ya en $12{,}31$ y $\SI{12.53}{\milli\joule}$, o sea
               \alert{$k_BT = 12{,}41 \pm \SI{0.11}{\milli\joule}$}
               (\SI{0.9}{\percent}).
-        \cond{la misma bolsa de muestras que el ajuste, en 40 intervalos de $v$}
+        \cond{la misma gran bolsa que el ajuste, en 40 intervalos de $v$}
     }
 \end{frame}
 
 \begin{frame}{Efecto de la densidad}
-    \figbulw[0.3em]{slide-26-t90-t100-vs-densidad.png}{%
+    \figbulw[0.3em]{slide-27-t90-t100-vs-densidad.png}{%
         \item \alert{Hay densidad óptima}: $\mtnov$ baja de \SI{66}{\second}
               ($\rho = 6$) a \SI{21.8}{\second} en $\rho = 86$, y vuelve a
               \SI{54.3}{\second} en $\rho = 367$.
@@ -603,7 +620,7 @@
 \end{frame}
 
 \begin{frame}{Posición óptima para cada densidad}
-    \figbulw[0.2em]{slide-27-mapa-t90-xo-N.png}{%
+    \figbulw[0.2em]{slide-28-mapa-t90-xo-N.png}{%
         \item Rojo es más rápido; la \textbf{línea negra} une la celda más rápida
               de cada densidad.
         \item \alert{De $N = 20$ a $300$ el mínimo queda entre $0{,}175$ y
@@ -636,7 +653,8 @@
               \SI{14.8}{\second} contra \SI{31.2}{\second} en la pared, y es el mismo
               ($0{,}237 \pm \SI{0.011}{\meter}$) de $N = 20$ a $300$.
         \item $f(v)$ llega a Maxwell-Boltzmann en medio segundo, con
-              $k_BT = \SI{12.4}{\milli\joule}$: el $m v_0^2/2$ del arranque.
+              $k_BT = \SI{12.4}{\milli\joule}$: el $m v_0^2/2$ del arranque, y
+              $\langle |\vv| \rangle$ medido a \SI{0.2}{\percent} del que predice.
         \item Con los obstáculos en el centro hay una densidad óptima,
               $\rho = \SI{86}{\particulas\per\meter\squared}$ ($N = 70$):
               $\mtnov = \SI{21.8}{\second}$, contra \SI{66}{\second} a
