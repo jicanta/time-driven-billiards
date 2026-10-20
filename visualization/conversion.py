@@ -72,9 +72,11 @@ def plot_cases(axes, cases: list[Path], labels: list[str], tmax: float) -> list[
         axes.plot(grid, mean, color=color, label=label)
         axes.fill_between(grid, mean - std, mean + std, color=color, alpha=0.15, linewidth=0)
         if reached:
+            # <t90> con su desvio, sobre la linea de 0,9: la barra lleva el
+            # mismo estilo que las del resto de las figuras (common.ERRORBAR).
             center, spread = common.mean_std(reached)
             axes.errorbar([center], [0.9], xerr=[spread], color=color, marker=marker,
-                          markersize=9, linestyle="none", zorder=5)
+                          zorder=5, **common.ERRORBAR)
             lines.append(f"{case.name}: <t90> = {center:.2f} ± {spread:.2f} s "
                          f"({len(reached)}/{len(runs)} llegan a 0,9), "
                          f"Fu({tmax:g} s) = {mean[-1]:.2f}")
@@ -151,7 +153,11 @@ def main() -> None:
         lines = plot_runs(axes, runs, labels, arguments.realizaciones)
         default_name = "Fu_vs_t_" + "_".join(run.parent.name for run in runs) + ".png"
 
-    axes.axhline(0.9, color="#999999", linestyle="--", linewidth=1)
+    # La linea de 0,9 es la definicion de t90 y va en la leyenda como todo lo
+    # que esta dibujado (igual que la "conservacion exacta" de la energia):
+    # los simbolos sobre ella son <t90> y la barra su desvio.
+    axes.axhline(0.9, color="#999999", linestyle="--", linewidth=1.2,
+                 label="$F_u$ = 0,9: $\\langle t_{90} \\rangle$")
     axes.set_xlabel(common.AXIS_TIME)
     axes.set_ylabel(common.AXIS_FU)
     axes.set_ylim(0, 1.02)

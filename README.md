@@ -45,6 +45,7 @@ tp-4/
 ├── visualization/      # Python: post-procesamiento (observables), figuras y animaciones
 ├── report/             # presentacion.tex (beamer 16:9, la presentación que se entrega), comun.tex, figuras/*.tikz y guion.md; build/ ignorado
 ├── youtube/            # titulos.md con título y descripción de cada video (los .mp4 no se versionan)
+├── gif/                # los mismos cuatro videos como GIF, para embeber en la presentación en vivo
 ├── slides-images/      # todas las imágenes de la presentación numeradas por diapositiva: figuras (las lee presentacion.tex) y esquemas TikZ renderizados
 └── data/               # salidas de simulación y figuras (ignoradas por git)
     ├── oscilador/      #   sistema 1: una trayectoria por esquema y por dt
@@ -85,6 +86,7 @@ make mapa                  # ítem 2.4.b: barrido (xo, N)
 make mapa-figuras          # mapa de calor de ⟨t90⟩ en el plano (xo, N)
 make animations            # corridas características, videos y cuadro fijo de cada una
 make youtube               # copia los videos con nombres legibles en youtube/
+make gifs                  # los mismos cuatro videos como GIF en gif/
 make oscilador-sin-amortiguamiento  # control: con gamma = 0 Beeman y Verlet dan la misma constante
 make figuras-diapositivas  # las figuras de las diapositivas (data/figuras_diapositivas/);
                            # los 4 cuadros fijos de animación salen de make animations
@@ -355,7 +357,7 @@ vale `m v0²/2 = 0,0125 J`.
 | `conversion.py` | 2.2 | `--casos`: `Fu(t)` promedio de varios `xo` en una misma figura, con banda de `± σ` entre realizaciones y `⟨t90⟩ ± σ` marcado sobre la línea de `0,9` (es la figura que pide el ítem); `--runs` dibuja corridas sueltas como escalón, para mirar una configuración de cerca |
 | `speeds.py` | 2.3 | `f(v)` en varios instantes exactos, un histograma por bolsa (`N × M` muestras), ajuste de Maxwell-Boltzmann de la estacionaria por el mínimo de `E(kT)` (cuyo ancho da el error del ajuste) y comparación con `m ⟨v²⟩/2` y `m v₀²/2` |
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad, en dos ejes y nada más, desde el barrido propio del ítem (`make densidad`: `xo = r`, las densidades del mapa, 20 realizaciones, cada corrida hasta convertirlas todas). No usa las corridas del 2.1.b: con su `tf = 30 s` fijo la mayoría de las densidades no llega a `Fu = 0,9` y la figura no muestra ninguna densidad óptima |
-| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`: eje `x` con la posición real de los obstáculos, una fila por `N` y escala de colores logarítmica (⟨t90⟩ crece más con `N` que con `xo`; en escala lineal el color lo gobierna la fila y adentro de cada una queda todo del mismo tono). Encima va el `xo` óptimo de cada densidad como una línea negra con opacidad moderada: un punto por fila, el vértice de la parábola ajustada a su panza (no la celda más baja, que entre las del fondo sale sorteada por azar). Por consola salen ese vértice con su error, qué celdas son compatibles con el mínimo y cuánto castiga la peor posición |
+| `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`: eje `x` con la posición real de los obstáculos, una fila por `N` y escala de colores logarítmica (⟨t90⟩ crece más con `N` que con `xo`; en escala lineal el color lo gobierna la fila y adentro de cada una queda todo del mismo tono). Encima va el `xo` óptimo de cada densidad como una línea negra con opacidad moderada: un punto por fila, en la celda más baja de esa fila (el cuadrado más rojo). Por consola salen esa celda, el vértice de la parábola ajustada a la fila con su error (el número fino del óptimo, que va en la viñeta), qué celdas son compatibles con el mínimo y cuánto castiga la peor posición |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
 | `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |
 | `halfstep.py` | 1.1 | prueba de la decisión de Velocity Verlet: verifica contra el motor y mide el orden que da cada una de las 4 maneras de evaluar `a(t+dt)` |

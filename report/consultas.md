@@ -201,10 +201,13 @@ resuelve:
   hay choques y la conversión la decide el parámetro de impacto, que es el
   mismo argumento del ítem 2.4.a.
 
-Sigue sin marcarse ninguna celda sobre el mapa: el mínimo se lee por la escala
-de colores, y el número fino sale del ajuste, no de la celda más baja (cuál de
-las del fondo sale la más baja es azar: a `N = 50` cae en `0,175 m` y a
-`N = 150` en `0,275 m`, con el mismo vértice dentro del error).
+Lo que la cátedra pidió el 19/10 (dibujar encima el `x_o` óptimo de cada
+densidad) va como una línea negra que une la **celda más baja de cada fila**,
+calculada de los datos. Zigzaguea dentro del fondo del valle porque cuál de las
+celdas del fondo sale la más baja es azar (a `N = 50` cae en `0,175 m` y a
+`N = 150` en `0,275 m`, con el mismo vértice dentro del error); el número fino,
+`0,237 ± 0,011 m`, sale del ajuste de la parábola y va en la viñeta, no
+dibujado.
 
 ### B6. La explicación de la densidad óptima, ¿necesita figura propia?
 

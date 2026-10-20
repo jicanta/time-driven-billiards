@@ -26,6 +26,7 @@
 #   make una-particula  N = 1: sin choques solo se convierte si el parametro de impacto es < 3r (item 2.4.a)
 #   make animations     corridas caracteristicas, videos y cuadro fijo de cada una
 #   make youtube        copia los videos con nombres legibles en youtube/
+#   make gifs           los mismos cuatro videos como GIF en gif/ (para embeber en la presentacion en vivo)
 #   make figuras-diapositivas  las figuras de las diapositivas (data/figuras_diapositivas);
 #                           los 4 cuadros fijos de animacion salen de make animations
 #   make slides-images      las 20 imagenes de la presentacion numeradas por diapositiva:
@@ -188,7 +189,7 @@ ZIP         := $(ENTREGA)_Codigo.zip
         energia energia-figuras energia-densa \
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
-        densidad densidad-figuras mapa mapa-figuras check una-particula animations youtube figuras-diapositivas \
+        densidad densidad-figuras mapa mapa-figuras check una-particula animations youtube gifs figuras-diapositivas \
         slides-images slides-images-tikz documentos capturas entrega clean-figures
 
 all: todo
@@ -441,6 +442,27 @@ youtube:
 	cp $(ANIM)/borde.mp4           "$(YOUTUBE)/03 - SdS TP4 G10 - Obstaculos en el borde - N 100.mp4"
 	cp $(ANIM)/sin_obstaculos.mp4  "$(YOUTUBE)/04 - SdS TP4 G10 - Sin obstaculos - N 100.mp4"
 	@ls -l $(YOUTUBE)/*.mp4 | awk '{printf "  %5.1f MB  ", $$5/1e6; for (i=9;i<=NF;i++) printf "%s ", $$i; print ""}'
+
+# Los mismos cuatro videos como GIF, para embeberlos en la presentacion en
+# vivo (la que se proyecta sin links, D12 del TP2) y para quien no abra el
+# mp4. Uno de cada dos cuadros guardados a la mitad de los cuadros por segundo,
+# asi el GIF corre en tiempo real igual que el video, y GIF_WIDTH px de ancho
+# con una paleta propia por video (dos pasadas de ffmpeg): unos 8 MB cada uno.
+# Se versionan, como los del TP3. Mismo numero y nombre que el video de
+# youtube/titulos.md.
+GIF       := gif
+GIF_WIDTH ?= 560
+gifs:
+	mkdir -p $(GIF)
+	@for par in centro:01-obstaculos-en-el-centro optimo:02-obstaculos-en-la-posicion-optima \
+	           borde:03-obstaculos-en-el-borde sin_obstaculos:04-sin-obstaculos; do \
+	    caso=$${par%%:*}; nombre=$${par##*:}; \
+	    ffmpeg -v error -y -i $(ANIM)/$$caso.mp4 -filter_complex \
+	        "[0:v]fps=$$(echo "$(FPS)/2" | bc -l),scale=$(GIF_WIDTH):-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=64:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
+	        $(GIF)/$$nombre.gif; \
+	    echo "  $(GIF)/$$nombre.gif"; \
+	done
+	@ls -l $(GIF)/*.gif | awk '{printf "  %5.1f MB  ", $$5/1e6; for (i=9;i<=NF;i++) printf "%s ", $$i; print ""}'
 
 figuras-diapositivas: oscilador-figuras energia-figuras bench-figuras obstaculos-figuras \
                       velocidades-figuras densidad-figuras mapa-figuras

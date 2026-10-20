@@ -22,8 +22,8 @@ Convenciones (las mismas en todas las figuras):
 * El nombre de cada eje es el simbolo del enunciado con su unidad (N, rho,
   x_o, t, f(v), ...), no la frase que lo describe: el simbolo esta definido en
   las diapositivas de observables y de parametros, y asi el rotulo no se come
-  el ancho del eje. Solo van en palabras los que no tienen simbolo (el tiempo
-  de ejecucion, el ECM del ajuste).
+  el ancho del eje. Solo va en palabras el que no tiene simbolo (el tiempo
+  de ejecucion).
 """
 
 from __future__ import annotations
@@ -82,7 +82,11 @@ AXIS_OFFSET = "$x_o$ (m)"
 AXIS_SPEED = "$v = |\\vec{v}|$ (m/s)"
 AXIS_PDF = "$f(v)$ (s/m)"
 AXIS_DENSITY = "$\\rho$ (partículas/m$^2$)"
-AXIS_FIT_ERROR = "error cuadrático medio $E$ (s$^2$/m$^2$)"
+AXIS_THERMAL = "$k_B T$ (mJ)"
+# E(kBT) es el error cuadratico medio del ajuste de f(v) (Teorica 0): el
+# argumento lo distingue de la energia total E(t) y el nombre completo va en la
+# diapositiva que lo define.
+AXIS_FIT_ERROR = "$E(k_B T)$ (s$^2$/m$^2$)"
 
 SCHEME_LABEL = {
     "beeman": "Beeman",

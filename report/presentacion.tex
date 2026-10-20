@@ -379,8 +379,8 @@
               exacto de esa conversión. Medimos $\tnov$ y $\tcien$.
         \item \rotulo{Energía total}: $E(t) = \sum_{i} \tfrac{1}{2} m v_i^2
               + \sum_{\text{contactos}} \tfrac{1}{2} k\,\xi^2$, constante si el
-              esquema integra bien. Se mide su \textbf{error relativo}
-              $\varepsilon(t) = 100\,(E(t) - E_0)/E_0$ en \%, y como escalar
+              esquema integra bien. Se mide su \textbf{error relativo porcentual}
+              $\varepsilon(t) = 100\,(E(t) - E_0)/E_0$, y como escalar
               $\varepsilon_{\max}(\dt) = \max_t |\varepsilon(t)|$.
         \item \rotulo{Distribución del módulo de la velocidad}: $f(v)$, histograma
               de $|\vv|$ en 40 intervalos (área 1) sobre \textbf{una sola bolsa}
@@ -446,7 +446,7 @@
     \figbulw[0.35em]{slide-14-error-energia-vs-t.png}{%
         \item Conservativo: $E$ tiene que quedarse en
               $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$. Se grafica
-              \textbf{cuánto se aparta}, en \%.
+              su \textbf{error relativo porcentual} $\varepsilon$.
         \item $\SI{5e-4}{\second}$ se va al \SI{2.6}{\percent} y
               $\SI{2e-4}{\second}$ al \SI{-0.6}{\percent};
               \alert{$\SI{5e-5}{\second}$ se queda en el \SI{0.04}{\percent}}.
@@ -604,12 +604,13 @@
 
 \begin{frame}{Posición óptima para cada densidad}
     \figbulw[0.2em]{slide-27-mapa-t90-xo-N.png}{%
-        \item Rojo es más rápido; la \textbf{línea negra} es el óptimo de cada
-              densidad, el vértice de la parábola de su fila.
-        \item \alert{De $N = 20$ a $300$ la línea es recta}:
-              $x_o = 0{,}237 \pm \SI{0.011}{\meter}$. A $N = 5$ y $10$ se corre
-              afuera ($0{,}287$ y $\SI{0.350}{\meter}$): sin choques manda el
-              parámetro de impacto.
+        \item Rojo es más rápido; la \textbf{línea negra} une la celda más rápida
+              de cada densidad.
+        \item \alert{De $N = 20$ a $300$ el mínimo queda entre $0{,}175$ y
+              \SI{0.30}{\meter}}, un fondo plano: la parábola de cada fila lo
+              ubica en $x_o = 0{,}237 \pm \SI{0.011}{\meter}$. A $N = 5$ y $10$
+              se corre afuera ($0{,}35$ y $\SI{0.40}{\meter}$): sin choques manda
+              el parámetro de impacto.
         \item Centro y pared son lo peor: la pared cuesta $1{,}9$ veces el mínimo a
               $N = 20$ y $2{,}4$ a $N = 300$.
         \cond{$t_{max} = \SI{300}{\second}$, 16 posiciones $\times$ 10 densidades $\times$ 20 realizaciones}

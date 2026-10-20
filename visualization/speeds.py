@@ -200,7 +200,10 @@ def main() -> None:
     axes.plot([1000 * thermal], [error.min()], marker="o", color=common.USED, markersize=9,
               linestyle="none",
               label=f"mínimo en $k_BT$ = {common.decimal(1000 * thermal, 2)} mJ")
-    axes.set_xlabel("energía térmica $k_B T$ (mJ)")
+    # Los ejes llevan el simbolo y la unidad, como el resto de las figuras:
+    # "energia termica" y "error cuadratico medio" estan definidos en la
+    # diapositiva, no hace falta repetirlos en el rotulo.
+    axes.set_xlabel(common.AXIS_THERMAL)
     axes.set_ylabel(common.AXIS_FIT_ERROR)
     common.headroom(axes, 0.22)
     axes.legend(loc="upper center")

@@ -18,18 +18,18 @@ se corre con la densidad. Por eso:
   todo del mismo tono. En logaritmica una fila se lleva casi un tercio de la
   barra de color y el minimo de cada densidad se ve.
 * El optimo de cada densidad va DIBUJADO encima del mapa, como una linea
-  negra con opacidad moderada que une un punto por fila. El color contesta
-  "cuanto tarda"; la linea contesta "donde esta el minimo de esta fila" y, al
-  verla recta, contesta de una la segunda pregunta del item: el optimo no se
-  corre con la densidad.
+  negra con opacidad moderada que une un punto por fila: la CELDA MAS BAJA de
+  esa fila (el argmin de ⟨t90⟩ sobre xo), o sea el cuadrado mas rojo. El color
+  contesta "cuanto tarda" y la linea contesta "donde esta el minimo de esta
+  fila"; que de N = 20 para arriba se quede entre 0,175 y 0,30 m contesta la
+  segunda pregunta del item: el optimo no se corre con la densidad.
 
-  El punto de cada fila es el VERTICE DE LA PARABOLA ajustada a la fila, no la
-  celda mas baja. La curva ⟨t90⟩(xo) tiene un fondo ancho y plano, y con el
-  error que tienen estas mediciones cual de las celdas del fondo sale sorteada
-  mas baja es en buena parte azar: la celda minima salta de 0,175 m (N = 50) a
-  0,275 m (N = 150) cuando las dos filas tienen el mismo vertice dentro del
-  error, y una linea que une argminos se veria como un zigzag que no esta en
-  los datos. El vertice usa las 12 posiciones del tramo ajustado y es estable.
+  La linea une celdas medidas y por eso zigzaguea: la curva ⟨t90⟩(xo) tiene un
+  fondo ancho y plano, y cual de las celdas del fondo sale sorteada mas baja
+  es en buena parte azar (a N = 50 cae en 0,175 m y a N = 150 en 0,275 m,
+  cuando las dos filas son iguales dentro del desvio). El numero fino del
+  optimo, con su error, sale del VERTICE DE LA PARABOLA ajustada a cada fila
+  sobre el mismo tramo; se informa por consola y va en la vineta, no dibujado.
 
 El barrido que escribe `make mapa` corta cada corrida apenas Fu llega a 0,9
 (--until-fraction 0.9: esperar a que se conviertan todas cuesta el triple de
@@ -177,12 +177,15 @@ def main() -> None:
                 writer.writerow([count, offset, grid[row, column], error[row, column],
                                  int(reached[row, column])])
 
-    # El optimo de cada fila se calcula antes de dibujar, porque va dibujado
-    # encima del mapa (y despues se informa por consola con su error).
+    # Lo que va dibujado encima del mapa es la celda mas baja de cada fila (el
+    # cuadrado mas rojo); el vertice de la parabola es el numero fino con error
+    # y se informa por consola.
     rows_with_vertex = []
+    lowest_cells = []
     for row in range(len(counts)):
         if np.all(np.isnan(grid[row])):
             continue
+        lowest_cells.append((row, float(offsets[int(np.nanargmin(grid[row]))])))
         centre, uncertainty = vertex(offsets, grid[row], error[row])
         if centre is not None:
             rows_with_vertex.append((row, int(counts[row]), centre, uncertainty))
@@ -207,13 +210,14 @@ def main() -> None:
     bar.ax.yaxis.set_minor_formatter(FuncFormatter(lambda value, _: ""))
     bar.ax.set_yticklabels([common.decimal(t) for t in ticks])
 
-    # El optimo de cada densidad, encima del mapa: negro con opacidad moderada,
-    # que se lee sobre cualquier color de la escala sin tapar las celdas por
-    # las que pasa. Sin entrada de leyenda: el mapa esta cubierto de datos y
+    # La celda mas baja de cada densidad, encima del mapa: negro con opacidad
+    # moderada, que se lee sobre cualquier color de la escala sin tapar las
+    # celdas por las que pasa. El punto cae en el centro de la celda (xo real,
+    # fila entera). Sin entrada de leyenda: el mapa esta cubierto de datos y
     # una caja encima tapa celdas; que es la linea lo dice la vineta.
-    if len(rows_with_vertex) > 1:
-        axes.plot([centre for *_, centre, _ in rows_with_vertex],
-                  [row for row, *_ in rows_with_vertex],
+    if len(lowest_cells) > 1:
+        axes.plot([offset for _, offset in lowest_cells],
+                  [row for row, _ in lowest_cells],
                   color="#111111", alpha=0.6, linewidth=2.0, marker="o", markersize=5,
                   markerfacecolor="#111111", zorder=3)
 
@@ -225,9 +229,9 @@ def main() -> None:
     common.save(figure, out)
     plt.close(figure)
 
-    # La lectura fina, por consola: el error del vertice de cada fila (en la
-    # figura va el vertice, no su error), que celdas son compatibles con el
-    # minimo y cuanto castiga la peor posicion.
+    # La lectura fina, por consola: la celda mas baja de cada fila (la que une
+    # la linea de la figura), el vertice de la parabola con su error, que
+    # celdas son compatibles con el minimo y cuanto castiga la peor posicion.
     vertices = {row: (centre, uncertainty)
                 for row, _, centre, uncertainty in rows_with_vertex}
     best_offsets = []

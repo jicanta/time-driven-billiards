@@ -148,7 +148,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 ## 20. Fracción de usadas: los tres xo típicos — `slide-20-Fu-vs-t-xo-tipicos.png`
 
 - Las tres curvas juntas, que es como lo pide el ítem 2.2: Fu(t) para pocos valores típicos de xo. Cada una es el promedio de las 15 realizaciones y la banda es ±1 desvío entre ellas.
-- Misma forma, corrida en el tiempo: el óptimo llega a 0,9 en 14,8 s, el centro en 26,5 s y el borde en 31,2 s. El punto sobre la línea de 0,9 es ⟨t90⟩ y la barra horizontal su desvío.
+- Misma forma, corrida en el tiempo: el óptimo llega a 0,9 en 14,8 s, el centro en 26,5 s y el borde en 31,2 s. La línea punteada de 0,9 está en la leyenda porque es la definición de t90: el símbolo de cada curva sobre ella es ⟨t90⟩ y la barra horizontal su desvío, con el mismo estilo de barra que el resto de las figuras.
 - El óptimo además es el de menos dispersión (±1,7 s contra ±3,4 y ±3,1).
 - La cola es larga en los tres: ⟨t100⟩ ≈ 2,3 ⟨t90⟩. Ninguna realización se queda sin convertir antes de tmax = 100 s, así que no hay que reportar Fu(tmax).
 
@@ -183,7 +183,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 25. Error cuadrático medio del ajuste — `slide-25-E-vs-kT.png`
 
-- Método de la Teórica 0: se recorre kBT en una grilla y se toma el mínimo de E(kBT).
+- Método de la Teórica 0: se recorre kBT en una grilla y se toma el mínimo de E(kBT). Los ejes son el símbolo con la unidad, como en el resto: E(kBT) es el error cuadrático medio del ajuste (el argumento lo distingue de la energía total E(t)) y kBT la energía térmica, los dos nombrados en la viñeta.
 - **El ancho del mínimo es el error del ajuste**, que es lo que esta figura agrega: E se duplica ya en 12,31 y 12,53 mJ, o sea kBT = 12,41 ± 0,11 mJ, un 0,9 %. Es la forma de ponerle error a un ajuste de un parámetro sin más que la curva E(parámetro).
 - "Energía térmica" es el nombre que le da el enunciado a kBT: es el único parámetro libre del ajuste, no una temperatura medida.
 
@@ -203,10 +203,10 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - El barrido es de 16 posiciones × 10 densidades × 20 realizaciones (3200 corridas): hace falta esa resolución para distinguir si el óptimo se corre con N o si es siempre el mismo.
 - La escala de colores está dada vuelta a propósito: el rojo es la conversión **más rápida**, porque lo que tiene que saltar a la vista es el óptimo y no el peor caso. Y está recortada en 38 s (1,3 veces el más alto de los mínimos de cada fila, la flecha de la barra lo marca): los bordes de las densidades extremas llegan a 70 s y se llevaban media escala ellos solos.
 - La mancha roja **cierra por arriba y por abajo**: hay óptimo en las dos variables. Por eso está la fila de N = 5, que es la que la cierra por abajo.
-- La **línea negra** es el óptimo de cada densidad, un punto por fila: el color contesta “cuánto tarda” y la línea contesta “dónde está el mínimo de esta fila”. Verla recta de N = 20 para arriba contesta de una la segunda pregunta del ítem.
-- Cada punto es el **vértice de la parábola** ajustada a la fila sobre el mismo tramo (xo = 0,10–0,40 m), no la celda más baja: cuál de las del fondo sale la más baja es en buena parte azar (a N = 50 cae en 0,175 m y a N = 150 en 0,275 m, y las dos tienen el mismo vértice dentro del error), así que una línea que uniera argminos sería un zigzag que no está en los datos.
-- De N = 20 en adelante (ocho densidades) los vértices dan **0,237 ± 0,011 m**: el óptimo no se corre con la densidad en todo ese rango, y no es exactamente 0,2 sino 0,24 m (0,46 R).
-- Las dos densidades más bajas sí se corren hacia afuera: 0,287 ± 0,020 m en N = 5 y 0,350 ± 0,031 m en N = 10 (a 2,5 y 3,7 σ del promedio). Con tan pocas partículas casi no hay choques y la conversión la decide el parámetro de impacto de cada trayectoria, así que separar los obstáculos cubre más parámetros de impacto. Es el mismo argumento del ítem 2.4.a (con N = 1 sólo convierte si b < 3r). Sobre las diez densidades el ajuste da −0,018 ± 0,007 m por década de N, y ese corrimiento lo aportan enteramente esas dos filas.
+- La **línea negra** une la celda más rápida de cada densidad (el cuadrado más rojo de cada fila, calculado de los datos: el argmin de ⟨t90⟩ sobre xo): el color contesta “cuánto tarda” y la línea contesta “dónde está el mínimo de esta fila”.
+- La línea **zigzaguea** de N = 20 para arriba porque el fondo del valle es ancho y plano: cuál de las celdas del fondo sale la más baja es en buena parte azar (a N = 50 cae en 0,175 m y a N = 150 en 0,275 m, y las dos filas son iguales dentro del desvío). Lo que hay que leer es que **siempre cae entre 0,175 y 0,30 m**, nunca en el centro ni en la pared.
+- El número fino sale de ajustar una **parábola a cada fila** sobre el mismo tramo (xo = 0,10–0,40 m) y tomar el vértice: de N = 20 en adelante (ocho densidades) da **0,237 ± 0,011 m**. El óptimo no se corre con la densidad en todo ese rango, y no es exactamente 0,2 sino 0,24 m (0,46 R). Lo imprime `make mapa-figuras` fila por fila; no está dibujado porque la línea es la medición y el vértice es un ajuste.
+- Las dos densidades más bajas sí se corren hacia afuera: la celda más baja está en 0,35 m en N = 5 y en 0,40 m en N = 10 (los vértices, 0,287 ± 0,020 y 0,350 ± 0,031 m, a 2,5 y 3,7 σ del promedio). Con tan pocas partículas casi no hay choques y la conversión la decide el parámetro de impacto de cada trayectoria, así que separar los obstáculos cubre más parámetros de impacto. Es el mismo argumento del ítem 2.4.a (con N = 1 sólo convierte si b < 3r). Sobre las diez densidades el ajuste da −0,018 ± 0,007 m por década de N, y ese corrimiento lo aportan enteramente esas dos filas.
 - Los extremos son siempre los peores, y cuál de los dos es peor cambia con la densidad: a N = 5 el centro es cuatro veces y media el mínimo, a N = 10 centro y pared cuestan lo mismo (30,1 y 29,5 s), y a N = 300 la pared es claramente peor (69,8 contra 54,3 s). El castigo de la pared crece con N: 1,9 veces el mínimo a N = 20 y 2,4 a N = 300.
 - ⟨t90⟩ en el óptimo pasa de 11,0 s (N = 10) a 29,5 s (N = 300), y vuelve a subir a 14,3 s en N = 5.
 - El barrido del mapa corre con tmax = 300 s, no 100: a N = 5 hay realizaciones que tardan 150 s en convertir las cinco partículas. De N = 10 para arriba no cambia nada, ninguna pasa de 70 s.

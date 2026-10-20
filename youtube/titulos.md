@@ -23,6 +23,11 @@ decimal, como en las diapositivas. El cuadro fijo del PDF es el instante
 `t = 10 s` y tiene el mismo lienzo y la misma tipografía que el video; en el
 PDF sólo va el cuadro fijo con el link explícito debajo.
 
+Los mismos cuatro videos están como GIF en `gif/` (`make gifs`, numerados
+igual que acá): son para embeber en la presentación en vivo, que se proyecta
+sin links, y corren en tiempo real como el video (la mitad de los cuadros a la
+mitad de los cuadros por segundo). A YouTube se sube el `.mp4`.
+
 Común a todos: dominio circular de `R = 0,51 m`, `N = 100` partículas de
 `r = 0,0175 m` y `m = 0,025 kg`, `v0 = 1 m/s`, `k = 10⁴ N/m`,
 `dt = 5·10⁻⁵ s`, condición inicial al azar (semilla 7, la misma que la
