@@ -173,7 +173,14 @@ Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
 > `Δt = 5·10⁻⁵ s`, con `D = 3,8·10⁻⁴`. ¿Les parece bien el observable y esa
 > cota, o esperan otro criterio?
 
-### B4. La figura de energía muestra 3 de los 7 `Δt` medidos
+### B4. La figura de energía muestra 3 de los 7 `Δt` medidos — ACTUALIZADO el 20/10: son dos figuras
+
+Hoy van dos diapositivas: la **evolución del sistema**, `E(t)` en Joule con
+4 `Δt` (`5·10⁻⁴`, `2·10⁻⁴`, `10⁻⁴` y `5·10⁻⁵ s`, diapositiva 14), que es lo que
+pide el ítem 2.1.a textual, y el **error** `ε(t)` en porcentaje con 3 (sin el
+`5·10⁻⁴ s`, que ya se vio despegarse en Joule; diapositiva 15). Lo de abajo es
+lo que se preguntó.
+
 
 > Medimos 7 pasos pero dibujamos 3, los que se leen en una misma escala: uno
 > que deriva hacia arriba (`5·10⁻⁴ s`, 2,6 %), uno hacia abajo (`2·10⁻⁴ s`,

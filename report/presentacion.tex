@@ -444,23 +444,37 @@
 \end{frame}
 
 \begin{frame}{Conservación de la energía}
-    \figbulw[0.35em]{slide-14-error-energia-vs-t.png}{%
+    \figbulw[0.25em]{slide-14-energia-vs-t.png}{%
         \item Conservativo: $E$ tiene que quedarse en
-              $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$. Se grafica
-              su \textbf{error relativo porcentual} $\varepsilon$.
-        \item $\SI{5e-4}{\second}$ se va al \SI{2.6}{\percent} y
-              $\SI{2e-4}{\second}$ al \SI{-0.6}{\percent};
+              $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$; lo que se aparta
+              es \textbf{error del esquema}.
+        \item $\SI{5e-4}{\second}$ \textbf{sube} a \SI{3.85}{\joule} y
+              $\SI{2e-4}{\second}$ \textbf{baja}; $\SI{1e-4}{\second}$ y
+              \alert{$\SI{5e-5}{\second}$} no se despegan de $E_0$.
+        \item Son 4 de los 7 $\dt$: $\SI{1e-3}{\second}$ llega a \SI{45}{\joule}
+              (el choque dura $\tau = \SI{3.5}{\milli\second}$: entran tres pasos);
+              $\SI{2e-5}{\second}$ y $\SI{1e-5}{\second}$ caen sobre la del elegido.
+        \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$, estado cada \SI{0.01}{\second}}
+    }
+\end{frame}
+
+\begin{frame}{Error de la energía contra el tiempo}
+    \figbulw[0.35em]{slide-15-error-energia-vs-t.png}{%
+        \item Las mismas curvas como \textbf{error relativo porcentual}
+              $\varepsilon(t)$, sin la de $\SI{5e-4}{\second}$: la escala alcanza
+              para separar las tres que quedan sobre $E_0$.
+        \item $\SI{2e-4}{\second}$ se va al \SI{-0.6}{\percent} y
+              $\SI{1e-4}{\second}$ al \SI{0.1}{\percent};
               \alert{$\SI{5e-5}{\second}$ se queda en el \SI{0.04}{\percent}}.
-        \item Son 3 de los 7 $\dt$ medidos: $\SI{1e-3}{\second}$ llega al
-              \SI{1100}{\percent} (el choque dura
-              $\tau = \pi\sqrt{\mu/k} = \SI{3.5}{\milli\second}$: entran tres pasos)
-              y de $\SI{1e-4}{\second}$ para abajo caen todas sobre el cero.
+        \item El error no crece sin parar: cada curva \textbf{deriva y se
+              estabiliza}. Por eso el escalar que resume la corrida es el máximo,
+              $\varepsilon_{\max}$.
         \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$, estado cada \SI{0.01}{\second}}
     }
 \end{frame}
 
 \begin{frame}{Elección del paso: error máximo}
-    \figbul{slide-15-error-maximo-vs-dt.png}{%
+    \figbul{slide-16-error-maximo-vs-dt.png}{%
         \item Observable escalar: $\varepsilon_{\max}(\dt)$, el error más grande de
               la corrida. Ajusta $\varepsilon_{\max} \propto \dt^{2{,}0}$.
         \item Criterio: el $\dt$ \textbf{más largo} con
@@ -474,7 +488,7 @@
 \end{frame}
 
 \begin{frame}{Obstáculos en el centro}
-    \animbul{slide-16-animacion-centro.png}{https://youtu.be/PENDIENTE-01}{%
+    \animbul{slide-17-animacion-centro.png}{https://youtu.be/PENDIENTE-01}{%
         $x_o = r = \SI{0.0175}{\meter}$, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Los dos obstáculos se tocan: forman un solo blanco de $4r$ de ancho
               en el centro del dominio.
@@ -484,7 +498,7 @@
 \end{frame}
 
 \begin{frame}{Tiempo de ejecución contra $N$}
-    \figbul{slide-17-tiempo-ejecucion-vs-N.png}{%
+    \figbul{slide-18-tiempo-ejecucion-vs-N.png}{%
         \item \textbf{Paso temporal}: \alert{$t \propto N^{0{,}88}$}; la celda de
               índice deja el costo de un paso en $O(N)$.
         \item \textbf{Eventos} (TP3): \alert{$t \propto N^{3{,}52}$}: cada choque
@@ -496,7 +510,7 @@
 \end{frame}
 
 \begin{frame}{Obstáculos en la posición óptima}
-    \animbul{slide-18-animacion-optimo.png}{https://youtu.be/PENDIENTE-02}{%
+    \animbul{slide-19-animacion-optimo.png}{https://youtu.be/PENDIENTE-02}{%
         $x_o = \SI{0.20}{\meter}$, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Separados, cada obstáculo barre su propia zona y ninguno queda a la
               sombra del otro.
@@ -506,7 +520,7 @@
 \end{frame}
 
 \begin{frame}{Obstáculos en el borde}
-    \animbul{slide-19-animacion-borde.png}{https://youtu.be/PENDIENTE-03}{%
+    \animbul{slide-20-animacion-borde.png}{https://youtu.be/PENDIENTE-03}{%
         $x_o = R - r = \SI{0.4925}{\meter}$, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Pegados a la pared, los obstáculos quedan fuera del camino de casi
               todas las trayectorias.
@@ -515,7 +529,7 @@
 \end{frame}
 
 \begin{frame}{Fracción de usadas: los tres $x_o$ típicos}
-    \figbul{slide-20-Fu-vs-t-xo-tipicos.png}{%
+    \figbul{slide-21-Fu-vs-t-xo-tipicos.png}{%
         \item Misma forma, corrida en el tiempo: el \alert{óptimo} llega a $0{,}9$ en
               \SI{14.8}{\second}, el centro en \SI{26.5}{\second} y el borde en
               \SI{31.2}{\second}.
@@ -528,7 +542,7 @@
 \end{frame}
 
 \begin{frame}{$\mtnov$ contra la posición de los obstáculos}
-    \figbul{slide-21-t90-vs-xo.png}{%
+    \figbul{slide-22-t90-vs-xo.png}{%
         \item \alert{Sí hay posición óptima}: $\mtnov$ cae de \SI{26.5}{\second}
               en $x_o = r$ a \SI{14.8}{\second} en \SI{0.20}{\meter} y sube a
               \SI{31.2}{\second} contra la pared.
@@ -542,7 +556,7 @@
 \end{frame}
 
 \begin{frame}{Sin obstáculos}
-    \animbul{slide-22-animacion-sin-obstaculos.png}{https://youtu.be/PENDIENTE-04}{%
+    \animbul{slide-23-animacion-sin-obstaculos.png}{https://youtu.be/PENDIENTE-04}{%
         sin obstáculos, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Sin conversión: todas quedan frescas. Es el sistema con el que se eligió
               el paso y el de la distribución de velocidades.
@@ -552,7 +566,7 @@
 \end{frame}
 
 \begin{frame}{Rapidez media contra el tiempo}
-    \figbulw[0.3em]{slide-23-v-medio-vs-t.png}{%
+    \figbulw[0.3em]{slide-24-v-medio-vs-t.png}{%
         \item Un escalar por instante: $\langle |\vv| \rangle$ de la bolsa de ese
               instante, banda $\pm 1$ desvío entre realizaciones.
         \item Baja desde $v_0$ mientras $f(v)$ se ensancha a $E$ constante;
@@ -566,7 +580,7 @@
 \end{frame}
 
 \begin{frame}{Distribución del módulo de la velocidad}
-    \figbulw[0.45em]{slide-24-f-v-vs-t.png}{%
+    \figbulw[0.45em]{slide-25-f-v-vs-t.png}{%
         \item En $t = 0$ todas tienen $|\vv| = v_0$: $f(v)$ es una \textbf{delta}
               que se sale de la figura.
         \item A los \SI{0.15}{\second} el pico ya cayó a un tercio y apareció la cola;
@@ -580,7 +594,7 @@
 \end{frame}
 
 \begin{frame}{La gran bolsa: ajuste de Maxwell-Boltzmann}
-    \figbulw[0.45em]{slide-25-f-v-gran-bolsa-ajuste.png}{%
+    \figbulw[0.45em]{slide-26-f-v-gran-bolsa-ajuste.png}{%
         \item \textbf{Un solo histograma} con todos los $|\vv|$ del estacionario de
               todas las realizaciones, ajustado con
               $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$ y $k_BT$ como
@@ -594,7 +608,7 @@
 \end{frame}
 
 \begin{frame}{Error cuadrático medio del ajuste}
-    \figbul{slide-26-E-vs-kT.png}{%
+    \figbul{slide-27-E-vs-kT.png}{%
         \item Método de la Teórica 0: se recorre $k_BT$ en una grilla y se toma el
               \textbf{mínimo} del error cuadrático medio $E(k_BT)$.
         \item El \textbf{ancho del mínimo es el error del ajuste}: $E$ se duplica
@@ -606,7 +620,7 @@
 \end{frame}
 
 \begin{frame}{Efecto de la densidad}
-    \figbulw[0.3em]{slide-27-t90-t100-vs-densidad.png}{%
+    \figbulw[0.3em]{slide-28-t90-t100-vs-densidad.png}{%
         \item \alert{Hay densidad óptima}: $\mtnov$ baja de \SI{66}{\second}
               ($\rho = 6$) a \SI{21.8}{\second} en $\rho = 86$, y vuelve a
               \SI{54.3}{\second} en $\rho = 367$.
@@ -620,7 +634,7 @@
 \end{frame}
 
 \begin{frame}{Posición óptima para cada densidad}
-    \figbulw[0.2em]{slide-28-mapa-t90-xo-N.png}{%
+    \figbulw[0.2em]{slide-29-mapa-t90-xo-N.png}{%
         \item Rojo es más rápido; la \textbf{línea negra} une la celda más rápida
               de cada densidad.
         \item \alert{De $N = 20$ a $300$ el mínimo queda entre $0{,}175$ y

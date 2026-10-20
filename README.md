@@ -90,7 +90,7 @@ make gifs                  # los mismos cuatro videos como GIF en gif/
 make oscilador-sin-amortiguamiento  # control: con gamma = 0 Beeman y Verlet dan la misma constante
 make figuras-diapositivas  # las figuras de las diapositivas (data/figuras_diapositivas/);
                            # los 4 cuadros fijos de animación salen de make animations
-make slides-images         # las 22 imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
+make slides-images         # las 23 imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
 make todo                  # todas las simulaciones; make all es su alias
 make clean-figures         # borra data/figures/ y data/figuras_diapositivas/
 make slides-images-tikz    # sólo los esquemas TikZ de las diapositivas (report/figuras/*.tikz) renderizados a PNG

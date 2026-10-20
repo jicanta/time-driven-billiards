@@ -10,17 +10,20 @@ esquema de integracion (Teorica 4, diapositiva 35). El motor no la calcula:
 sale de los estados guardados en dynamic.txt, con las mismas xi del enunciado
 (pares de particulas, obstaculos y la particula imagen de la pared).
 
-Lo que se grafica NO es la energia en Joule sino su **error relativo en
-porcentaje**
+Van dos figuras contra el tiempo. La primera es la EVOLUCION DEL SISTEMA, la
+energia total en Joule tal como la pide el enunciado, con el dt que se despega
+hacia arriba (5*10^-4 s, +2,6 %), el que se despega hacia abajo (2*10^-4 s) y
+los dos que se quedan sobre E0 (10^-4 y 5*10^-5 s). La segunda es su **error
+relativo en porcentaje**
 
     eps(t) = 100 (E(t) - E_0) / E_0,
 
-que es lo que se decide con esta figura: "me quedo con este paso porque el
-error es menor que tanto por ciento". En Joule hay que leer la separacion
-contra una recta de E0 y despues dividir mentalmente; en porcentaje el numero
-del eje ya es el numero de la frase, y el cero -- que es la conservacion
-exacta -- queda en el medio, con las curvas que derivan hacia arriba de un
-lado y las que derivan hacia abajo del otro.
+que es lo que se decide: "me quedo con este paso porque el error es menor que
+tanto por ciento". En Joule hay que leer la separacion contra la recta de E0 y
+dividir mentalmente; en porcentaje el numero del eje ya es el numero de la
+frase, y el cero -- la conservacion exacta -- queda en el medio. La del error
+deja afuera el 5*10^-4 s, que ya se vio despegarse en la primera, y asi la
+escala alcanza para distinguir 10^-4 s (0,1 %) del elegido (0,04 %).
 
 El observable escalar que resume cada curva es el **maximo de ese error**
 
@@ -56,7 +59,25 @@ import numpy as np
 
 import common
 
-COLORS = ["#d62728", "#ff7f0e", "#2ca02c", "#1f5fbf", "#9467bd", "#8c564b", "#17becf"]
+# Un color por dt, el MISMO en la figura de E(t) y en la de eps(t): las dos
+# muestran las mismas corridas y un dt tiene que verse igual en las dos.
+COLORS = {1e-3: "#9467bd", 5e-4: "#d62728", 2e-4: "#ff7f0e", 1e-4: "#2ca02c",
+          5e-5: "#1f5fbf", 2e-5: "#8c564b", 1e-5: "#17becf"}
+
+
+def color_of(step: float) -> str:
+    return next(color for value, color in COLORS.items() if np.isclose(step, value))
+
+
+def select(rows: list[dict], wanted: str) -> list[dict]:
+    """Las filas de los dt pedidos (lista separada por coma), en el orden del
+    barrido (dt decreciente)."""
+    values = [float(value) for value in wanted.split(",") if value]
+    missing = [value for value in values
+               if not any(np.isclose(row["dt"], value) for row in rows)]
+    if missing:
+        raise SystemExit("no hay corrida con dt = " + ", ".join(f"{v:g}" for v in missing))
+    return [row for row in rows if any(np.isclose(row["dt"], value) for value in values)]
 
 
 def summarize(root: Path) -> list[dict]:
@@ -102,9 +123,14 @@ def main() -> None:
     parser.add_argument("--estable", type=float, default=0.1,
                         help="deriva por encima de la cual se considera que el paso es "
                              "inestable: queda fuera del ajuste de la ley de potencia")
-    parser.add_argument("--pasos", type=str, default="5e-4,2e-4,5e-5",
-                        help="los dt (s) que se dibujan en la figura de E(t), separados por "
-                             "coma: los representativos, los que se leen en una misma escala")
+    parser.add_argument("--pasos-energia", type=str, default="5e-4,2e-4,1e-4,5e-5",
+                        help="los dt (s) de la figura de E(t) en Joule, separados por coma: "
+                             "el que se despega para arriba, el que se despega para abajo "
+                             "y los dos que se quedan sobre E0")
+    parser.add_argument("--pasos", type=str, default="2e-4,1e-4,5e-5",
+                        help="los dt (s) que se dibujan en la figura del error eps(t), "
+                             "separados por coma: los que se leen en una misma escala "
+                             "alrededor del elegido")
     common.add_common_arguments(parser)
     arguments = parser.parse_args()
     common.use_style(arguments.estilo)
@@ -114,21 +140,45 @@ def main() -> None:
     count = rows[0]["N"]
     write_csv(rows, arguments.energia / "resumen.csv")
 
-    # Un solo panel y una sola escala, con los dt de --pasos: los que se leen
-    # juntos. El resto del barrido no se pierde, sigue en la tabla, en
-    # resumen.csv y en la figura de eps_max.
-    wanted = [float(value) for value in arguments.pasos.split(",") if value]
-    shown = [row for row in rows if any(np.isclose(row["dt"], value) for value in wanted)]
-    missing = [value for value in wanted
-               if not any(np.isclose(row["dt"], value) for row in rows)]
-    if missing:
-        raise SystemExit("no hay corrida con dt = " + ", ".join(f"{v:g}" for v in missing))
+    # LA EVOLUCION DEL SISTEMA: la energia total en Joule contra el tiempo,
+    # que es lo que pide el enunciado ("graficar la energia total del sistema
+    # en funcion del tiempo para distintos valores de dt"). Van los dt de
+    # --pasos-energia: el que se despega hacia arriba, el que se despega hacia
+    # abajo y los que se quedan sobre E0. El mas largo (10^-3 s) se va a 45 J y
+    # aplastaria a todos contra E0: queda en la figura de eps_max, con el
+    # barrido entero.
+    shown_energy = select(rows, arguments.pasos_energia)
     figure, axes = plt.subplots()
     reach = 0.0
-    for row, color in zip(shown, COLORS):
+    for row in shown_energy:
+        reach = max(reach, float(np.abs(row["E"] - row["E0"]).max()))
+        axes.plot(row["t"], row["E"], color=color_of(row["dt"]),
+                  label=f"$\\Delta t = {common.scientific(row['dt'])}$ s")
+    base = rows[0]["E0"]
+    axes.axhline(base, color="#111111", linestyle=":", linewidth=1.3,
+                 label=f"$E_0$ = {common.decimal(base, 2)} J", zorder=1)
+    axes.set_ylabel(common.AXIS_ENERGY)
+    axes.set_xlabel(common.AXIS_TIME)
+    # Simetrico alrededor de E0, que queda en el medio: la mitad que las
+    # curvas no usan es donde entra la leyenda.
+    axes.set_ylim(base - 1.3 * reach, base + 1.3 * reach)
+    axes.legend(loc="lower left", ncol=2)
+    value_figure = out_dir / f"energia_vs_t_N{count}.png"
+    common.save(figure, value_figure)
+    plt.close(figure)
+
+    # EL ERROR, en porcentaje, con los dt de --pasos: los que se leen juntos en
+    # una escala alrededor del elegido. El resto del barrido no se pierde,
+    # sigue en la tabla, en resumen.csv y en la figura de eps_max.
+    shown = select(rows, arguments.pasos)
+    figure, axes = plt.subplots()
+    reach = 0.0
+    highest, lowest = 0.0, 0.0
+    for row in shown:
         error = 100.0 * (row["E"] - row["E0"]) / row["E0"]
         reach = max(reach, float(np.abs(error).max()))
-        axes.plot(row["t"], error, color=color,
+        highest, lowest = max(highest, float(error.max())), min(lowest, float(error.min()))
+        axes.plot(row["t"], error, color=color_of(row["dt"]),
                   label=f"$\\Delta t = {common.scientific(row['dt'])}$ s")
     # La referencia es el CERO, que es la conservacion exacta, y el eje se abre
     # igual para los dos lados: queda en el medio de la figura, con las curvas
@@ -139,11 +189,12 @@ def main() -> None:
                  label="conservación exacta", zorder=1)
     axes.set_ylabel(common.AXIS_ENERGY_ERROR)
     axes.set_xlabel(common.AXIS_TIME)
-    # Simetrico: el cero queda en el medio. Las curvas no lo son (la que deriva
-    # hacia arriba llega al 2,6 % y la que deriva hacia abajo al -0,6 %), y esa
-    # mitad de abajo que queda libre es donde entra la leyenda sin tapar nada.
+    # Simetrico: el cero queda en el medio. Las curvas no lo son (la que mas
+    # deriva lo hace hacia un solo lado), y la mitad que queda libre es donde
+    # entra la leyenda sin tapar nada: arriba si la deriva grande es negativa,
+    # abajo si es positiva.
     axes.set_ylim(-1.3 * reach, 1.3 * reach)
-    axes.legend(loc="lower left", ncol=2)
+    axes.legend(loc="upper left" if abs(lowest) > highest else "lower left", ncol=2)
     energy_figure = out_dir / f"error_energia_vs_t_N{count}.png"
     common.save(figure, energy_figure)
     plt.close(figure)
@@ -198,11 +249,14 @@ def main() -> None:
     for row in rows:
         print(f"{row['dt']:10.1e} {row['cuadros']:8d} {100 * row['deriva']:18.4g} "
               f"{100 * row['deriva_final']:15.4g}")
+    print("dt en la figura de E(t): " + ", ".join(f"{row['dt']:g} s" for row in shown_energy)
+          + f" (de los {len(rows)} del barrido)")
     print("dt en la figura de eps(t): " + ", ".join(f"{row['dt']:g} s" for row in shown)
           + f" (de los {len(rows)} del barrido; el resto no se distingue en esa escala)")
     print(f"ajuste eps_max = c dt^a sobre los pasos estables: a = {exponent:.2f}")
     print(f"dt elegido (error ≤ {limit:g} %): {chosen:g} s" if chosen
           else "ningún dt del barrido queda por debajo de la cota")
+    print(value_figure)
     print(energy_figure)
     print(drift_figure)
     print(arguments.energia / "resumen.csv")
