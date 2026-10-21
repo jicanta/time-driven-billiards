@@ -435,13 +435,14 @@
     \figbulw[0.3em]{slide-13-energia-oscilador-vs-t.png}{%
         \item $E = \tfrac{1}{2} m v^2 + \tfrac{1}{2} k r^2$ \textbf{no se conserva}: el
               amortiguamiento la disipa como $e^{-\gamma t / m}$, de \SI{5018}{\joule}
-              a \SI{4}{\joule} en \SI{5}{\second}.
+              a \SI{4}{\joule}.
         \item \textbf{Beeman}, \textbf{Verlet original} y \textbf{Velocity Verlet} caen
-              sobre la analítica (a \SI{1}{\second}, dentro del \SI{0.2}{\percent}).
+              sobre la analítica: dentro del \SI{2}{\percent} en los \SI{5}{\second}. Velocity
+              Verlet pierde un orden, pero son \SI{3}{\milli\meter} sobre \SI{1}{\meter}:
+              no se ve en esta escala.
         \item \alert{Euler p-c disipa de más}: a \SI{1}{\second} le queda la
-              \textbf{mitad}. Con pasos más cortos se acerca: lo mide el ECM de la
-              diapositiva siguiente.
-        \cond{$\dt = \SI{5e-3}{\second}$, el más largo del barrido; $t_f = \SI{5}{\second}$; $m$, $k$, $\gamma$ y $A$ de la tabla de parámetros}
+              \textbf{mitad}. Con pasos más cortos se acerca: lo mide el ECM.
+        \cond{$\dt = \SI{5e-3}{\second}$, el más largo del barrido; $t_f = \SI{5}{\second}$}
     }
 \end{frame}
 

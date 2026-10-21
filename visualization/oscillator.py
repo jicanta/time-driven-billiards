@@ -12,9 +12,12 @@ la disipa como exp(-gamma t / m), con ondulaciones porque la potencia
 disipada es gamma v^2 y v oscila. Se dibuja con UN solo dt (--energia, el mas
 largo del barrido): a ese paso Euler predictor-corrector pierde energia mucho
 mas rapido que la analitica (le agrega disipacion numerica) y los otros tres
-caen encima de la curva exacta; con pasos mas cortos Euler se acerca y la
-figura deja de distinguir nada, que es justamente lo que mide el ECM. Eje
-lineal: es el valor absoluto de la energia lo que se pidio ver.
+caen encima de la curva exacta, Velocity Verlet incluido: pierde un orden en
+el ECM (dt^2 en vez de dt^4), pero con ese paso son 3 mm de error en
+posicion sobre 1 m de amplitud y menos del 1 % en energia, invisible sobre
+un eje de 5000 J. Con pasos mas cortos Euler se acerca y la figura deja de
+distinguir nada, que es justamente lo que mide el ECM. Eje lineal: es el
+valor absoluto de la energia lo que se pidio ver.
 
 Lee las trayectorias que escribe `billar oscillator` (una linea por paso de
 integracion) y calcula, para cada esquema y cada dt,
@@ -147,10 +150,12 @@ def trajectory_figure(root: Path, parameters: dict, step: float, out_dir: Path) 
 
 def energy_figure(root: Path, parameters: dict, step: float, out_dir: Path):
     """E(t) de los cuatro esquemas con el paso `step`, sobre la analitica.
-    Devuelve (ruta, {esquema: E / E_analitica en t = 1 s}, E0)."""
+    Devuelve (ruta, {esquema: E / E_analitica en t = 1 s},
+    {esquema: max |E - E_analitica| / E_analitica}, E0)."""
     figure, axes = plt.subplots()
     reference = None
     ratio_at_one = {}
+    worst = {}
     initial = None
     for name in common.SCHEMES:
         path = root / name / f"dt{step:.1e}.txt"
@@ -166,6 +171,7 @@ def energy_figure(root: Path, parameters: dict, step: float, out_dir: Path):
                                          common.analytic_velocity(parameters, t))
         one = int(np.searchsorted(t, 1.0))
         ratio_at_one[name] = float(energy[one] / exact[one])
+        worst[name] = float(np.abs(energy / exact - 1.0).max())
     if reference is not None:
         exact = common.oscillator_energy(parameters, common.analytic_position(parameters, reference),
                                          common.analytic_velocity(parameters, reference))
@@ -182,7 +188,7 @@ def energy_figure(root: Path, parameters: dict, step: float, out_dir: Path):
     out = out_dir / f"energia_vs_t_dt{step:.1e}.png"
     common.save(figure, out)
     plt.close(figure)
-    return out, ratio_at_one, initial
+    return out, ratio_at_one, worst, initial
 
 
 def main() -> None:
@@ -203,8 +209,8 @@ def main() -> None:
     write_csv(schemes, arguments.oscilador / "ecm.csv")
 
     # Primera figura: la energia contra el tiempo con el dt de --energia.
-    energy_out, ratio_at_one, initial = energy_figure(arguments.oscilador, parameters,
-                                                      arguments.energia, out_dir)
+    energy_out, ratio_at_one, worst, initial = energy_figure(arguments.oscilador, parameters,
+                                                             arguments.energia, out_dir)
 
     # Segunda figura: ECM contra dt de los cuatro esquemas en doble
     # logaritmica, un solo panel, que es lo que pide el enunciado del sistema 1
@@ -288,6 +294,10 @@ def main() -> None:
           f"decae como exp(-t / {parameters['m'] / parameters['gamma']:.2f} s); en t = 1 s cada "
           "esquema tiene, respecto de la analítica, "
           + ", ".join(f"{common.SCHEME_LABEL[n]} {100 * (r - 1):+.1f} %" for n, r in ratio_at_one.items()))
+    print("  apartamiento máximo de la energía respecto de la analítica en toda la corrida: "
+          + ", ".join(f"{common.SCHEME_LABEL[n]} {100 * w:.2f} %" for n, w in worst.items())
+          + " (Velocity Verlet pierde un orden en el ECM pero en energía no se distingue de "
+            "Verlet original en esta escala)")
     print(f"{'dt (s)':>10}" + "".join(f"{common.SCHEME_LABEL[n]:>28}" for n in schemes))
     every = sorted({s for series in schemes.values() for s in series["dt"]}, reverse=True)
     for step in every:
