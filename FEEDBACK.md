@@ -90,9 +90,10 @@ entregar.
   variable contra el observable.
 - La cátedra pidió después (21/10) que el sistema 1 lleve también la energía
   del oscilador contra el tiempo, en valor absoluto: son dos diapositivas.
-- Una sola diapositiva para el sistema 1, con la figura de ECM contra dt de
-  los cuatro esquemas: lo pide el enunciado explícitamente ("no mostrar
-  animaciones, ni introducción, ni ninguna otra información").
+- El enunciado pedía una sola diapositiva para el sistema 1, la de ECM contra
+  dt de los cuatro esquemas ("no mostrar animaciones, ni introducción, ni
+  ninguna otra información"): esa sigue siendo la única con el ECM, y la de
+  energía es la que agregó la cátedra.
 - Terminología fija y definida antes de usarse: partícula fresca/usada,
   conversión, obstáculo, partícula imagen, paso de integración `dt`, paso de
   guardado `dt2`, deriva de energía, fracción de usadas `Fu`, `t90`, `t100`,

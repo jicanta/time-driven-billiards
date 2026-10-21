@@ -72,7 +72,7 @@ make una-particula         # N = 1: sin choques sólo se convierte si el paráme
 make oscilador             # sistema 1: los 4 esquemas y los 9 dt
 make oscilador-figuras     # E(t) del oscilador y ECM vs dt (las dos figuras del sistema 1) y la trayectoria
 make energia               # ítem 2.1.a: N = 300 sin obstáculos, barrido de dt con cuadros
-make energia-figuras       # energía vs t (los 4 dt representativos) y deriva vs dt con su ajuste
+make energia-figuras       # E(t) en Joule y su error en % (los 3 dt que se leen juntos) y el error máximo vs dt con su ajuste
 make energia-densa         # verifica el dt elegido en el caso más denso (N = 700 con obstáculos)
 make bench                 # ítem 2.1.b: tiempos contra N (máquina descargada)
 make bench-tp3             # los mismos tiempos con el motor del TP3, en esta computadora
@@ -80,8 +80,9 @@ make bench-figuras         # tiempo de ejecución vs N de los dos paradigmas
 make obstaculos            # ítem 2.2: barrido de xo con N = 100 y N = 20
 make obstaculos-figuras    # ⟨t90⟩ vs xo y Fu(t) de los tres xo típicos, en una sola figura
 make velocidades           # ítem 2.3: N = 100 sin obstáculos, cuadros hasta el estacionario
-make velocidades-figuras   # f(v) por instante, ajuste de Maxwell-Boltzmann y E(kT)
-make densidad-figuras      # ítem 2.4.a: ⟨t90⟩ y ⟨t100⟩ vs densidad (usa las corridas del 2.1.b)
+make velocidades-figuras   # rapidez media vs t, f(v) por instante, la gran bolsa con el ajuste de Maxwell-Boltzmann y E(kT)
+make densidad              # ítem 2.4.a: barrido propio de N con xo = r, 20 realizaciones, hasta convertirlas todas
+make densidad-figuras      # ítem 2.4.a: ⟨t90⟩ y ⟨t100⟩ vs densidad
 make mapa                  # ítem 2.4.b: barrido (xo, N)
 make mapa-figuras          # mapa de calor de ⟨t90⟩ en el plano (xo, N)
 make animations            # corridas características, videos y cuadro fijo de cada una
@@ -91,7 +92,7 @@ make oscilador-sin-amortiguamiento  # control: con gamma = 0 Beeman y Verlet dan
 make figuras-diapositivas  # las figuras de las diapositivas (data/figuras_diapositivas/);
                            # los 4 cuadros fijos de animación salen de make animations
 make slides-images         # las 24 imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
-make todo                  # todas las simulaciones; make all es su alias
+make todo                  # todas las simulaciones (densidad y una-particula se corren aparte); make all es su alias
 make clean-figures         # borra data/figures/ y data/figuras_diapositivas/
 make slides-images-tikz    # sólo los esquemas TikZ de las diapositivas (report/figuras/*.tikz) renderizados a PNG
 make documentos            # report/presentacion.tex → report/build/presentacion.pdf (lee slides-images/)
@@ -216,8 +217,8 @@ Teórica 4 la trata de una manera distinta; esa diferencia es el resultado del
   **implícita**, y la diapositiva no escribe ese caso. Hay **dos lecturas y
   las dos se defienden** —evaluar `f(t+dt)` con la velocidad de medio paso, o
   despejar `v(t+dt)` como se hizo con Verlet original—, con consecuencias
-  distintas. Cuál va está **consultado a la cátedra** (`PLAN.md` §9, duda 4);
-  mientras tanto corre la de medio paso. Ver abajo.
+  distintas. Se consultó a la cátedra (`PLAN.md` §9, duda 4) y el 19/10
+  contestaron que está bien la de medio paso, que es la que corre. Ver abajo.
 - **Beeman**: la variante **predictor-corrector** de la diapositiva 20, que
   es la que la teórica da explícitamente para fuerzas que dependen de `v`.
   Ahí sí la diapositiva dice qué velocidad entra en `a(t+dt)`: la predicha.
@@ -269,8 +270,8 @@ medio paso el residuo escala como `dt²`.
 orden, pero deja 3 esquemas distintos en vez de 4 (en la figura de ECM vs
 `dt` se superpone con Verlet original); la de medio paso mantiene los cuatro
 separados, que es lo que el enunciado pide comparar, al precio de un orden.
-Ninguna es "la correcta": está consultado a la cátedra (`PLAN.md` §9, duda 4)
-y mientras tanto corre la de medio paso.
+Ninguna es "la correcta" a priori: se consultó a la cátedra (`PLAN.md` §9,
+duda 4) y el 19/10 validaron la de medio paso, que es la que corre.
 
 El barrido va de `dt = 5·10⁻³` a `10⁻⁵ s` con espaciado 1-2-5 (nueve valores,
 tres décadas). Por debajo de `10⁻⁵` el archivo de trayectorias de un solo `dt`
@@ -313,8 +314,9 @@ sistema masa-resorte, `τ = π √(μ/k)`: 3,51 ms entre dos partículas
 (`μ = m/2`) y 4,97 ms contra un obstáculo o la pared (`μ = m`). El paso tiene
 que resolver ese choque.
 
-Lo que se grafica no es `E(t)` en Joule sino su **error relativo en
-porcentaje**, `eps(t) = 100 (E(t) − E₀) / E₀`, con el cero (la conservación
+Se grafican las dos cosas: `E(t)` en Joule, que es la evolución del sistema
+que pide el ítem, y su **error relativo en porcentaje**,
+`eps(t) = 100 (E(t) − E₀) / E₀`, con el cero (la conservación
 exacta) en el medio de la figura: así el número del eje es el número de la
 frase con la que se elige el paso. El observable escalar que resume cada curva
 es `eps_max(dt) = maxₜ |eps(t)|`, una sola cifra por corrida. Se elige el `dt`
@@ -357,9 +359,9 @@ vale `m v0²/2 = 0,0125 J`.
 | Script | Ítem | Qué hace |
 |---|---|---|
 | `common.py` | — | lectura de las corridas, observables (energía, `Fu`, `t90`, ECM, ajuste de `kT`), estilos `informe`/`diapositiva` y `save()` con coma decimal en los ejes |
-| `oscillator.py` | 1.1, 1.2 | ECM contra `dt` de los cuatro esquemas, en doble logarítmica y con el exponente de `ECM = c dtᵖ` ajustado en log-log (la figura de la presentación), más `ECM/dt⁴` de los dos de cuarto orden como figura aparte; `--trayectoria dt` agrega la figura de posición contra tiempo |
-| `energy.py` | 2.1.a | error relativo de la energía en % contra `t` para los `dt` de `--pasos` (los representativos, los que se leen en una misma escala, con el cero en el medio) y `eps_max` en % contra `dt` sobre el barrido entero, con la cota y el `dt` elegido marcados |
-| `bench.py` | 2.1.b | tiempo de ejecución contra `N` con el desvío entre las 10 realizaciones (dibujado, y escrito en el pie porque en cuatro décadas no se ve), una serie por archivo de tiempos, ajuste `t = c Nᵃ` punteado y sin entrada propia en la leyenda, ejes doble logarítmicos |
+| `oscillator.py` | 1.1, 1.2 | `E(t)` del oscilador con los cuatro esquemas sobre la analítica para el `dt` de `--energia` (la primera figura del sistema 1), ECM contra `dt` de los cuatro esquemas, en doble logarítmica y con el exponente de `ECM = c dtᵖ` ajustado en log-log (la figura de la presentación), más `ECM/dt⁴` de los dos de cuarto orden como figura aparte; `--trayectoria dt` agrega la figura de posición contra tiempo |
+| `energy.py` | 2.1.a | `E(t)` en Joule para los `dt` de `--pasos-energia`, error relativo de la energía en % contra `t` para los `dt` de `--pasos` (los representativos, los que se leen en una misma escala, con el cero en el medio) y `eps_max` en % contra `dt` sobre el barrido entero, con la cota y el `dt` elegido marcados |
+| `bench.py` | 2.1.b | tiempo de ejecución contra `N` con el desvío entre las 10 realizaciones (dibujado; en cuatro décadas queda dentro del símbolo, y el script lo imprime por consola), una serie por archivo de tiempos, ajuste `t = c Nᵃ` punteado y sin entrada propia en la leyenda, ejes doble logarítmicos |
 | `explore.py` | 2.2 | `t90` de cada corrida desde el registro de conversiones, `resumen.csv` con `⟨t90⟩ ± σ`, cuántas realizaciones llegan y `Fu(tmax)`; figura `⟨t90⟩` contra `xo` con una curva por `N`; `--fraccion 1` hace lo mismo con `t100` |
 | `conversion.py` | 2.2 | `--casos`: `Fu(t)` promedio de varios `xo` en una misma figura, con banda de `± σ` entre realizaciones y `⟨t90⟩ ± σ` marcado sobre la línea de `0,9` (es la figura que pide el ítem); `--runs` dibuja corridas sueltas como escalón, para mirar una configuración de cerca |
 | `speeds.py` | 2.3 | rapidez media `⟨|v|⟩` contra `t` (un escalar por cuadro, dice desde cuándo es estacionario y verifica el ajuste con `√(πkT/2m)`), `f(v)` en varios instantes exactos, un histograma por bolsa (`N × M` muestras), **la gran bolsa** (todos los cuadros del estacionario de todas las realizaciones en un solo histograma, `f_v_gran_bolsa_ajuste_*.png`) ajustada con Maxwell-Boltzmann por el mínimo de `E(kT)` (cuyo ancho da el error del ajuste) y comparación con `m ⟨v²⟩/2` y `m v₀²/2` |

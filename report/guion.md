@@ -38,8 +38,8 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - **Cada esquema lleva escrita su decisión**, media línea en gris debajo de sus ecuaciones: Verlet original la v despejada, Velocity Verlet la de medio paso v(t + Δt/2), Beeman la predicha y Euler p-c la de Euler, cada una con el orden que da. Señalar esas cuatro líneas: es lo que se compara, y lo que explica las dos figuras del sistema 1 (diapositivas 13 y 14) antes de mostrarlas. Lo que cambia de un esquema a otro no son las ecuaciones sino **esa elección**.
 - Si preguntan por Velocity Verlet (es la pregunta más probable de esta diapositiva): la fórmula de la Teórica es v(t + Δt) = v(t) + (Δt/2m)(f(t) + f(t + Δt)), y f(t + Δt) necesita v(t + Δt), que es lo que la ecuación está calculando. Queda implícita y hay dos salidas razonables.
 - Una es despejar v(t + Δt) —se puede, f es lineal en v, igual que en Verlet original—. Da segundo orden, pero el esquema que queda **es** Verlet original: sumando pasos consecutivos de las dos fórmulas se llega a la recurrencia de Verlet y a su velocidad centrada, sin usar de qué depende f. O sea que quedarían 3 esquemas distintos en vez de 4.
-- La otra, la que corre, es evaluar f(t + Δt) con v(t + Δt/2), la única velocidad que aparece entre los dos pasos intermedios de la diapositiva 17. Mantiene los cuatro esquemas separados y cuesta un orden: ECM ∝ Δt^2,04 en vez de Δt⁴, porque v(t + Δt/2) se aparta de v(t + Δt) en O(Δt) y ese error entra en f(t + Δt) multiplicado por Δt/2. Beeman no lo pierde porque su predictor es de O(Δt²).
-- Honestidad: ninguna de las dos es "la correcta", y está consultado a la cátedra. Si preguntan, se dice así. Las dos están medidas (`make velocity-verlet-variantes`).
+- La otra, la que corre, es evaluar f(t + Δt) con v(t + Δt/2), la única velocidad que aparece entre los dos pasos intermedios de la diapositiva 17 de la Teórica 4. Mantiene los cuatro esquemas separados y cuesta un orden: ECM ∝ Δt^2,04 en vez de Δt⁴, porque v(t + Δt/2) se aparta de v(t + Δt) en O(Δt) y ese error entra en f(t + Δt) multiplicado por Δt/2. Beeman no lo pierde porque su predictor es de O(Δt²).
+- Honestidad: ninguna de las dos es "la correcta" a priori; se consultó y la cátedra validó la de medio paso el 19/10 (consulta A1). Si preguntan, se dice así. Las dos están medidas (`make velocity-verlet-variantes`).
 
 ## 6. Motor de simulación — `slide-06-motor-uml.png`
 
@@ -57,7 +57,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 - Parámetros, observables y los casos que se corrieron.
 
-## 9. Parámetros — `slide-09-parametros-dominio.png`
+## 9. Parámetros — `slide-09-parametros-dominio.png` y `slide-09-parametros-tabla.png`
 
 - La tabla va en tres bloques. **Fijos**, lo que no se toca en todo el trabajo: R = 0,51 m, r = 0,0175 m, m = 0,025 kg, v0 = 1 m/s y k = 10⁴ N/m.
 - **Variables**, lo que se barre, escrito como **intervalo entre corchetes** porque es un rango recorrido y no una lista de valores sueltos: N ∈ [5, 700], la densidad ρ = N/πR² que le corresponde, ρ ∈ [6, 857] partículas/m² (el mismo barrido contado por unidad de área, y el parámetro con el que el ítem 2.4 pide los resultados), y xo ∈ [r, R − r], de obstáculos en contacto entre sí a obstáculos contra la pared.
@@ -76,7 +76,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 - Sistema 1: 4 esquemas, 9 pasos de 5·10⁻³ a 10⁻⁵ s. Paso temporal: N = 300 sin obstáculos, 7 pasos, verificado a N = 700 con obstáculos.
 - Costo: xo = r, N de 50 a 700, 10 realizaciones por N, contra el motor del TP3 en la misma máquina.
-- Posición de los obstáculos: 11 valores de xo con N = 100 y 20, 15 realizaciones. Velocidades: N = 100, 30 realizaciones. Densidad: las corridas del 2.1.b y un barrido (xo, N) de 16 posiciones × 10 densidades con 20 realizaciones por punto (3200 corridas).
+- Posición de los obstáculos: 11 valores de xo con N = 100 y 20, 15 realizaciones. Velocidades: N = 100, 30 realizaciones. Densidad: barrido propio con xo = r, 10 densidades (N de 5 a 300), 20 realizaciones, cada corrida hasta convertirlas todas (tmax = 300 s, que ninguna necesita); y un barrido (xo, N) de 16 posiciones × 10 densidades con 20 realizaciones por punto (3200 corridas).
 
 ## 12. Resultados (separador)
 
@@ -187,7 +187,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 ## 26. Distribución del módulo de la velocidad — `slide-26-f-v-vs-t.png`
 
 - En t = 0 f(v) es una delta en v0 que se sale de la figura.
-- A los 0,15 s el pico ya cayó a un tercio y apareció la cola de velocidades bajas; la curva de t = 30 s es el estacionario, y desde 0,5 s las curvas ya no se distinguen entre sí (por eso están éstas tres y no más).
+- A los 0,15 s el pico ya bajó a 2,45 s/m, 2,7 veces el del estacionario (0,90 s/m; la delta de t = 0 mide 11,3 s/m, que es 1 sobre el ancho del intervalo), y apareció la cola de velocidades bajas; la curva de t = 30 s es el estacionario, y desde 0,5 s las curvas ya no se distinguen entre sí (por eso están éstas tres y no más).
 - Las tres son instantes exactos, cada uno con su t: el estacionario se muestra como el último cuadro guardado, no como un promedio sobre cuadros. Ese promedio se usa en la figura del ajuste, que es donde hace falta la estadística.
 - f(v) se ensancha sin que cambie E: el sistema es conservativo.
 - Cada curva es **un solo histograma de una bolsa**: los |v| de las 100 partículas de las 30 realizaciones de ese instante, todos juntos, 3000 muestras (la bolsa de un instante; la **gran bolsa** de la diapositiva siguiente junta además todos los cuadros del estacionario). No es el promedio de 30 histogramas con su desvío como barra: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y promediarlos con barras del 51 % tapaba la forma de f(v), que es lo que la figura muestra. Decir cuántas realizaciones y cuántas muestras entran en la bolsa: está en la línea de condiciones.
@@ -250,4 +250,4 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## Cierre
 
-- Muchas gracias; preguntas.
+- Muchas gracias.

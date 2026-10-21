@@ -307,8 +307,8 @@ es el cambio de color de una partícula, que es parte del estado.
 | Script | Ítem | Qué hace |
 |---|---|---|
 | `common.py` | — | lectura de las corridas, observables, estilos y `save()` |
-| `oscillator.py` | 1.1, 1.2 | ECM contra `dt` de los cuatro esquemas y la trayectoria |
-| `energy.py` | 2.1.a | error relativo de `E` en % por `dt`, y su máximo contra `dt` |
+| `oscillator.py` | 1.1, 1.2 | `E(t)` del oscilador con los cuatro esquemas, ECM contra `dt` y la trayectoria |
+| `energy.py` | 2.1.a | `E(t)` en Joule y su error relativo en % por `dt`, y el error máximo contra `dt` |
 | `bench.py` | 2.1.b | tiempo de ejecución contra `N` de los dos paradigmas |
 | `explore.py` | 2.2 | `⟨t90⟩` contra `xo`, una curva por `N` |
 | `conversion.py` | 2.2 | `Fu(t)` de los `xo` típicos en una figura (`--casos`), con `⟨t90⟩ ± σ` marcado |
@@ -365,16 +365,14 @@ es el cambio de color de una partícula, que es parte del estado.
 ### Ítem 2.1.b — Tiempo de ejecución contra N
 
 - Obstáculos en contacto (`xo = r`), `tf = 30 s`, `N` de 50 a 700, 10
-  realizaciones por `N` más una de calentamiento descartada. El barrido se
-  extiende por debajo (`N` de 5 a 30) porque el ítem 2.4.a usa estas mismas
-  corridas y a `N` grande ninguna realización llega a `Fu = 0,9` en 30 s; el
-  ajuste de la ley de potencia del 2.1.b se hace sobre `N ≥ 50`, donde el
-  costo ya está dominado por las partículas y no por el barrido fijo de la
-  grilla.
+  realizaciones por `N` más una de calentamiento descartada. El barrido
+  también se corrió por debajo (`N` de 5 a 30), pero el ajuste de la ley de
+  potencia y la figura se hacen sobre `N ≥ 50`, donde el costo ya está
+  dominado por las partículas y no por el barrido fijo de la grilla. El ítem
+  2.4.a ya no usa estas corridas: tiene su barrido propio (consulta A4).
 - En el mismo gráfico, los tiempos del ítem 1.1 del TP3 (dirigido por
   eventos) **corridos en esta misma computadora**.
 - Se ajusta `t = c Nᵃ` a cada serie y se compara el exponente.
-- Las conversiones de estas corridas se guardan porque el ítem 2.4.a las usa.
 
 ### Ítem 2.2 — Posición de los obstáculos
 
@@ -429,8 +427,8 @@ es el cambio de color de una partícula, que es parte del estado.
   barrido propio las dos curvas son una U: `⟨t90⟩` mínimo en `ρ = 86`
   (`N = 70`), 21,8 s, contra 66 s en `ρ = 6` y 54 s en `ρ = 367`.
 - (b) (opcional, se hace) mapa de calor de `⟨t90⟩` en `(xo, N)` con
-  `N ∈ {20, 50, 100, 200, 300}` y 6 valores de `xo`, 6 realizaciones por
-  punto, con un proceso por `N`.
+  10 densidades (`N` de 5 a 300) y 16 valores de `xo`, 20 realizaciones por
+  punto (3200 corridas), con un proceso por celda `(N, xo)`.
 
 ### Ítem 2.5 — Declaración sobre uso de agentes de IA
 
@@ -468,8 +466,8 @@ Se cambian si los profesores indican otra cosa.
    forma exacta. La alternativa (evaluar la fuerza con una velocidad predicha
    hacia atrás) le quitaría un orden de convergencia al esquema por una
    decisión de implementación, no por el esquema.
-3. **Velocity Verlet con la velocidad de medio paso.** ⚠️ **Decisión abierta,
-   consultada a la cátedra** (duda 4 de §9). La diapositiva 17 escribe
+3. **Velocity Verlet con la velocidad de medio paso.** Consultado a la
+   cátedra (duda 4 de §9) y **validado el 19/10**. La diapositiva 17 escribe
    `v(t+dt) = v(t) + (dt/2m)(f(t) + f(t+dt))` y, aparte, los dos pasos
    intermedios `v(t+dt/2)` y `v(t+dt)`. Con una fuerza que sólo depende de la
    posición no hay nada que elegir. Acá `f` depende de `v`, así que `f(t+dt)`
@@ -522,7 +520,7 @@ Se cambian si los profesores indican otra cosa.
    letra y da segundo orden, pero deja 3 esquemas distintos en vez de 4 (en la
    figura de ECM vs `dt` se superpone con Verlet original); (a) mantiene los 4
    esquemas separados, que es lo que el enunciado pide comparar, al precio de
-   un orden. Mientras no haya respuesta queda (a). Pasar a (b) es una línea en
+   un orden. La cátedra validó (a) el 19/10. Pasar a (b) sería una línea en
    `velocityVerlet()` más rehacer el barrido y las figuras, y pediría una
    viñeta en la diapositiva del sistema 1 explicando por qué hay 3 curvas.
 4. **`dt = 5·10⁻⁵ s` para todo el sistema 2**, elegido en el ítem 2.1.a con la
@@ -554,7 +552,7 @@ Se cambian si los profesores indican otra cosa.
    debajo, el costo de un paso lo domina el barrido de las 29 × 29 celdas de
    la grilla, que no depende de `N`, y la curva se aplana: ajustar ahí mide
    el piso de la implementación, no cómo escala el paradigma. Los `N`
-   chicos se corren igual porque el ítem 2.4.a usa estas mismas corridas.
+   chicos quedan medidos pero fuera de la figura.
 
 ---
 
@@ -593,4 +591,4 @@ nota y con lo que contestamos si nos devuelven la pregunta, está en
      queda distinto de Verlet original, pero pierde un orden
      (`ECM ∝ dt^2,04`).
 
-   ¿Cuál de las dos se espera? Mientras tanto corre la segunda.
+   ¿Cuál de las dos se espera? Respuesta del 19/10: la segunda está bien, y es la que corre.

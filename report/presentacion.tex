@@ -402,7 +402,7 @@
 \begin{frame}{Casos estudiados}
     \vspace{-0.1em}
     \small
-    \begin{itemize}\setlength{\itemsep}{0.7em}
+    \begin{itemize}\setlength{\itemsep}{0.55em}
         \item \textbf{Esquemas de integración} \cita{1.1, 1.2}: los 4 esquemas,
               9 pasos de $\SI{5e-3}{\second}$ a $\SI{1e-5}{\second}$,
               $t_f = \SI{5}{\second}$.
@@ -420,10 +420,10 @@
         \item \textbf{Distribución de velocidades} \cita{2.3}: $N = 100$ sin
               obstáculos, $t_{max} = \SI{30}{\second}$, $\dtd = \SI{0.05}{\second}$,
               \textbf{30 realizaciones}.
-        \item \textbf{Densidad} \cita{2.4}: las corridas del 2.1.b, extendidas
-              hasta $N = 5$, y un barrido $(x_o, N)$ con 10 densidades
-              ($N$ de 5 a 300) y 16 posiciones, \textbf{20 realizaciones} por
-              punto: 3200 corridas.
+        \item \textbf{Densidad} \cita{2.4}: barrido propio con $x_o = r$, 10 densidades
+              ($N$ de 5 a 300), \textbf{20 realizaciones}, hasta convertirlas todas;
+              y el mapa $(x_o, N)$: 16 posiciones $\times$ esas 10 densidades $\times$
+              20 realizaciones, 3200 corridas.
     \end{itemize}
 \end{frame}
 
@@ -601,9 +601,9 @@
     \figbulw[0.45em]{slide-26-f-v-vs-t.png}{%
         \item En $t = 0$ todas tienen $|\vv| = v_0$: $f(v)$ es una \textbf{delta}
               que se sale de la figura.
-        \item A los \SI{0.15}{\second} el pico ya cayó a un tercio y apareció la cola;
-              desde \SI{0.5}{\second} las curvas no se distinguen de la de
-              \SI{30}{\second}.
+        \item A los \SI{0.15}{\second} el pico ya bajó a $2{,}7$ veces el del
+              estacionario y apareció la cola; desde \SI{0.5}{\second} las curvas
+              no se distinguen de la de \SI{30}{\second}.
         \item Cada curva es \textbf{un solo histograma} de la bolsa de ese
               instante ($N \times M$ muestras), y el sistema es conservativo: $f(v)$
               se ensancha sin que cambie $E$.
@@ -612,16 +612,16 @@
 \end{frame}
 
 \begin{frame}{La gran bolsa: ajuste de Maxwell-Boltzmann}
-    \figbulw[0.45em]{slide-27-f-v-gran-bolsa-ajuste.png}{%
-        \item \textbf{Un solo histograma} con todos los $|\vv|$ del estacionario de
-              todas las realizaciones, barra $\pm 1$ desvío entre ellas; ajustado con
-              $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$ y $k_BT$ como
+    \figbulw[0.35em]{slide-27-f-v-gran-bolsa-ajuste.png}{%
+        \item \textbf{Un solo histograma} con todos los $|\vv|$ del estacionario
+              (barra: $\pm 1$ desvío entre realizaciones). Ajuste de
+              $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$ con $k_BT$ como
               \textbf{único parámetro libre}.
         \item \alert{$k_BT = \SI{12.41}{\milli\joule}$} contra
               $m v_0^2/2 = \SI{12.50}{\milli\joule}$: \SI{-0.7}{\percent}.
         \item $m\langle v^2\rangle/2 = \SI{12.32}{\milli\joule}$ es un poco menor:
               en promedio el \SI{1.4}{\percent} de $E$ está en los resortes.
-        \cond{la gran bolsa: $30 \times 401$ cuadros ($t \geq \SI{10}{\second}$) $\times\,100 = 1{,}2\cdot10^{6}$ muestras, un histograma de 40 intervalos}
+        \cond{$30 \times 401$ cuadros ($t \geq \SI{10}{\second}$) $\times\,100 = 1{,}2\cdot10^{6}$ muestras, 40 intervalos}
     }
 \end{frame}
 

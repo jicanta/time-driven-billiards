@@ -9,7 +9,7 @@
 #   make velocity-verlet-variantes  por que Velocity Verlet pierde un orden: las 4 maneras
 #                           de evaluar a(t+dt) y el orden que da cada una
 #   make energia        item 2.1.a: N = 300 sin obstaculos, un barrido de dt con cuadros
-#   make energia-figuras    E(t) en Joule (4 dt), su error en % (3 dt) y el error maximo vs dt
+#   make energia-figuras    E(t) en Joule y su error en % (los mismos 3 dt) y el error maximo vs dt
 #   make energia-densa  verifica el dt elegido en el caso mas denso (N = 700 con obstaculos)
 #   make bench          item 2.1.b: tiempos contra N (maquina descargada)
 #   make bench-tp3      los mismos tiempos con el motor del TP3 (dirigido por eventos)
@@ -294,8 +294,8 @@ bench-tp3:
 	    --repeats $(REPEATS) --warmup $(WARMUP) --placement random --seed 1 \
 	    --out $(CURDIR)/$(BENCH)/tp3_random.txt
 
-# El barrido de N llega hasta 5 porque el item 2.4.a usa estas mismas corridas;
-# la figura del item 2.1.b arranca en N = 50 (ver PLAN.md, decision 9).
+# El barrido de N se corrio desde 5, pero la figura del item 2.1.b arranca en
+# N = 50 (ver PLAN.md, decision 9); el item 2.4.a tiene su barrido propio.
 N_BENCH_MIN ?= 50
 bench-figuras:
 	$(PY) visualization/bench.py --desde $(N_BENCH_MIN) \
