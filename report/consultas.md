@@ -29,9 +29,15 @@ esquema de integración lleve su "decisión: con qué v evalúa a(t+dt)".
 | **Tabla** | Sacar dt2 y tf, corchetes en los intervalos, `10^4` y no `1 × 10^4` | Hecho |
 | **Observables** | Definir `t_x` como el que cumple `Fu(t_x) = x/100` | Hecho, con t90 y t100 como los dos casos |
 
-Después (21/10) pidieron además, para el sistema 1, la **energía del oscilador
-contra el tiempo en valor absoluto**, no sólo el ECM: es la diapositiva 13, con
-los cuatro esquemas sobre la analítica y `dt = 5·10⁻³ s`.
+Después (21/10) pidieron además, para el sistema 1, la evolución contra el
+tiempo y no sólo el ECM; por mail (22/10) precisaron que sea la **posición**,
+no la energía ("¿por qué graficar la energía, si no se conserva? Lo que querés
+estimar es la posición"): es la diapositiva 13, `r(t)` de los cuatro esquemas
+sobre la analítica con `dt = 5·10⁻³ s`. En el mismo mail: la fórmula de
+Maxwell-Boltzmann **va en la presentación** (es un observable; está en la
+diapositiva 10) y la comparación que pide el enunciado es `kBT` contra
+`m v0²/2`; comparar además `⟨|v|⟩` o `m⟨v²⟩/2` queda a criterio, según el
+tiempo.
 
 Lo que sigue abajo queda como registro de lo que se preguntó y de lo que se
 contesta si vuelven sobre el tema en la defensa.

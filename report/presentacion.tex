@@ -20,9 +20,9 @@
 %   * cada diapositiva de figura es el grafico grande mas dos o tres vinetas
 %   * conclusiones como punteo corto, solo con cifras de las figuras mostradas
 % y el enunciado del TP4:
-%   * el sistema 1 ocupa DOS diapositivas: la energia del oscilador contra el
-%     tiempo (en valor absoluto, los cuatro esquemas sobre la analitica, que
-%     la pidio la catedra) y la figura de ECM vs dt de los cuatro esquemas,
+%   * el sistema 1 ocupa DOS diapositivas: la posicion del oscilador contra el
+%     tiempo (los cuatro esquemas sobre la analitica; la catedra pidio ver lo
+%     que se estima, que es r(t)) y la figura de ECM vs dt de los cuatro esquemas,
 %     que es la que pide el enunciado, sin animaciones ni introduccion ni
 %     "ninguna otra informacion". Por eso la del ECM es un solo panel. Lo que
 %     separa a Beeman de Verlet original es la constante del error y no la
@@ -372,13 +372,13 @@
 \end{frame}
 
 \begin{frame}{Observables}
-    \vspace{-0.2em}
-    \small
-    \begin{itemize}\setlength{\itemsep}{0.7em}
+    \vspace{-0.3em}
+    \footnotesize
+    \begin{itemize}\setlength{\itemsep}{0.45em}
         \item \rotulo{Conversión}: $\Fu(t) = \Nu(t)/N$, con $\Nu$ las usadas
               acumuladas. \alert{$t_x$} es el instante en que la conversión llega
               al $x$ \%, el que cumple $\Fu(t_x) = x/100$, tomado en el instante
-              exacto de esa conversión. Medimos $\tnov$ y $\tcien$.
+              exacto de esa conversión; medimos $\tnov$ y $\tcien$.
         \item \rotulo{Energía total}: $E(t) = \sum_{i} \tfrac{1}{2} m v_i^2
               + \sum_{\text{contactos}} \tfrac{1}{2} k\,\xi^2$, constante si el
               esquema integra bien. Se mide su \textbf{error relativo porcentual}
@@ -388,9 +388,13 @@
               de $|\vv|$ en 40 intervalos (área 1) sobre \textbf{una sola bolsa}
               con los $|\vv|$ de las $N$ partículas de las $M$ realizaciones; la
               \textbf{gran bolsa} del estacionario suma además todos los cuadros con
-              $t \ge \SI{10}{\second}$. La rapidez media $\langle |\vv| \rangle$ de
-              la bolsa de cada instante dice desde cuándo es estacionario.
-        \item \rotulo{Sistema 1}: $\displaystyle \mathrm{ECM}(\dt) = \frac{1}{n}
+              $t \ge \SI{10}{\second}$ y se ajusta con \textbf{Maxwell-Boltzmann} en 2D,
+              $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$, con $k_BT$ como único
+              parámetro: el mínimo del error cuadrático medio $E(k_BT)$ (Teórica 0).
+              La rapidez media $\langle |\vv| \rangle$ de cada instante dice desde
+              cuándo es estacionario.
+        \item \rotulo{Sistema 1}: $r(t)$ contra la analítica y
+              $\displaystyle \mathrm{ECM}(\dt) = \frac{1}{n}
               \sum_{j=1}^{n}\left[r_{\text{num}}(t_j) - r_{\text{an}}(t_j)\right]^2$
               sobre los $n$ pasos de integración.
         \item \rotulo{Promedios}: $\langle x \rangle = \frac{1}{M}\sum_{k=1}^{M} x_k$
@@ -431,18 +435,18 @@
 \section{Resultados}
 % =========================================================
 
-\begin{frame}{Sistema 1: energía contra el tiempo}
-    \figbulw[0.3em]{slide-13-energia-oscilador-vs-t.png}{%
-        \item $E = \tfrac{1}{2} m v^2 + \tfrac{1}{2} k r^2$ \textbf{no se conserva}: el
-              amortiguamiento la disipa como $e^{-\gamma t / m}$, de \SI{5018}{\joule}
-              a \SI{4}{\joule}.
+\begin{frame}{Sistema 1: posición contra el tiempo}
+    \figbulw[0.3em]{slide-13-posicion-oscilador-vs-t.png}{%
+        \item Lo que se estima es $r(t)$: los cuatro esquemas sobre la analítica
+              $r(t) = A\,e^{-\gamma t / 2m} \cos \omega t$, con el paso más largo
+              del barrido.
         \item \textbf{Beeman}, \textbf{Verlet original} y \textbf{Velocity Verlet} caen
-              sobre la analítica: dentro del \SI{2}{\percent} en los \SI{5}{\second}. Velocity
-              Verlet pierde un orden, pero son \SI{3}{\milli\meter} sobre \SI{1}{\meter}:
-              no se ve en esta escala.
-        \item \alert{Euler p-c disipa de más}: a \SI{1}{\second} le queda la
-              \textbf{mitad}. Con pasos más cortos se acerca: lo mide el ECM.
-        \cond{$\dt = \SI{5e-3}{\second}$, el más largo del barrido; $t_f = \SI{5}{\second}$}
+              sobre la analítica: se apartan como mucho $1$, $1$ y \SI{6}{\milli\meter}
+              (sobre $A = \SI{1}{\meter}$).
+        \item \alert{Euler p-c pierde amplitud}: se aparta hasta \SI{15}{\centi\meter}
+              y a \SI{1}{\second} ya está \SI{13}{\centi\meter} por debajo. Con pasos más
+              cortos se acerca: lo mide el ECM.
+        \cond{$\dt = \SI{5e-3}{\second}$; se muestran los primeros \SI{2}{\second} de $t_f = \SI{5}{\second}$}
     }
 \end{frame}
 

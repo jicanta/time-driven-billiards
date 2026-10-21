@@ -70,7 +70,7 @@ make build                 # engine/build/billar
 make check                 # validación: deriva de energía, solapamientos y escapes (visualization/check.py)
 make una-particula         # N = 1: sin choques sólo se convierte si el parámetro de impacto es < 3r (ítem 2.4.a)
 make oscilador             # sistema 1: los 4 esquemas y los 9 dt
-make oscilador-figuras     # E(t) del oscilador y ECM vs dt (las dos figuras del sistema 1) y la trayectoria
+make oscilador-figuras     # r(t) del oscilador y ECM vs dt (las dos figuras del sistema 1)
 make energia               # ítem 2.1.a: N = 300 sin obstáculos, barrido de dt con cuadros
 make energia-figuras       # E(t) en Joule y su error en % (los 3 dt que se leen juntos) y el error máximo vs dt con su ajuste
 make energia-densa         # verifica el dt elegido en el caso más denso (N = 700 con obstáculos)
@@ -278,13 +278,14 @@ tres décadas). Por debajo de `10⁻⁵` el archivo de trayectorias de un solo `
 pasa los 200 MB de texto y los esquemas de segundo orden ya están en el ruido
 de redondeo del doble.
 
-A la presentación van **dos figuras**. La primera es la **energía del
-oscilador contra el tiempo**, `E = ½mv² + ½kr²` en valor absoluto, con los
-cuatro esquemas y la analítica encima, para un solo paso (`dt = 5·10⁻³ s`, el
-más largo del barrido): la pidió la cátedra además del ECM. La energía no se
-conserva (el amortiguamiento la disipa como `exp(−γt/m)`), Beeman y los dos
-Verlet caen sobre la exacta y Euler predictor-corrector disipa de más: a 1 s
-le queda la mitad. La segunda es el ECM de los cuatro esquemas en doble
+A la presentación van **dos figuras**. La primera es la **posición del
+oscilador contra el tiempo**, `r(t)` de los cuatro esquemas con la analítica
+encima, para un solo paso (`dt = 5·10⁻³ s`, el más largo del barrido) y en los
+primeros 2 s: la pidió la cátedra además del ECM, y pidió la posición y no la
+energía porque lo que se estima es `r(t)` y la energía de este sistema no se
+conserva. Beeman y los dos Verlet caen sobre la exacta (como mucho 1, 1 y
+6 mm) y Euler predictor-corrector pierde amplitud: se aparta hasta 15 cm. La
+segunda es el ECM de los cuatro esquemas en doble
 logarítmica, literalmente lo que pide el enunciado del sistema 1 (*«con esta
 última figura de ECM vs dt para los 4 métodos [...] ni ninguna otra
 información»*), así que no lleva paneles de más.
@@ -359,7 +360,7 @@ vale `m v0²/2 = 0,0125 J`.
 | Script | Ítem | Qué hace |
 |---|---|---|
 | `common.py` | — | lectura de las corridas, observables (energía, `Fu`, `t90`, ECM, ajuste de `kT`), estilos `informe`/`diapositiva` y `save()` con coma decimal en los ejes |
-| `oscillator.py` | 1.1, 1.2 | `E(t)` del oscilador con los cuatro esquemas sobre la analítica para el `dt` de `--energia` (la primera figura del sistema 1), ECM contra `dt` de los cuatro esquemas, en doble logarítmica y con el exponente de `ECM = c dtᵖ` ajustado en log-log (la figura de la presentación), más `ECM/dt⁴` de los dos de cuarto orden como figura aparte; `--trayectoria dt` agrega la figura de posición contra tiempo |
+| `oscillator.py` | 1.1, 1.2 | `r(t)` del oscilador con los cuatro esquemas sobre la analítica para el `dt` de `--posicion`, en los primeros `--ventana` segundos (la primera figura del sistema 1), ECM contra `dt` de los cuatro esquemas, en doble logarítmica y con el exponente de `ECM = c dtᵖ` ajustado en log-log (la figura de la presentación), más `ECM/dt⁴` de los dos de cuarto orden como figura aparte |
 | `energy.py` | 2.1.a | `E(t)` en Joule para los `dt` de `--pasos-energia`, error relativo de la energía en % contra `t` para los `dt` de `--pasos` (los representativos, los que se leen en una misma escala, con el cero en el medio) y `eps_max` en % contra `dt` sobre el barrido entero, con la cota y el `dt` elegido marcados |
 | `bench.py` | 2.1.b | tiempo de ejecución contra `N` con el desvío entre las 10 realizaciones (dibujado; en cuatro décadas queda dentro del símbolo, y el script lo imprime por consola), una serie por archivo de tiempos, ajuste `t = c Nᵃ` punteado y sin entrada propia en la leyenda, ejes doble logarítmicos |
 | `explore.py` | 2.2 | `t90` de cada corrida desde el registro de conversiones, `resumen.csv` con `⟨t90⟩ ± σ`, cuántas realizaciones llegan y `Fu(tmax)`; figura `⟨t90⟩` contra `xo` con una curva por `N`; `--fraccion 1` hace lo mismo con `t100` |
@@ -392,9 +393,9 @@ post-proceso; tabla de parámetros en tres bloques, **fijos, variables y
 simulación**, con símbolo y valor como la del TP3, angosta para que el
 esquema del dominio sea grande; una diapositiva define la
 **conversión** y los observables. El **sistema 1 ocupa dos diapositivas**: la
-energía del oscilador contra el tiempo (la pidió la cátedra) y la figura de
-ECM contra `dt` de los cuatro esquemas, como pide el enunciado, sin nada
-más. Resultados va un bloque por ítem, cada diapositiva con **el
+posición del oscilador contra el tiempo (la pidió la cátedra: es lo que se
+estima, y la energía no se conserva) y la figura de ECM contra `dt` de los
+cuatro esquemas, como pide el enunciado, sin nada más. Resultados va un bloque por ítem, cada diapositiva con **el
 gráfico grande más dos o tres viñetas** con lo que se lee en él, y las
 conclusiones son un punteo corto, una línea por ítem, sólo con cifras que
 estén en las figuras mostradas. La última diapositiva es la **declaración de uso de agentes de IA**

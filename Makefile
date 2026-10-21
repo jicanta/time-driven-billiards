@@ -2,9 +2,9 @@
 #
 #   make build          compila el motor (engine/build/billar)
 #   make oscilador      sistema 1: integra el oscilador con los 4 esquemas y todos los dt
-#   make oscilador-figuras  E(t) del oscilador con el dt mas largo y ECM vs dt (las dos
-#                           figuras del sistema 1), la constante del error de los dos
-#                           de cuarto orden y la trayectoria
+#   make oscilador-figuras  r(t) del oscilador con el dt mas largo y ECM vs dt (las dos
+#                           figuras del sistema 1) y la constante del error de los dos
+#                           de cuarto orden
 #   make oscilador-sin-amortiguamiento  control: con gamma = 0 Beeman y Verlet dan la misma constante
 #   make velocity-verlet-variantes  por que Velocity Verlet pierde un orden: las 4 maneras
 #                           de evaluar a(t+dt) y el orden que da cada una
@@ -72,11 +72,11 @@ SLIDES   := data/figuras_diapositivas
 # segundo orden ya estan en el ruido de redondeo del doble.
 DTS_OSC  ?= 5e-3,2e-3,1e-3,5e-4,2e-4,1e-4,5e-5,2e-5,1e-5
 TF_OSC   ?= 5
-# El dt de la figura de E(t) del oscilador: el mas largo del barrido, que es
+# El dt de la figura de r(t) del oscilador: el mas largo del barrido, que es
 # donde Euler predictor-corrector se despega a ojo de la analitica. La etiqueta
 # es como la escribe oscillator.py en el nombre del archivo ({dt:.1e}).
-DT_EOSC      ?= 5e-3
-DT_EOSC_TAG  ?= 5.0e-03
+DT_POSC      ?= 5e-3
+DT_POSC_TAG  ?= 5.0e-03
 OSC      := data/oscilador
 # Control sin amortiguamiento (make oscilador-sin-amortiguamiento): cuatro dt
 # alcanzan para comparar las constantes del error de los dos esquemas.
@@ -218,8 +218,8 @@ oscilador: build
 	    --dts $(DTS_OSC) --tf $(TF_OSC) --dir $(OSC)
 
 oscilador-figuras:
-	$(PY) visualization/oscillator.py --energia $(DT_EOSC) --trayectoria 1e-3
-	$(PY) visualization/oscillator.py --energia $(DT_EOSC) --figures $(SLIDES) --estilo diapositiva
+	$(PY) visualization/oscillator.py --posicion $(DT_POSC)
+	$(PY) visualization/oscillator.py --posicion $(DT_POSC) --figures $(SLIDES) --estilo diapositiva
 
 # Por que Beeman le gana a Verlet original (diapositiva 14). Los dos son de
 # cuarto orden en el ECM y en la escala completa se superponen; la ampliacion
@@ -482,7 +482,7 @@ clean-figures:
 # el numero es el del pie de la diapositiva.
 slides-images:
 	rm -rf $(FIGS) && mkdir -p $(FIGS)
-	cp $(SLIDES)/1_oscilador/energia_vs_t_dt$(DT_EOSC_TAG).png                       $(FIGS)/slide-13-energia-oscilador-vs-t.png
+	cp $(SLIDES)/1_oscilador/posicion_vs_t_dt$(DT_POSC_TAG).png                      $(FIGS)/slide-13-posicion-oscilador-vs-t.png
 	cp $(SLIDES)/1_oscilador/ECM_vs_dt.png                                          $(FIGS)/slide-14-ECM-vs-dt.png
 	cp $(SLIDES)/2.1_paso_y_tiempos/energia_vs_t_N$(N_ENERGIA).png                  $(FIGS)/slide-15-energia-vs-t.png
 	cp $(SLIDES)/2.1_paso_y_tiempos/error_energia_vs_t_N$(N_ENERGIA).png            $(FIGS)/slide-16-error-energia-vs-t.png

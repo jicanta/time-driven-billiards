@@ -307,7 +307,7 @@ es el cambio de color de una partícula, que es parte del estado.
 | Script | Ítem | Qué hace |
 |---|---|---|
 | `common.py` | — | lectura de las corridas, observables, estilos y `save()` |
-| `oscillator.py` | 1.1, 1.2 | `E(t)` del oscilador con los cuatro esquemas, ECM contra `dt` y la trayectoria |
+| `oscillator.py` | 1.1, 1.2 | `r(t)` del oscilador con los cuatro esquemas sobre la analítica y ECM contra `dt` |
 | `energy.py` | 2.1.a | `E(t)` en Joule y su error relativo en % por `dt`, y el error máximo contra `dt` |
 | `bench.py` | 2.1.b | tiempo de ejecución contra `N` de los dos paradigmas |
 | `explore.py` | 2.2 | `⟨t90⟩` contra `xo`, una curva por `N` |
@@ -343,9 +343,10 @@ es el cambio de color de una partícula, que es parte del estado.
   (`gamma = 0`: las constantes coinciden).
 - Los `dt` en los que la medición ya es ruido de redondeo del doble y no error
   del esquema quedan fuera de la figura y del ajuste.
-- Son **dos diapositivas del sistema 1**: antes del ECM va `E(t)` del oscilador
-  en valor absoluto con `dt = 5·10⁻³ s` (los cuatro esquemas sobre la
-  analítica; la pidió la cátedra). El enunciado pedía sólo la del ECM.
+- Son **dos diapositivas del sistema 1**: antes del ECM va `r(t)` del oscilador
+  con `dt = 5·10⁻³ s` en los primeros 2 s (los cuatro esquemas sobre la
+  analítica; la pidió la cátedra: la posición, no la energía, que no se
+  conserva). El enunciado pedía sólo la del ECM.
 
 ### Ítem 2.1.a — Elección del paso temporal
 

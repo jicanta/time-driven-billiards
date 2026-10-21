@@ -1,23 +1,20 @@
-"""Sistema 1: la energia contra el tiempo y el error cuadratico medio contra
+"""Sistema 1: la posicion contra el tiempo y el error cuadratico medio contra
 el paso de integracion.
 
 Son las dos figuras del sistema 1 en la presentacion. El enunciado pedia una
-sola diapositiva, la del ECM; la catedra pidio ademas la energia del oscilador
-tal cual, en valor absoluto, a lo largo del tiempo, con los cuatro esquemas
-sobre la solucion analitica. Esa va primero (es la evolucion) y el ECM
-despues (es el escalar).
+sola diapositiva, la del ECM; la catedra pidio ademas ver la trayectoria: lo
+que se estima es la posicion r(t), asi que se grafica la posicion de los
+cuatro esquemas sobre la solucion analitica (no la energia, que en este
+sistema no se conserva y no es lo que se compara). Esa va primero (es la
+evolucion) y el ECM despues (es el escalar).
 
-La energia es E = m v^2 / 2 + k x^2 / 2 y NO se conserva: el amortiguamiento
-la disipa como exp(-gamma t / m), con ondulaciones porque la potencia
-disipada es gamma v^2 y v oscila. Se dibuja con UN solo dt (--energia, el mas
-largo del barrido): a ese paso Euler predictor-corrector pierde energia mucho
-mas rapido que la analitica (le agrega disipacion numerica) y los otros tres
-caen encima de la curva exacta, Velocity Verlet incluido: pierde un orden en
-el ECM (dt^2 en vez de dt^4), pero con ese paso son 3 mm de error en
-posicion sobre 1 m de amplitud y menos del 1 % en energia, invisible sobre
-un eje de 5000 J. Con pasos mas cortos Euler se acerca y la figura deja de
-distinguir nada, que es justamente lo que mide el ECM. Eje lineal: es el
-valor absoluto de la energia lo que se pidio ver.
+La posicion se dibuja con UN solo dt (--posicion, el mas largo del barrido) y
+en una ventana corta (--ventana): a ese paso Euler predictor-corrector pierde
+amplitud a ojo (se aparta hasta 15 cm de la analitica, con A = 1 m) y los
+otros tres caen encima de la curva exacta, Velocity Verlet incluido: pierde
+un orden en el ECM (dt^2 en vez de dt^4), pero con ese paso son 6 mm sobre
+1 m, menos que el grosor del trazo. Con pasos mas cortos Euler se acerca y la
+figura deja de distinguir nada, que es justamente lo que mide el ECM.
 
 Lee las trayectorias que escribe `billar oscillator` (una linea por paso de
 integracion) y calcula, para cada esquema y cada dt,
@@ -44,11 +41,7 @@ justamente el paso en el que Verlet se separa de Beeman en la figura.
 
     python3 visualization/oscillator.py
     python3 visualization/oscillator.py --estilo diapositiva --figures data/figuras_diapositivas
-    python3 visualization/oscillator.py --trayectoria 1e-3
-
-Con --trayectoria se agrega la figura de la posicion contra el tiempo de los
-cuatro esquemas y la solucion analitica con ese dt (figura de apoyo, fuera de
-la presentacion).
+    python3 visualization/oscillator.py --posicion 1e-3 --ventana 5
 """
 
 from __future__ import annotations
@@ -125,81 +118,50 @@ def write_csv(schemes: dict, path: Path) -> None:
                 writer.writerow([name, step, count, error])
 
 
-def trajectory_figure(root: Path, parameters: dict, step: float, out_dir: Path) -> Path:
+def position_figure(root: Path, parameters: dict, step: float, window: float, out_dir: Path):
+    """r(t) de los cuatro esquemas con el paso `step` sobre la analitica, en
+    los primeros `window` segundos. Devuelve (ruta, {esquema: max |r - r_an|})."""
     figure, axes = plt.subplots()
     reference = None
+    worst = {}
     for name in common.SCHEMES:
         path = root / name / f"dt{step:.1e}.txt"
         if not path.exists():
             continue
         t, x, _ = common.read_trajectory(path)
+        shown = t <= window
         color, _ = common.SCHEME_STYLE[name]
-        axes.plot(t, x, color=color, linewidth=1.4, label=common.SCHEME_LABEL[name])
-        reference = t
+        axes.plot(t[shown], x[shown], color=color, linewidth=1.8, label=common.SCHEME_LABEL[name])
+        reference = t[shown]
+        worst[name] = float(np.abs(x - common.analytic_position(parameters, t)).max())
     if reference is not None:
+        # La analitica punteada y encima de todas: donde un esquema la sigue,
+        # se ve la raya sobre su curva; donde no, queda el hueco.
         axes.plot(reference, common.analytic_position(parameters, reference), color="#111111",
-                  linestyle="--", linewidth=1.2, label="analítica")
+                  linestyle="--", linewidth=1.4, label="analítica", zorder=3)
     axes.set_xlabel(common.AXIS_TIME)
     axes.set_ylabel(common.AXIS_POSITION)
-    axes.legend(loc="upper right", ncol=2)
+    axes.set_xlim(0.0, window)
+    # La amplitud decae: despues del primer pico la mitad de arriba queda
+    # libre y ahi entra la leyenda, en tres columnas para que sea baja.
+    common.headroom(axes, 0.28)
+    axes.legend(loc="upper right", ncol=3, columnspacing=1.0)
     out = out_dir / f"posicion_vs_t_dt{step:.1e}.png"
     common.save(figure, out)
     plt.close(figure)
-    return out
-
-
-def energy_figure(root: Path, parameters: dict, step: float, out_dir: Path):
-    """E(t) de los cuatro esquemas con el paso `step`, sobre la analitica.
-    Devuelve (ruta, {esquema: E / E_analitica en t = 1 s},
-    {esquema: max |E - E_analitica| / E_analitica}, E0)."""
-    figure, axes = plt.subplots()
-    reference = None
-    ratio_at_one = {}
-    worst = {}
-    initial = None
-    for name in common.SCHEMES:
-        path = root / name / f"dt{step:.1e}.txt"
-        if not path.exists():
-            continue
-        t, x, v = common.read_trajectory(path)
-        energy = common.oscillator_energy(parameters, x, v)
-        color, _ = common.SCHEME_STYLE[name]
-        axes.plot(t, energy, color=color, linewidth=1.8, label=common.SCHEME_LABEL[name])
-        reference = t
-        initial = float(energy[0])
-        exact = common.oscillator_energy(parameters, common.analytic_position(parameters, t),
-                                         common.analytic_velocity(parameters, t))
-        one = int(np.searchsorted(t, 1.0))
-        ratio_at_one[name] = float(energy[one] / exact[one])
-        worst[name] = float(np.abs(energy / exact - 1.0).max())
-    if reference is not None:
-        exact = common.oscillator_energy(parameters, common.analytic_position(parameters, reference),
-                                         common.analytic_velocity(parameters, reference))
-        # La analitica punteada y encima de todas: donde un esquema la sigue,
-        # se ve la raya sobre su curva; donde no, queda el hueco.
-        axes.plot(reference, exact, color="#111111", linestyle="--", linewidth=1.4,
-                  label="analítica", zorder=3)
-    axes.set_xlabel(common.AXIS_TIME)
-    axes.set_ylabel(common.AXIS_ENERGY)
-    axes.set_xlim(0.0, float(reference[-1]))
-    axes.set_ylim(bottom=0.0)
-    # La energia cae desde la esquina superior izquierda: la derecha queda libre.
-    axes.legend(loc="upper right")
-    out = out_dir / f"energia_vs_t_dt{step:.1e}.png"
-    common.save(figure, out)
-    plt.close(figure)
-    return out, ratio_at_one, worst, initial
+    return out, worst
 
 
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--oscilador", type=Path, default=common.OSCILLATOR)
-    parser.add_argument("--energia", type=float, default=5e-3,
-                        help="dt de la figura de energia contra tiempo (el mas largo del "
+    parser.add_argument("--posicion", type=float, default=5e-3,
+                        help="dt de la figura de posicion contra tiempo (el mas largo del "
                              "barrido: es donde los esquemas se distinguen a ojo)")
-    parser.add_argument("--trayectoria", type=float, default=0.0,
-                        help="dt de la figura de posicion contra tiempo (0 = no hacerla)")
+    parser.add_argument("--ventana", type=float, default=2.0,
+                        help="hasta que instante (s) se dibuja la posicion: con los 5 s "
+                             "enteros las oscilaciones se amontonan")
     common.add_common_arguments(parser)
     arguments = parser.parse_args()
     common.use_style(arguments.estilo)
@@ -208,9 +170,9 @@ def main() -> None:
     out_dir = common.folder("1", arguments.figures)
     write_csv(schemes, arguments.oscilador / "ecm.csv")
 
-    # Primera figura: la energia contra el tiempo con el dt de --energia.
-    energy_out, ratio_at_one, worst, initial = energy_figure(arguments.oscilador, parameters,
-                                                             arguments.energia, out_dir)
+    # Primera figura: la posicion contra el tiempo con el dt de --posicion.
+    position_out, worst = position_figure(arguments.oscilador, parameters, arguments.posicion,
+                                          arguments.ventana, out_dir)
 
     # Segunda figura: ECM contra dt de los cuatro esquemas en doble
     # logaritmica, un solo panel, que es lo que pide el enunciado del sistema 1
@@ -290,13 +252,11 @@ def main() -> None:
     print(f"m = {parameters['m']:g} kg, k = {parameters['k']:g} N/m, "
           f"gamma = {parameters['gamma']:g} kg/s, A = {parameters['A']:g} m, "
           f"tf = {parameters['tf']:g} s, w = {common.angular_frequency(parameters):.4f} rad/s")
-    print(f"energía contra el tiempo con dt = {arguments.energia:g} s: E0 = {initial:.1f} J, "
-          f"decae como exp(-t / {parameters['m'] / parameters['gamma']:.2f} s); en t = 1 s cada "
-          "esquema tiene, respecto de la analítica, "
-          + ", ".join(f"{common.SCHEME_LABEL[n]} {100 * (r - 1):+.1f} %" for n, r in ratio_at_one.items()))
-    print("  apartamiento máximo de la energía respecto de la analítica en toda la corrida: "
-          + ", ".join(f"{common.SCHEME_LABEL[n]} {100 * w:.2f} %" for n, w in worst.items())
-          + " (Velocity Verlet pierde un orden en el ECM pero en energía no se distingue de "
+    print(f"posición contra el tiempo con dt = {arguments.posicion:g} s (se dibujan los primeros "
+          f"{arguments.ventana:g} s de {parameters['tf']:g}); apartamiento máximo de la analítica "
+          f"en toda la corrida: "
+          + ", ".join(f"{common.SCHEME_LABEL[n]} {1000 * w:.1f} mm" for n, w in worst.items())
+          + " (Velocity Verlet pierde un orden en el ECM, pero en posición no se distingue de "
             "Verlet original en esta escala)")
     print(f"{'dt (s)':>10}" + "".join(f"{common.SCHEME_LABEL[n]:>28}" for n in schemes))
     every = sorted({s for series in schemes.values() for s in series["dt"]}, reverse=True)
@@ -333,14 +293,11 @@ def main() -> None:
     best = max(wins, key=lambda name: wins[name])
     print(f"menor ECM: {common.SCHEME_LABEL[best]} en {wins[best]} de "
           f"{len(schemes[best]['ecm'])} pasos del barrido")
-    print(energy_out)
+    print(position_out)
     print(out)
     if zoom is not None:
         print(zoom)
     print(arguments.oscilador / "ecm.csv")
-
-    if arguments.trayectoria > 0:
-        print(trajectory_figure(arguments.oscilador, parameters, arguments.trayectoria, out_dir))
 
 
 if __name__ == "__main__":

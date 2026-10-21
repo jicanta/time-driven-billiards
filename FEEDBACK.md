@@ -88,8 +88,13 @@ entregar.
 - **En Resultados, por cada caso, el orden de la guía** (§2.4.1 a §2.4.3):
   primero la animación, después `Fu(t)` de ese caso y recién al final la
   variable contra el observable.
-- La cátedra pidió después (21/10) que el sistema 1 lleve también la energía
-  del oscilador contra el tiempo, en valor absoluto: son dos diapositivas.
+- La cátedra pidió después (21/10) que el sistema 1 lleve también la
+  evolución del oscilador contra el tiempo: son dos diapositivas. Y por mail
+  (22/10) precisó que sea la **posición**, no la energía: "¿por qué graficar
+  la energía, si no se conserva? Lo que querés estimar es la posición".
+  También que la fórmula de Maxwell-Boltzmann va en la presentación, porque
+  es un observable, y que la comparación que pide el enunciado es `kBT`
+  contra `m v0²/2`; lo demás queda a criterio según el tiempo.
 - El enunciado pedía una sola diapositiva para el sistema 1, la de ECM contra
   dt de los cuatro esquemas ("no mostrar animaciones, ni introducción, ni
   ninguna otra información"): esa sigue siendo la única con el ECM, y la de
