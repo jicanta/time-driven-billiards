@@ -448,11 +448,12 @@
         \item Conservativo: $E$ tiene que quedarse en
               $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$; lo que se aparta
               es \textbf{error del esquema}.
-        \item $\SI{5e-4}{\second}$ \textbf{sube} a \SI{3.85}{\joule} y
-              $\SI{2e-4}{\second}$ \textbf{baja}; $\SI{1e-4}{\second}$ y
-              \alert{$\SI{5e-5}{\second}$} no se despegan de $E_0$.
-        \item Son 4 de los 7 $\dt$: $\SI{1e-3}{\second}$ llega a \SI{45}{\joule}
-              (el choque dura $\tau = \SI{3.5}{\milli\second}$: entran tres pasos);
+        \item $\SI{2e-4}{\second}$ \textbf{baja} hasta \SI{3.73}{\joule};
+              $\SI{1e-4}{\second}$ y \alert{$\SI{5e-5}{\second}$} no se despegan
+              de $E_0$.
+        \item Son 3 de los 7 $\dt$: $\SI{5e-4}{\second}$ sube a \SI{3.85}{\joule} y
+              $\SI{1e-3}{\second}$ a \SI{45}{\joule} (el choque dura
+              $\tau = \SI{3.5}{\milli\second}$: entran tres pasos), fuera de escala;
               $\SI{2e-5}{\second}$ y $\SI{1e-5}{\second}$ caen sobre la del elegido.
         \cond{$N = 300$, sin obstáculos, $t_f = \SI{5}{\second}$, estado cada \SI{0.01}{\second}}
     }
@@ -460,11 +461,11 @@
 
 \begin{frame}{Error de la energía contra el tiempo}
     \figbulw[0.35em]{slide-15-error-energia-vs-t.png}{%
-        \item Las mismas curvas como \textbf{error relativo porcentual}
-              $\varepsilon(t)$, sin la de $\SI{5e-4}{\second}$: la escala alcanza
-              para separar las tres que quedan sobre $E_0$.
+        \item Las mismas tres curvas como \textbf{error relativo porcentual}
+              $\varepsilon(t)$. La escala marca la \textbf{cota} del
+              \SI{0.1}{\percent} con la que se elige el paso.
         \item $\SI{2e-4}{\second}$ se va al \SI{-0.6}{\percent} y
-              $\SI{1e-4}{\second}$ al \SI{0.1}{\percent};
+              $\SI{1e-4}{\second}$ roza la cota (\SI{0.1}{\percent});
               \alert{$\SI{5e-5}{\second}$ se queda en el \SI{0.04}{\percent}}.
         \item El error no crece sin parar: cada curva \textbf{deriva y se
               estabiliza}. Por eso el escalar que resume la corrida es el máximo,
@@ -569,9 +570,9 @@
     \figbulw[0.3em]{slide-24-v-medio-vs-t.png}{%
         \item Un escalar por instante: $\langle |\vv| \rangle$ de la bolsa de ese
               instante, banda $\pm 1$ desvío entre realizaciones.
-        \item Baja desde $v_0$ mientras $f(v)$ se ensancha a $E$ constante;
-              \alert{desde \SI{0.4}{\second} ya es estacionario}. La
-              \textbf{gran bolsa} toma $t \geq \SI{10}{\second}$, con margen.
+        \item Arranca en $v_0$ y baja mientras $f(v)$ se ensancha a $E$ constante;
+              \alert{desde \SI{0.4}{\second} ya es estacionario} y sigue plano
+              hasta los \SI{30}{\second}.
         \item Verificación: con el $k_BT$ ajustado, Maxwell-Boltzmann da
               $\langle |\vv| \rangle = \sqrt{\pi k_BT / 2m} = \SI{0.883}{\meter\per\second}$;
               medido, $0{,}881$.

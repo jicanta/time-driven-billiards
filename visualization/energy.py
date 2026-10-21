@@ -10,20 +10,20 @@ esquema de integracion (Teorica 4, diapositiva 35). El motor no la calcula:
 sale de los estados guardados en dynamic.txt, con las mismas xi del enunciado
 (pares de particulas, obstaculos y la particula imagen de la pared).
 
-Van dos figuras contra el tiempo. La primera es la EVOLUCION DEL SISTEMA, la
-energia total en Joule tal como la pide el enunciado, con el dt que se despega
-hacia arriba (5*10^-4 s, +2,6 %), el que se despega hacia abajo (2*10^-4 s) y
-los dos que se quedan sobre E0 (10^-4 y 5*10^-5 s). La segunda es su **error
-relativo en porcentaje**
+Van dos figuras contra el tiempo, con los MISMOS tres dt (2*10^-4, 10^-4 y
+5*10^-5 s): el que se despega hacia abajo, el que roza la cota y el elegido.
+La primera es la EVOLUCION DEL SISTEMA, la energia total en Joule tal como la
+pide el enunciado. La segunda es su **error relativo en porcentaje**
 
     eps(t) = 100 (E(t) - E_0) / E_0,
 
 que es lo que se decide: "me quedo con este paso porque el error es menor que
 tanto por ciento". En Joule hay que leer la separacion contra la recta de E0 y
 dividir mentalmente; en porcentaje el numero del eje ya es el numero de la
-frase, y el cero -- la conservacion exacta -- queda en el medio. La del error
-deja afuera el 5*10^-4 s, que ya se vio despegarse en la primera, y asi la
-escala alcanza para distinguir 10^-4 s (0,1 %) del elegido (0,04 %).
+frase, y el cero -- la conservacion exacta -- queda en el medio; la cota con la
+que se elige el paso va marcada en la escala del eje, no como otra linea. Los
+dt mas largos quedan afuera de las dos (5*10^-4 s sube un 2,6 % y 10^-3 s se
+va a 45 J: aplastan a las demas) y estan en la figura de eps_max.
 
 El observable escalar que resume cada curva es el **maximo de ese error**
 
@@ -123,10 +123,10 @@ def main() -> None:
     parser.add_argument("--estable", type=float, default=0.1,
                         help="deriva por encima de la cual se considera que el paso es "
                              "inestable: queda fuera del ajuste de la ley de potencia")
-    parser.add_argument("--pasos-energia", type=str, default="5e-4,2e-4,1e-4,5e-5",
+    parser.add_argument("--pasos-energia", type=str, default="2e-4,1e-4,5e-5",
                         help="los dt (s) de la figura de E(t) en Joule, separados por coma: "
-                             "el que se despega para arriba, el que se despega para abajo "
-                             "y los dos que se quedan sobre E0")
+                             "los mismos que la del error, para que las dos figuras se lean "
+                             "una al lado de la otra")
     parser.add_argument("--pasos", type=str, default="2e-4,1e-4,5e-5",
                         help="los dt (s) que se dibujan en la figura del error eps(t), "
                              "separados por coma: los que se leen en una misma escala "
@@ -194,6 +194,17 @@ def main() -> None:
     # entra la leyenda sin tapar nada: arriba si la deriva grande es negativa,
     # abajo si es positiva.
     axes.set_ylim(-1.3 * reach, 1.3 * reach)
+    # La cota con la que se elige el paso (--cota, en %) va MARCADA EN LA
+    # ESCALA, como una marca mas del eje, y no como otra linea: con tres
+    # curvas y el cero la leyenda ya esta completa. Las demas marcas son las
+    # redondas que entran.
+    limit = 100.0 * arguments.cota
+    step = 0.2 if reach > 0.3 else 0.1
+    ticks = sorted({round(v, 6) + 0.0 for v in np.arange(-step * 10, step * 10 + 1e-9, step)
+                    if abs(v) <= 1.3 * reach} | {-limit, limit})
+    ticks = [0.0 if abs(v) < 1e-9 else v for v in ticks]
+    axes.set_yticks(ticks)
+    axes.set_yticklabels([common.decimal(v) for v in ticks])
     axes.legend(loc="upper left" if abs(lowest) > highest else "lower left", ncol=2)
     energy_figure = out_dir / f"error_energia_vs_t_N{count}.png"
     common.save(figure, energy_figure)
@@ -203,7 +214,6 @@ def main() -> None:
     # En porcentaje, la misma unidad que la figura de eps(t): la cota de la
     # linea de comandos viene en relativo y se convierte aca.
     drift = 100.0 * np.array([row["deriva"] for row in rows])
-    limit = 100.0 * arguments.cota
     chosen = float(steps[drift <= limit].max()) if (drift <= limit).any() else None
 
     stable = drift <= 100.0 * arguments.estable

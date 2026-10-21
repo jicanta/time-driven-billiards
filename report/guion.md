@@ -94,15 +94,15 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 ## 14. Conservación de la energía — `slide-14-energia-vs-t.png`
 
 - La **evolución del sistema**, tal como la pide el ítem 2.1.a: la energía total en Joule contra el tiempo para distintos Δt. E0 = N·½mv0² = 3,75 J (la línea punteada) y el sistema es conservativo: todo lo que se aparta de E0 es error del integrador.
-- Se ven cuatro Δt: 5·10⁻⁴ s **sube** (llega a 3,85 J, un 2,6 %), 2·10⁻⁴ s **baja** un poco, y 10⁻⁴ y 5·10⁻⁵ s no se despegan de E0 en esta escala. Cada Δt tiene el mismo color acá y en la figura siguiente.
-- Son 4 de los 7 Δt medidos. Δt = 10⁻³ s llega a **45 J** y aplastaría a todas contra E0: el choque dura τ = π√(μ/k) = 3,5 ms y con ese paso entran sólo tres pasos por choque, así que el resorte no se integra. 2·10⁻⁵ y 10⁻⁵ s caen encima de la del elegido. El barrido entero está en la figura de ε_máx, dos diapositivas más adelante.
+- Se ven tres Δt, los mismos de la figura siguiente y con el mismo color: 2·10⁻⁴ s **baja** hasta 3,73 J, y 10⁻⁴ y 5·10⁻⁵ s no se despegan de E0 en esta escala.
+- Son 3 de los 7 Δt medidos. 5·10⁻⁴ s sube a 3,85 J (2,6 %) y Δt = 10⁻³ s llega a **45 J**: los dos aplastarían a las demás contra E0 (el choque dura τ = π√(μ/k) = 3,5 ms y con 10⁻³ s entran sólo tres pasos por choque, así que el resorte no se integra). 2·10⁻⁵ y 10⁻⁵ s caen encima de la del elegido. El barrido entero, con esos cuatro, está en la figura de ε_máx, dos diapositivas más adelante.
 
 ## 15. Error de la energía contra el tiempo — `slide-15-error-energia-vs-t.png`
 
 - Las mismas corridas como **error relativo porcentual** ε(t) = 100·(E − E0)/E0: así el número del eje es el número de la frase con la que se elige el paso ("me quedo con éste porque el error es menor que tanto por ciento"). El cero es la conservación exacta y está en el medio.
-- Se saca la de 5·10⁻⁴ s, que ya se vio despegarse en Joule: con ella adentro la escala llegaba al 3 % y las tres de abajo quedaban pegadas al cero. Ahora se distinguen: 2·10⁻⁴ s se va al −0,6 %, 10⁻⁴ s al 0,1 % y 5·10⁻⁵ s se queda en el 0,04 %.
+- Los mismos tres Δt que la figura anterior. La **cota del 0,1 %** con la que se elige el paso está marcada en la escala del eje (las marcas ±0,1), no como otra línea: con tres curvas y el cero la leyenda ya está completa. 2·10⁻⁴ s se va al −0,6 %, 10⁻⁴ s roza la cota (0,1 %) y 5·10⁻⁵ s se queda en el 0,04 %, adentro.
 - El error no crece sin parar: cada curva deriva en el primer segundo y después se estabiliza. Por eso el escalar que resume cada corrida es el máximo, ε_máx, y no la pendiente ni el valor final.
-- Si preguntan por qué no está 10⁻³ s: llega al 1100 % y no entra en ninguna escala junto con las demás; está en la figura siguiente.
+- Si preguntan por qué no están 5·10⁻⁴ ni 10⁻³ s: el primero sube al 2,6 % y el segundo al 1100 %, y con cualquiera de los dos adentro las tres de abajo quedaban pegadas al cero; están en la figura siguiente, que es la que tiene el barrido entero.
 
 ## 16. Elección del paso: error máximo — `slide-16-error-maximo-vs-dt.png`
 
@@ -171,9 +171,9 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 
 ## 24. Rapidez media contra el tiempo — `slide-24-v-medio-vs-t.png`
 
-- Un escalar por instante: la rapidez media ⟨|v|⟩ de las 100 partículas de las 30 realizaciones (la bolsa de ese instante), con el desvío entre realizaciones como banda. El eje t es logarítmico porque el transitorio dura un segundo y la corrida 30.
-- Arranca en v0 = 1 m/s y baja mientras f(v) se ensancha: la energía no cambia (E se conserva), pero la media de |v| no es la raíz de la media de v², y cuanto más ancha es f(v) más chica queda ⟨|v|⟩. Desde 0,4 s ya está dentro de la banda del estacionario.
-- Es lo que define **desde cuándo se arma la gran bolsa** del ajuste: tomamos t ≥ 10 s, con mucho margen (la línea de trazo y punto). Entre 0,4 y 10 s también es estacionario; el margen no cuesta nada porque la corrida llega a 30 s.
+- Un escalar por instante: la rapidez media ⟨|v|⟩ de las 100 partículas de las 30 realizaciones (la bolsa de ese instante), con el desvío entre realizaciones como banda. Esa banda existe porque ⟨|v|⟩ se calcula por realización y se promedia; el histograma de la gran bolsa, en cambio, es uno solo y no tiene desvío que dibujar.
+- Arranca **exactamente en v0** en t = 0 (todas nacen con |v| = v0) y baja mientras f(v) se ensancha: la energía no cambia (E se conserva), pero la media de |v| no es la raíz de la media de v², y cuanto más ancha es f(v) más chica queda ⟨|v|⟩. En el primer cuadro guardado, 0,05 s, ya hubo choques y la media ya bajó a 0,97. Desde 0,4 s está dentro de la banda del estacionario y sigue plana hasta los 30 s (la figura muestra los primeros 2 s, que es donde pasa algo).
+- La gran bolsa del ajuste toma t ≥ 10 s: es estacionario desde mucho antes, el margen es gratis porque la corrida llega a 30 s. Va en la línea de condiciones de la diapositiva del ajuste, no dibujado acá.
 - La línea roja punteada es la verificación: Maxwell-Boltzmann en 2D con el kBT ajustado en la diapositiva 26 predice ⟨|v|⟩ = √(πkBT/2m) = 0,883 m/s, y la medida en el estacionario es 0,881 m/s (0,2 %). El ajuste usa la forma entera de f(v); esto usa un solo momento, por eso es independiente.
 - Si preguntan por qué la banda es tan ancha (±0,014 m/s) frente a lo chica que es la diferencia entre instantes: es el desvío entre realizaciones de un promedio de 100 partículas, no el error de la media.
 

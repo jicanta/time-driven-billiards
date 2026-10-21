@@ -30,10 +30,11 @@ muestras que la de un instante suelto.
 
 Antes de la bolsa del estacionario va la rapidez media contra el tiempo: un
 escalar por cuadro (la media de |v| de la bolsa de ese instante, con el desvio
-entre realizaciones como banda) que dice cuando empieza el estacionario y, por
-lo tanto, desde donde se arma la gran bolsa. Con el kT ajustado,
-Maxwell-Boltzmann predice <|v|> = sqrt(pi kT / 2m): es una verificacion
-independiente del ajuste.
+entre realizaciones como banda) que dice cuando empieza el estacionario. Esa
+banda existe porque <|v|> se calcula por realizacion y se promedia: el
+histograma de la gran bolsa, en cambio, es UNO solo y no tiene desvio que
+dibujar. Con el kT ajustado, Maxwell-Boltzmann predice <|v|> = sqrt(pi kT /
+2m): es una verificacion independiente del ajuste.
 
 La estacionaria (LA GRAN BOLSA: todos los cuadros con t >= --estacionario de
 todas las realizaciones, en un solo histograma) se ajusta con la distribucion
@@ -126,6 +127,9 @@ def main() -> None:
     parser.add_argument("--estacionario", type=float, default=20.0,
                         help="instante desde el cual se promedia para el ajuste")
     parser.add_argument("--bins", type=int, default=40)
+    parser.add_argument("--ventana", type=float, default=2.0,
+                        help="hasta que instante (s) se dibuja la rapidez media contra t: "
+                             "el transitorio dura medio segundo y despues es plano")
     common.add_common_arguments(parser)
     arguments = parser.parse_args()
     common.use_style(arguments.estilo)
@@ -192,30 +196,28 @@ def main() -> None:
 
     # Rapidez media contra el tiempo: un escalar por cuadro (la media de la
     # bolsa de ese instante, con el desvio entre realizaciones como banda) que
-    # dice CUANDO empieza el estacionario, y por lo tanto desde donde se arma
-    # la gran bolsa. Arranca en v0 y baja mientras f(v) se ensancha a energia
-    # constante (la media de |v| no es la raiz de la media de v^2). El eje t
-    # es logaritmico porque el transitorio dura un segundo y la corrida 30.
+    # dice CUANDO empieza el estacionario. Arranca EXACTAMENTE en v0 en t = 0
+    # (todas las particulas nacen con |v| = v0) y baja mientras f(v) se
+    # ensancha a energia constante (la media de |v| no es la raiz de la media
+    # de v^2). El eje t es lineal y corto (--ventana): en escala logaritmica el
+    # punto t = 0 no se puede dibujar y la curva parecia arrancar por debajo de
+    # v0, cuando lo que pasa es que en el primer cuadro guardado (0,05 s) ya
+    # hubo choques. Lo que queda fuera de la ventana es plano hasta t_max: lo
+    # dice la salida por consola.
     per_frame = speeds.mean(axis=2)                       # (M, F)
     mean_speed = per_frame.mean(axis=0)
     spread_speed = per_frame.std(axis=0, ddof=1) if runs > 1 else np.zeros_like(mean_speed)
-    shown = times > 0.0
     figure, axes = plt.subplots()
-    axes.plot(times[shown], mean_speed[shown], color=common.FRESH,
+    axes.plot(times, mean_speed, color=common.FRESH,
               label="$\\langle |\\vec{v}| \\rangle$ por instante")
-    axes.fill_between(times[shown], (mean_speed - spread_speed)[shown],
-                      (mean_speed + spread_speed)[shown], color=common.FRESH, alpha=0.15,
-                      linewidth=0)
+    axes.fill_between(times, mean_speed - spread_speed, mean_speed + spread_speed,
+                      color=common.FRESH, alpha=0.15, linewidth=0)
     axes.axhline(static["v0"], color="#555555", linestyle=":", linewidth=1.4,
                  label="$v_0$")
     # La formula sqrt(pi kT / 2m) va en la vineta; en la leyenda, el numero.
     axes.axhline(predicted_mean, color=common.USED, linestyle="--", linewidth=1.8,
                  label=f"Maxwell-Boltzmann: {common.decimal(predicted_mean, 3)} m/s")
-    axes.axvline(arguments.estacionario, color="#111111", linestyle="-.", linewidth=1.4,
-                 label=f"gran bolsa: $t \\geq$ {common.decimal(arguments.estacionario)} s")
-    axes.set_xscale("log")
-    axes.set_xticks([0.1, 1.0, 10.0])
-    axes.set_xticklabels(["0,1", "1", "10"])
+    axes.set_xlim(0.0, arguments.ventana)
     axes.set_xlabel(common.AXIS_TIME)
     axes.set_ylabel(common.AXIS_MEAN_SPEED)
     low = min(mean_speed.min(), predicted_mean)
@@ -232,7 +234,7 @@ def main() -> None:
     # se dice en la diapositiva, no escondido en un rotulo de la figura.
     figure, axes = plt.subplots()
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
-             edgecolor=common.FRESH, label="simulación: la gran bolsa")
+             edgecolor=common.FRESH, label="gran bolsa (simulación)")
     fine = np.linspace(edges[0], edges[-1], 400)
     axes.plot(fine, common.maxwell_boltzmann(fine, thermal, mass), color=common.USED,
               linewidth=2.4, label="Maxwell-Boltzmann")
