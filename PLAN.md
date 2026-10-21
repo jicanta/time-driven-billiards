@@ -394,9 +394,10 @@ es el cambio de color de una partícula, que es parte del estado.
 - `f(v)` en varios instantes desde `t = 0` y la estacionaria (todos los
   cuadros con `t ≥ 10 s` de todas las realizaciones).
 - Cada histograma es **uno solo sobre la bolsa** de `N × M` muestras (y
-  `× cuadros` en el estacionario), sin barras de error (la cátedra, 19/10):
-  el histograma de una realización sola es ruido y promediar `M` curvas
-  ruidosas tapa la forma de `f(v)`.
+  `× cuadros` en el estacionario), una sola bolsa (la cátedra, 19/10): el
+  histograma de una realización sola es ruido y promediar `M` curvas ruidosas
+  tapa la forma de `f(v)`. En los instantes va sin barras (el desvío es del
+  51 %); en la gran bolsa, con el desvío entre realizaciones (4,8 %).
 - Ajuste de `kT` por el mínimo del error cuadrático medio (Teórica 0) y
   comparación con `m ⟨v²⟩/2 = m v0²/2`.
 

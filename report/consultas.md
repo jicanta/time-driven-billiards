@@ -24,7 +24,7 @@ esquema de integración lleve su "decisión: con qué v evalúa a(t+dt)".
 | **A4** `tf = 30 s` del 2.4.a | No hace falta atenerse a las corridas del 2.1.b | Barrido propio (`make densidad`): xo = r, las densidades del mapa, 20 realizaciones, hasta convertirlas todas. Las dos curvas existen en todas las densidades y la U se ve |
 | **B3** El observable de la energía | Graficar el error en **porcentaje**, no la energía absoluta | `eps(t) = 100 (E − E0)/E0` y `eps_max` contra dt, las dos en % |
 | **B7b** Las barras de error | Desvío, no error de la media (`σ/√M` tiende a cero) | Queda el desvío estándar entre realizaciones |
-| **B7** La bolsa de `f(v)` | Un solo histograma con todas las realizaciones juntas | Bolsa de N × M muestras (y × cuadros en el estacionario), sin barras |
+| **B7** La bolsa de `f(v)` | Un solo histograma con todas las realizaciones juntas | Bolsa de N × M muestras (y × cuadros en el estacionario); en los instantes sin barras (51 %, tapan la curva), en la gran bolsa con el desvío entre realizaciones (4,8 %) |
 | **2.4.b** El mapa | Dibujar encima el xo óptimo de cada densidad | Línea negra con opacidad moderada sobre el mapa de calor |
 | **Tabla** | Sacar dt2 y tf, corchetes en los intervalos, `10^4` y no `1 × 10^4` | Hecho |
 | **Observables** | Definir `t_x` como el que cumple `Fu(t_x) = x/100` | Hecho, con t90 y t100 como los dos casos |

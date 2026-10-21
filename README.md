@@ -327,16 +327,18 @@ ensamble): `30 × 401 × 100 = 1,2·10⁶` muestras. No es el promedio de los `M
 histogramas de cada realización con su desvío como barra: con 100 partículas en
 40 intervalos, el histograma de una realización sola es ruido, y promediar `M`
 curvas ruidosas con barras del 50 % tapa la forma de `f(v)`. El desvío entre
-realizaciones se sigue midiendo y se imprime, pero no se dibuja.
+realizaciones se sigue midiendo y se imprime; en la figura de los instantes no
+se dibuja.
 
 La figura de la evolución muestra **instantes**, cada uno con su `t` exacto
 (el último cuadro guardado hace de estacionario): un `t ≥ algo` es un promedio
-sobre cuadros, no un instante. Las dos figuras llevan barra de error por
-intervalo, y es el **desvío estándar entre realizaciones**, la misma
-convención que el resto del trabajo. En un instante suelto es grande (51 % en
-promedio: cada realización reparte `N = 100` partículas en 40 intervalos) y
-por eso se dibuja más tenue que la curva; en la estacionaria, que junta todos
-los cuadros desde `t = 10 s`, baja al 4,8 %.
+sobre cuadros, no un instante. La gran bolsa lleva barra de error por
+intervalo, y es el **desvío estándar entre realizaciones** (el histograma de
+cada una por separado), la misma convención que el resto del trabajo y la
+misma dispersión que la banda de la rapidez media. En un instante suelto ese
+desvío es grande (51 % en promedio: cada realización reparte `N = 100`
+partículas en 40 intervalos) y por eso ahí no se dibuja; en la gran bolsa,
+que junta todos los cuadros desde `t = 10 s`, baja al 4,8 %.
 
 La estacionaria se ajusta con Maxwell-Boltzmann en dos dimensiones,
 `f(v) = (m v / kT) exp(−m v²/2kT)`, con `kT` como único parámetro libre y por

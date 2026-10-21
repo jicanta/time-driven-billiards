@@ -160,9 +160,12 @@ def main() -> None:
     axes.set_ylabel(common.AXIS_ENERGY)
     axes.set_xlabel(common.AXIS_TIME)
     # Simetrico alrededor de E0, que queda en el medio: la mitad que las
-    # curvas no usan es donde entra la leyenda.
+    # curvas no usan es donde entra la leyenda (arriba si el que mas se
+    # despega lo hace hacia abajo, que es el caso de 2e-4 s).
     axes.set_ylim(base - 1.3 * reach, base + 1.3 * reach)
-    axes.legend(loc="lower left", ncol=2)
+    lowest = min(float((row["E"] - row["E0"]).min()) for row in shown_energy)
+    highest = max(float((row["E"] - row["E0"]).max()) for row in shown_energy)
+    axes.legend(loc="upper left" if abs(lowest) > highest else "lower left", ncol=2)
     value_figure = out_dir / f"energia_vs_t_N{count}.png"
     common.save(figure, value_figure)
     plt.close(figure)

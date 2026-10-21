@@ -15,9 +15,13 @@ estadistica es M veces mayor y la curva se lee. Cuantas realizaciones y cuantos
 cuadros entran en la bolsa va dicho en la figura y en la diapositiva: es lo que
 hace falta para saber de donde sale.
 
-El desvio entre realizaciones se sigue midiendo y este script lo imprime (es la
-respuesta si preguntan por la dispersion), pero no se dibuja: la figura es el
-histograma de la bolsa.
+El desvio entre realizaciones se sigue midiendo (el histograma de cada
+realizacion por separado y el desvio estandar entre ellos, intervalo por
+intervalo) y este script lo imprime. En la figura de los instantes no se
+dibuja, porque es del 51 % y tapa la forma de f(v); en la gran bolsa, que
+junta todos los cuadros y lo baja al 5 %, va como barra de error con el mismo
+criterio que la banda de la rapidez media: es la misma bolsa, con la misma
+dispersion entre realizaciones.
 
 La figura de la evolucion muestra INSTANTES, cada uno con su t exacto,
 incluido el ultimo: un "t >= algo" no es un instante sino un promedio sobre
@@ -30,11 +34,9 @@ muestras que la de un instante suelto.
 
 Antes de la bolsa del estacionario va la rapidez media contra el tiempo: un
 escalar por cuadro (la media de |v| de la bolsa de ese instante, con el desvio
-entre realizaciones como banda) que dice cuando empieza el estacionario. Esa
-banda existe porque <|v|> se calcula por realizacion y se promedia: el
-histograma de la gran bolsa, en cambio, es UNO solo y no tiene desvio que
-dibujar. Con el kT ajustado, Maxwell-Boltzmann predice <|v|> = sqrt(pi kT /
-2m): es una verificacion independiente del ajuste.
+entre realizaciones como banda) que dice cuando empieza el estacionario. Con
+el kT ajustado, Maxwell-Boltzmann predice <|v|> = sqrt(pi kT / 2m): es una
+verificacion independiente del ajuste.
 
 La estacionaria (LA GRAN BOLSA: todos los cuadros con t >= --estacionario de
 todas las realizaciones, en un solo histograma) se ajusta con la distribucion
@@ -235,6 +237,13 @@ def main() -> None:
     figure, axes = plt.subplots()
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
              edgecolor=common.FRESH, label="gran bolsa (simulación)")
+    # El desvio entre realizaciones, intervalo por intervalo, con el estilo de
+    # barra comun al resto del trabajo: la misma dispersion que la banda de la
+    # rapidez media, que sale de la misma bolsa. Es chica (del 5 %: cada
+    # realizacion aporta 40 000 muestras) y asi se ve que lo es.
+    if spread is not None:
+        axes.errorbar(centers, density, yerr=spread, color=common.FRESH, zorder=2.5,
+                      label="_nolegend_", **common.ERRORBAR)
     fine = np.linspace(edges[0], edges[-1], 400)
     axes.plot(fine, common.maxwell_boltzmann(fine, thermal, mass), color=common.USED,
               linewidth=2.4, label="Maxwell-Boltzmann")
@@ -270,9 +279,9 @@ def main() -> None:
     print(f"bolsa del estacionario (t ≥ {arguments.estacionario:g} s): {runs} x {frames} "
           f"cuadros x {count} partículas = {per_pool} muestras "
           f"({per_run.shape[1]} por realización)")
-    print(f"desvío entre realizaciones (NO se dibuja; intervalos con f(v) > 10 % del "
-          f"máximo): instante suelto {relative(instant_density, instant_spread):.1%}, "
-          f"estacionaria {relative(density, spread):.1%}")
+    print(f"desvío entre realizaciones (intervalos con f(v) > 10 % del máximo): "
+          f"instante suelto {relative(instant_density, instant_spread):.1%} (no se dibuja), "
+          f"gran bolsa {relative(density, spread):.1%} (la barra de error de su figura)")
     doubling = grid[error <= 2.0 * error.min()]
     print(f"kT ajustado        = {thermal:.6f} J  (el error cuadrático medio del ajuste se "
           f"duplica en {1000 * doubling.min():.2f} y {1000 * doubling.max():.2f} mJ)")
