@@ -2,8 +2,9 @@
 #
 #   make build          compila el motor (engine/build/billar)
 #   make oscilador      sistema 1: integra el oscilador con los 4 esquemas y todos los dt
-#   make oscilador-figuras  ECM vs dt (la unica figura del sistema 1), la constante
-#                           del error de los dos de cuarto orden y la trayectoria
+#   make oscilador-figuras  E(t) del oscilador con el dt mas largo y ECM vs dt (las dos
+#                           figuras del sistema 1), la constante del error de los dos
+#                           de cuarto orden y la trayectoria
 #   make oscilador-sin-amortiguamiento  control: con gamma = 0 Beeman y Verlet dan la misma constante
 #   make velocity-verlet-variantes  por que Velocity Verlet pierde un orden: las 4 maneras
 #                           de evaluar a(t+dt) y el orden que da cada una
@@ -30,8 +31,8 @@
 #   make gifs           los mismos cuatro videos como GIF en gif/ (para embeber en la presentacion en vivo)
 #   make figuras-diapositivas  las figuras de las diapositivas (data/figuras_diapositivas);
 #                           los 4 cuadros fijos de animacion salen de make animations
-#   make slides-images      las 23 imagenes de la presentacion numeradas por diapositiva:
-#                           copia las 17 figuras y renderiza los 6 esquemas TikZ
+#   make slides-images      las 24 imagenes de la presentacion numeradas por diapositiva:
+#                           copia las 18 figuras y renderiza los 6 esquemas TikZ
 #   make slides-images-tikz renderiza a PNG los esquemas TikZ de las diapositivas (report/figuras)
 #   make documentos     compila report/presentacion.tex (la presentación, lee slides-images/)
 #   make capturas       PNG de diapositivas sueltas (la tabla de parametros) en capturas/
@@ -71,6 +72,11 @@ SLIDES   := data/figuras_diapositivas
 # segundo orden ya estan en el ruido de redondeo del doble.
 DTS_OSC  ?= 5e-3,2e-3,1e-3,5e-4,2e-4,1e-4,5e-5,2e-5,1e-5
 TF_OSC   ?= 5
+# El dt de la figura de E(t) del oscilador: el mas largo del barrido, que es
+# donde Euler predictor-corrector se despega a ojo de la analitica. La etiqueta
+# es como la escribe oscillator.py en el nombre del archivo ({dt:.1e}).
+DT_EOSC      ?= 5e-3
+DT_EOSC_TAG  ?= 5.0e-03
 OSC      := data/oscilador
 # Control sin amortiguamiento (make oscilador-sin-amortiguamiento): cuatro dt
 # alcanzan para comparar las constantes del error de los dos esquemas.
@@ -212,10 +218,10 @@ oscilador: build
 	    --dts $(DTS_OSC) --tf $(TF_OSC) --dir $(OSC)
 
 oscilador-figuras:
-	$(PY) visualization/oscillator.py --trayectoria 1e-3
-	$(PY) visualization/oscillator.py --figures $(SLIDES) --estilo diapositiva
+	$(PY) visualization/oscillator.py --energia $(DT_EOSC) --trayectoria 1e-3
+	$(PY) visualization/oscillator.py --energia $(DT_EOSC) --figures $(SLIDES) --estilo diapositiva
 
-# Por que Beeman le gana a Verlet original (diapositiva 12). Los dos son de
+# Por que Beeman le gana a Verlet original (diapositiva 14). Los dos son de
 # cuarto orden en el ECM y en la escala completa se superponen; la ampliacion
 # muestra que Verlet mide un 15 % mas de ECM con el mismo paso. Lo unico en lo
 # que difieren es con que velocidad evaluan a(t+dt), y eso solo importa si la
@@ -476,23 +482,24 @@ clean-figures:
 # el numero es el del pie de la diapositiva.
 slides-images:
 	rm -rf $(FIGS) && mkdir -p $(FIGS)
-	cp $(SLIDES)/1_oscilador/ECM_vs_dt.png                                          $(FIGS)/slide-13-ECM-vs-dt.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/energia_vs_t_N$(N_ENERGIA).png                  $(FIGS)/slide-14-energia-vs-t.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/error_energia_vs_t_N$(N_ENERGIA).png            $(FIGS)/slide-15-error-energia-vs-t.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/error_maximo_vs_dt_N$(N_ENERGIA).png            $(FIGS)/slide-16-error-maximo-vs-dt.png
-	cp $(SLIDES)/animaciones/cuadro_centro_t$(CUADRO).png                           $(FIGS)/slide-17-animacion-centro.png
-	cp $(SLIDES)/2.1_paso_y_tiempos/tiempo_total_vs_N_paradigmas_M$(REPEATS)_log.png $(FIGS)/slide-18-tiempo-ejecucion-vs-N.png
-	cp $(SLIDES)/animaciones/cuadro_optimo_t$(CUADRO).png                           $(FIGS)/slide-19-animacion-optimo.png
-	cp $(SLIDES)/animaciones/cuadro_borde_t$(CUADRO).png                            $(FIGS)/slide-20-animacion-borde.png
-	cp $(SLIDES)/2.2_obstaculos/Fu_vs_t_n100_xo_tipicos.png                         $(FIGS)/slide-21-Fu-vs-t-xo-tipicos.png
-	cp $(SLIDES)/2.2_obstaculos/t90_vs_xo_N20-100_M$(SEEDS).png                     $(FIGS)/slide-22-t90-vs-xo.png
-	cp $(SLIDES)/animaciones/cuadro_sin_obstaculos_t$(CUADRO).png                   $(FIGS)/slide-23-animacion-sin-obstaculos.png
-	cp $(SLIDES)/2.3_velocidades/v_medio_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png            $(FIGS)/slide-24-v-medio-vs-t.png
-	cp $(SLIDES)/2.3_velocidades/f_v_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png               $(FIGS)/slide-25-f-v-vs-t.png
-	cp $(SLIDES)/2.3_velocidades/f_v_gran_bolsa_ajuste_N$(N_VEL)_M$(SEEDS_VEL).png  $(FIGS)/slide-26-f-v-gran-bolsa-ajuste.png
-	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-27-E-vs-kT.png
-	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(SEEDS_DENSIDAD).png           $(FIGS)/slide-28-t90-t100-vs-densidad.png
-	cp $(SLIDES)/2.4_densidad/mapa_t90_xo_N.png                                     $(FIGS)/slide-29-mapa-t90-xo-N.png
+	cp $(SLIDES)/1_oscilador/energia_vs_t_dt$(DT_EOSC_TAG).png                       $(FIGS)/slide-13-energia-oscilador-vs-t.png
+	cp $(SLIDES)/1_oscilador/ECM_vs_dt.png                                          $(FIGS)/slide-14-ECM-vs-dt.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/energia_vs_t_N$(N_ENERGIA).png                  $(FIGS)/slide-15-energia-vs-t.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/error_energia_vs_t_N$(N_ENERGIA).png            $(FIGS)/slide-16-error-energia-vs-t.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/error_maximo_vs_dt_N$(N_ENERGIA).png            $(FIGS)/slide-17-error-maximo-vs-dt.png
+	cp $(SLIDES)/animaciones/cuadro_centro_t$(CUADRO).png                           $(FIGS)/slide-18-animacion-centro.png
+	cp $(SLIDES)/2.1_paso_y_tiempos/tiempo_total_vs_N_paradigmas_M$(REPEATS)_log.png $(FIGS)/slide-19-tiempo-ejecucion-vs-N.png
+	cp $(SLIDES)/animaciones/cuadro_optimo_t$(CUADRO).png                           $(FIGS)/slide-20-animacion-optimo.png
+	cp $(SLIDES)/animaciones/cuadro_borde_t$(CUADRO).png                            $(FIGS)/slide-21-animacion-borde.png
+	cp $(SLIDES)/2.2_obstaculos/Fu_vs_t_n100_xo_tipicos.png                         $(FIGS)/slide-22-Fu-vs-t-xo-tipicos.png
+	cp $(SLIDES)/2.2_obstaculos/t90_vs_xo_N20-100_M$(SEEDS).png                     $(FIGS)/slide-23-t90-vs-xo.png
+	cp $(SLIDES)/animaciones/cuadro_sin_obstaculos_t$(CUADRO).png                   $(FIGS)/slide-24-animacion-sin-obstaculos.png
+	cp $(SLIDES)/2.3_velocidades/v_medio_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png            $(FIGS)/slide-25-v-medio-vs-t.png
+	cp $(SLIDES)/2.3_velocidades/f_v_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png               $(FIGS)/slide-26-f-v-vs-t.png
+	cp $(SLIDES)/2.3_velocidades/f_v_gran_bolsa_ajuste_N$(N_VEL)_M$(SEEDS_VEL).png  $(FIGS)/slide-27-f-v-gran-bolsa-ajuste.png
+	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-28-E-vs-kT.png
+	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(SEEDS_DENSIDAD).png           $(FIGS)/slide-29-t90-t100-vs-densidad.png
+	cp $(SLIDES)/2.4_densidad/mapa_t90_xo_N.png                                     $(FIGS)/slide-30-mapa-t90-xo-N.png
 	$(MAKE) slides-images-tikz
 	@ls $(FIGS) | wc -l
 

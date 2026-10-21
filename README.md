@@ -70,7 +70,7 @@ make build                 # engine/build/billar
 make check                 # validación: deriva de energía, solapamientos y escapes (visualization/check.py)
 make una-particula         # N = 1: sin choques sólo se convierte si el parámetro de impacto es < 3r (ítem 2.4.a)
 make oscilador             # sistema 1: los 4 esquemas y los 9 dt
-make oscilador-figuras     # ECM vs dt (la única figura del sistema 1) y la trayectoria
+make oscilador-figuras     # E(t) del oscilador y ECM vs dt (las dos figuras del sistema 1) y la trayectoria
 make energia               # ítem 2.1.a: N = 300 sin obstáculos, barrido de dt con cuadros
 make energia-figuras       # energía vs t (los 4 dt representativos) y deriva vs dt con su ajuste
 make energia-densa         # verifica el dt elegido en el caso más denso (N = 700 con obstáculos)
@@ -90,7 +90,7 @@ make gifs                  # los mismos cuatro videos como GIF en gif/
 make oscilador-sin-amortiguamiento  # control: con gamma = 0 Beeman y Verlet dan la misma constante
 make figuras-diapositivas  # las figuras de las diapositivas (data/figuras_diapositivas/);
                            # los 4 cuadros fijos de animación salen de make animations
-make slides-images         # las 23 imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
+make slides-images         # las 24 imágenes de la presentación numeradas por diapositiva (slides-images/, versionadas)
 make todo                  # todas las simulaciones; make all es su alias
 make clean-figures         # borra data/figures/ y data/figuras_diapositivas/
 make slides-images-tikz    # sólo los esquemas TikZ de las diapositivas (report/figuras/*.tikz) renderizados a PNG
@@ -277,11 +277,16 @@ tres décadas). Por debajo de `10⁻⁵` el archivo de trayectorias de un solo `
 pasa los 200 MB de texto y los esquemas de segundo orden ya están en el ruido
 de redondeo del doble.
 
-La figura que va a la presentación es **una sola**: el ECM de los cuatro
-esquemas en doble logarítmica. Es literalmente lo que pide el enunciado del
-sistema 1 (*«solo se debe mostrar una diapositiva [...] con esta última figura
-de ECM vs dt para los 4 métodos [...] ni ninguna otra información»*), así que
-no lleva paneles de más.
+A la presentación van **dos figuras**. La primera es la **energía del
+oscilador contra el tiempo**, `E = ½mv² + ½kr²` en valor absoluto, con los
+cuatro esquemas y la analítica encima, para un solo paso (`dt = 5·10⁻³ s`, el
+más largo del barrido): la pidió la cátedra además del ECM. La energía no se
+conserva (el amortiguamiento la disipa como `exp(−γt/m)`), Beeman y los dos
+Verlet caen sobre la exacta y Euler predictor-corrector disipa de más: a 1 s
+le queda la mitad. La segunda es el ECM de los cuatro esquemas en doble
+logarítmica, literalmente lo que pide el enunciado del sistema 1 (*«con esta
+última figura de ECM vs dt para los 4 métodos [...] ni ninguna otra
+información»*), así que no lleva paneles de más.
 
 Ahí Beeman y Verlet original se superponen, porque lo que los separa no es la
 pendiente sino la **constante del error**, y una diferencia del 15 % no se ve
@@ -384,9 +389,10 @@ contenido, sólo separadores de sección; UML del motor sin archivos ni
 post-proceso; tabla de parámetros en tres bloques, **fijos, variables y
 simulación**, con símbolo y valor como la del TP3, angosta para que el
 esquema del dominio sea grande; una diapositiva define la
-**conversión** y los observables. El **sistema 1 ocupa una sola diapositiva**,
-con la figura de ECM contra `dt` de los cuatro esquemas y nada más, como pide
-el enunciado. Resultados va un bloque por ítem, cada diapositiva con **el
+**conversión** y los observables. El **sistema 1 ocupa dos diapositivas**: la
+energía del oscilador contra el tiempo (la pidió la cátedra) y la figura de
+ECM contra `dt` de los cuatro esquemas, como pide el enunciado, sin nada
+más. Resultados va un bloque por ítem, cada diapositiva con **el
 gráfico grande más dos o tres viñetas** con lo que se lee en él, y las
 conclusiones son un punteo corto, una línea por ítem, sólo con cifras que
 estén en las figuras mostradas. La última diapositiva es la **declaración de uso de agentes de IA**

@@ -1,4 +1,20 @@
-"""Sistema 1: error cuadratico medio contra el paso de integracion.
+"""Sistema 1: la energia contra el tiempo y el error cuadratico medio contra
+el paso de integracion.
+
+Son las dos figuras del sistema 1 en la presentacion. El enunciado pedia una
+sola diapositiva, la del ECM; la catedra pidio ademas la energia del oscilador
+tal cual, en valor absoluto, a lo largo del tiempo, con los cuatro esquemas
+sobre la solucion analitica. Esa va primero (es la evolucion) y el ECM
+despues (es el escalar).
+
+La energia es E = m v^2 / 2 + k x^2 / 2 y NO se conserva: el amortiguamiento
+la disipa como exp(-gamma t / m), con ondulaciones porque la potencia
+disipada es gamma v^2 y v oscila. Se dibuja con UN solo dt (--energia, el mas
+largo del barrido): a ese paso Euler predictor-corrector pierde energia mucho
+mas rapido que la analitica (le agrega disipacion numerica) y los otros tres
+caen encima de la curva exacta; con pasos mas cortos Euler se acerca y la
+figura deja de distinguir nada, que es justamente lo que mide el ECM. Eje
+lineal: es el valor absoluto de la energia lo que se pidio ver.
 
 Lee las trayectorias que escribe `billar oscillator` (una linea por paso de
 integracion) y calcula, para cada esquema y cada dt,
@@ -28,8 +44,8 @@ justamente el paso en el que Verlet se separa de Beeman en la figura.
     python3 visualization/oscillator.py --trayectoria 1e-3
 
 Con --trayectoria se agrega la figura de la posicion contra el tiempo de los
-cuatro esquemas y la solucion analitica con ese dt (figura de apoyo: en la
-presentacion el sistema 1 lleva una sola diapositiva, la del ECM).
+cuatro esquemas y la solucion analitica con ese dt (figura de apoyo, fuera de
+la presentacion).
 """
 
 from __future__ import annotations
@@ -129,10 +145,53 @@ def trajectory_figure(root: Path, parameters: dict, step: float, out_dir: Path) 
     return out
 
 
+def energy_figure(root: Path, parameters: dict, step: float, out_dir: Path):
+    """E(t) de los cuatro esquemas con el paso `step`, sobre la analitica.
+    Devuelve (ruta, {esquema: E / E_analitica en t = 1 s}, E0)."""
+    figure, axes = plt.subplots()
+    reference = None
+    ratio_at_one = {}
+    initial = None
+    for name in common.SCHEMES:
+        path = root / name / f"dt{step:.1e}.txt"
+        if not path.exists():
+            continue
+        t, x, v = common.read_trajectory(path)
+        energy = common.oscillator_energy(parameters, x, v)
+        color, _ = common.SCHEME_STYLE[name]
+        axes.plot(t, energy, color=color, linewidth=1.8, label=common.SCHEME_LABEL[name])
+        reference = t
+        initial = float(energy[0])
+        exact = common.oscillator_energy(parameters, common.analytic_position(parameters, t),
+                                         common.analytic_velocity(parameters, t))
+        one = int(np.searchsorted(t, 1.0))
+        ratio_at_one[name] = float(energy[one] / exact[one])
+    if reference is not None:
+        exact = common.oscillator_energy(parameters, common.analytic_position(parameters, reference),
+                                         common.analytic_velocity(parameters, reference))
+        # La analitica punteada y encima de todas: donde un esquema la sigue,
+        # se ve la raya sobre su curva; donde no, queda el hueco.
+        axes.plot(reference, exact, color="#111111", linestyle="--", linewidth=1.4,
+                  label="analítica", zorder=3)
+    axes.set_xlabel(common.AXIS_TIME)
+    axes.set_ylabel(common.AXIS_ENERGY)
+    axes.set_xlim(0.0, float(reference[-1]))
+    axes.set_ylim(bottom=0.0)
+    # La energia cae desde la esquina superior izquierda: la derecha queda libre.
+    axes.legend(loc="upper right")
+    out = out_dir / f"energia_vs_t_dt{step:.1e}.png"
+    common.save(figure, out)
+    plt.close(figure)
+    return out, ratio_at_one, initial
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--oscilador", type=Path, default=common.OSCILLATOR)
+    parser.add_argument("--energia", type=float, default=5e-3,
+                        help="dt de la figura de energia contra tiempo (el mas largo del "
+                             "barrido: es donde los esquemas se distinguen a ojo)")
     parser.add_argument("--trayectoria", type=float, default=0.0,
                         help="dt de la figura de posicion contra tiempo (0 = no hacerla)")
     common.add_common_arguments(parser)
@@ -143,11 +202,14 @@ def main() -> None:
     out_dir = common.folder("1", arguments.figures)
     write_csv(schemes, arguments.oscilador / "ecm.csv")
 
-    # La figura de la diapositiva es UNA sola: ECM contra dt de los cuatro
-    # esquemas en doble logaritmica, que es exactamente lo que pide el
-    # enunciado del sistema 1 ("solo se debe mostrar una diapositiva [...] con
-    # esta ultima figura de ECM vs dt para los 4 metodos [...] ni ninguna otra
-    # informacion"). Lo que distingue a Beeman de Verlet original es la
+    # Primera figura: la energia contra el tiempo con el dt de --energia.
+    energy_out, ratio_at_one, initial = energy_figure(arguments.oscilador, parameters,
+                                                      arguments.energia, out_dir)
+
+    # Segunda figura: ECM contra dt de los cuatro esquemas en doble
+    # logaritmica, un solo panel, que es lo que pide el enunciado del sistema 1
+    # ("esta ultima figura de ECM vs dt para los 4 metodos [...] ni ninguna
+    # otra informacion"). Lo que distingue a Beeman de Verlet original es la
     # constante del error, no la pendiente, y en diez ordenes de magnitud una
     # diferencia del 15 % no se ve: eso va en su propia figura (abajo), que es
     # material de analisis y no entra en la charla.
@@ -222,6 +284,10 @@ def main() -> None:
     print(f"m = {parameters['m']:g} kg, k = {parameters['k']:g} N/m, "
           f"gamma = {parameters['gamma']:g} kg/s, A = {parameters['A']:g} m, "
           f"tf = {parameters['tf']:g} s, w = {common.angular_frequency(parameters):.4f} rad/s")
+    print(f"energía contra el tiempo con dt = {arguments.energia:g} s: E0 = {initial:.1f} J, "
+          f"decae como exp(-t / {parameters['m'] / parameters['gamma']:.2f} s); en t = 1 s cada "
+          "esquema tiene, respecto de la analítica, "
+          + ", ".join(f"{common.SCHEME_LABEL[n]} {100 * (r - 1):+.1f} %" for n, r in ratio_at_one.items()))
     print(f"{'dt (s)':>10}" + "".join(f"{common.SCHEME_LABEL[n]:>28}" for n in schemes))
     every = sorted({s for series in schemes.values() for s in series["dt"]}, reverse=True)
     for step in every:
@@ -257,6 +323,7 @@ def main() -> None:
     best = max(wins, key=lambda name: wins[name])
     print(f"menor ECM: {common.SCHEME_LABEL[best]} en {wins[best]} de "
           f"{len(schemes[best]['ecm'])} pasos del barrido")
+    print(energy_out)
     print(out)
     if zoom is not None:
         print(zoom)

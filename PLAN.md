@@ -343,7 +343,9 @@ es el cambio de color de una partícula, que es parte del estado.
   (`gamma = 0`: las constantes coinciden).
 - Los `dt` en los que la medición ya es ruido de redondeo del doble y no error
   del esquema quedan fuera de la figura y del ajuste.
-- **Es la única diapositiva del sistema 1** (lo pide el enunciado).
+- Son **dos diapositivas del sistema 1**: antes del ECM va `E(t)` del oscilador
+  en valor absoluto con `dt = 5·10⁻³ s` (los cuatro esquemas sobre la
+  analítica; la pidió la cátedra). El enunciado pedía sólo la del ECM.
 
 ### Ítem 2.1.a — Elección del paso temporal
 
@@ -444,8 +446,8 @@ TP3: Introducción (sistema y parámetros), Implementación (esquema de Verlet,
 UML del motor y el bucle del paso temporal, como el bucle de eventos del TP3),
 Simulaciones (observables y casos),
 Resultados (un bloque por ítem, cada diapositiva con la figura grande y dos o
-tres viñetas) y Conclusiones (un punteo corto, una línea por ítem). La
-**única diapositiva del sistema 1** abre Resultados. Al final, la
+tres viñetas) y Conclusiones (un punteo corto, una línea por ítem). Las
+**dos diapositivas del sistema 1** abren Resultados. Al final, la
 declaración de uso de IA.
 
 ---

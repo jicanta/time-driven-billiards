@@ -88,6 +88,8 @@ entregar.
 - **En Resultados, por cada caso, el orden de la guía** (§2.4.1 a §2.4.3):
   primero la animación, después `Fu(t)` de ese caso y recién al final la
   variable contra el observable.
+- La cátedra pidió después (21/10) que el sistema 1 lleve también la energía
+  del oscilador contra el tiempo, en valor absoluto: son dos diapositivas.
 - Una sola diapositiva para el sistema 1, con la figura de ECM contra dt de
   los cuatro esquemas: lo pide el enunciado explícitamente ("no mostrar
   animaciones, ni introducción, ni ninguna otra información").

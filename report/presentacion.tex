@@ -20,9 +20,11 @@
 %   * cada diapositiva de figura es el grafico grande mas dos o tres vinetas
 %   * conclusiones como punteo corto, solo con cifras de las figuras mostradas
 % y el enunciado del TP4:
-%   * el sistema 1 ocupa UNA sola diapositiva, con la figura de ECM vs dt de
-%     los cuatro esquemas y nada mas: ni animaciones, ni introduccion, ni
-%     "ninguna otra informacion". Por eso la figura es un solo panel. Lo que
+%   * el sistema 1 ocupa DOS diapositivas: la energia del oscilador contra el
+%     tiempo (en valor absoluto, los cuatro esquemas sobre la analitica, que
+%     la pidio la catedra) y la figura de ECM vs dt de los cuatro esquemas,
+%     que es la que pide el enunciado, sin animaciones ni introduccion ni
+%     "ninguna otra informacion". Por eso la del ECM es un solo panel. Lo que
 %     separa a Beeman de Verlet original es la constante del error y no la
 %     pendiente, asi que no se ve en diez ordenes de magnitud: esa comparacion
 %     va en data/figures/1_oscilador/ECM_constante_vs_dt.png, que es material
@@ -429,8 +431,22 @@
 \section{Resultados}
 % =========================================================
 
+\begin{frame}{Sistema 1: energía contra el tiempo}
+    \figbulw[0.3em]{slide-13-energia-oscilador-vs-t.png}{%
+        \item $E = \tfrac{1}{2} m v^2 + \tfrac{1}{2} k r^2$ \textbf{no se conserva}: el
+              amortiguamiento la disipa como $e^{-\gamma t / m}$, de \SI{5018}{\joule}
+              a \SI{4}{\joule} en \SI{5}{\second}.
+        \item \textbf{Beeman}, \textbf{Verlet original} y \textbf{Velocity Verlet} caen
+              sobre la analítica (a \SI{1}{\second}, dentro del \SI{0.2}{\percent}).
+        \item \alert{Euler p-c disipa de más}: a \SI{1}{\second} le queda la
+              \textbf{mitad}. Con pasos más cortos se acerca: lo mide el ECM de la
+              diapositiva siguiente.
+        \cond{$\dt = \SI{5e-3}{\second}$, el más largo del barrido; $t_f = \SI{5}{\second}$; $m$, $k$, $\gamma$ y $A$ de la tabla de parámetros}
+    }
+\end{frame}
+
 \begin{frame}{Sistema 1: error cuadrático medio contra el paso}
-    \figbulw[0.2em]{slide-13-ECM-vs-dt.png}{%
+    \figbulw[0.2em]{slide-14-ECM-vs-dt.png}{%
         \item \textbf{Beeman} y \textbf{Verlet original}: ECM $\propto \dt^{4}$ (pendiente
               ajustada $4{,}0$), o sea error $\propto \dt^{2}$: se superponen.
         \item \textbf{Velocity Verlet} y \textbf{Euler p-c}: ECM $\propto \dt^{2}$
@@ -444,7 +460,7 @@
 \end{frame}
 
 \begin{frame}{Conservación de la energía}
-    \figbulw[0.25em]{slide-14-energia-vs-t.png}{%
+    \figbulw[0.25em]{slide-15-energia-vs-t.png}{%
         \item Conservativo: $E$ tiene que quedarse en
               $E_0 = N\,\tfrac{1}{2} m v_0^2 = \SI{3.75}{\joule}$; lo que se aparta
               es \textbf{error del esquema}.
@@ -460,7 +476,7 @@
 \end{frame}
 
 \begin{frame}{Error de la energía contra el tiempo}
-    \figbulw[0.35em]{slide-15-error-energia-vs-t.png}{%
+    \figbulw[0.35em]{slide-16-error-energia-vs-t.png}{%
         \item Las mismas tres curvas como \textbf{error relativo porcentual}
               $\varepsilon(t)$. La escala marca la \textbf{cota} del
               \SI{0.1}{\percent} con la que se elige el paso.
@@ -475,7 +491,7 @@
 \end{frame}
 
 \begin{frame}{Elección del paso: error máximo}
-    \figbul{slide-16-error-maximo-vs-dt.png}{%
+    \figbul{slide-17-error-maximo-vs-dt.png}{%
         \item Observable escalar: $\varepsilon_{\max}(\dt)$, el error más grande de
               la corrida. Ajusta $\varepsilon_{\max} \propto \dt^{2{,}0}$.
         \item Criterio: el $\dt$ \textbf{más largo} con
@@ -489,7 +505,7 @@
 \end{frame}
 
 \begin{frame}{Obstáculos en el centro}
-    \animbul{slide-17-animacion-centro.png}{https://youtu.be/PENDIENTE-01}{%
+    \animbul{slide-18-animacion-centro.png}{https://youtu.be/PENDIENTE-01}{%
         $x_o = r = \SI{0.0175}{\meter}$, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Los dos obstáculos se tocan: forman un solo blanco de $4r$ de ancho
               en el centro del dominio.
@@ -499,7 +515,7 @@
 \end{frame}
 
 \begin{frame}{Tiempo de ejecución contra $N$}
-    \figbul{slide-18-tiempo-ejecucion-vs-N.png}{%
+    \figbul{slide-19-tiempo-ejecucion-vs-N.png}{%
         \item \textbf{Paso temporal}: \alert{$t \propto N^{0{,}88}$}; la celda de
               índice deja el costo de un paso en $O(N)$.
         \item \textbf{Eventos} (TP3): \alert{$t \propto N^{3{,}52}$}: cada choque
@@ -511,7 +527,7 @@
 \end{frame}
 
 \begin{frame}{Obstáculos en la posición óptima}
-    \animbul{slide-19-animacion-optimo.png}{https://youtu.be/PENDIENTE-02}{%
+    \animbul{slide-20-animacion-optimo.png}{https://youtu.be/PENDIENTE-02}{%
         $x_o = \SI{0.20}{\meter}$, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Separados, cada obstáculo barre su propia zona y ninguno queda a la
               sombra del otro.
@@ -521,7 +537,7 @@
 \end{frame}
 
 \begin{frame}{Obstáculos en el borde}
-    \animbul{slide-20-animacion-borde.png}{https://youtu.be/PENDIENTE-03}{%
+    \animbul{slide-21-animacion-borde.png}{https://youtu.be/PENDIENTE-03}{%
         $x_o = R - r = \SI{0.4925}{\meter}$, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Pegados a la pared, los obstáculos quedan fuera del camino de casi
               todas las trayectorias.
@@ -530,7 +546,7 @@
 \end{frame}
 
 \begin{frame}{Fracción de usadas: los tres $x_o$ típicos}
-    \figbul{slide-21-Fu-vs-t-xo-tipicos.png}{%
+    \figbul{slide-22-Fu-vs-t-xo-tipicos.png}{%
         \item Misma forma, corrida en el tiempo: el \alert{óptimo} llega a $0{,}9$ en
               \SI{14.8}{\second}, el centro en \SI{26.5}{\second} y el borde en
               \SI{31.2}{\second}.
@@ -543,7 +559,7 @@
 \end{frame}
 
 \begin{frame}{$\mtnov$ contra la posición de los obstáculos}
-    \figbul{slide-22-t90-vs-xo.png}{%
+    \figbul{slide-23-t90-vs-xo.png}{%
         \item \alert{Sí hay posición óptima}: $\mtnov$ cae de \SI{26.5}{\second}
               en $x_o = r$ a \SI{14.8}{\second} en \SI{0.20}{\meter} y sube a
               \SI{31.2}{\second} contra la pared.
@@ -557,7 +573,7 @@
 \end{frame}
 
 \begin{frame}{Sin obstáculos}
-    \animbul{slide-23-animacion-sin-obstaculos.png}{https://youtu.be/PENDIENTE-04}{%
+    \animbul{slide-24-animacion-sin-obstaculos.png}{https://youtu.be/PENDIENTE-04}{%
         sin obstáculos, $N = 100$, congelada en $t = \SI{10}{\second}$}{%
         \item Sin conversión: todas quedan frescas. Es el sistema con el que se eligió
               el paso y el de la distribución de velocidades.
@@ -567,7 +583,7 @@
 \end{frame}
 
 \begin{frame}{Rapidez media contra el tiempo}
-    \figbulw[0.3em]{slide-24-v-medio-vs-t.png}{%
+    \figbulw[0.3em]{slide-25-v-medio-vs-t.png}{%
         \item Un escalar por instante: $\langle |\vv| \rangle$ de la bolsa de ese
               instante, banda $\pm 1$ desvío entre realizaciones.
         \item Arranca en $v_0$ y baja mientras $f(v)$ se ensancha a $E$ constante;
@@ -581,7 +597,7 @@
 \end{frame}
 
 \begin{frame}{Distribución del módulo de la velocidad}
-    \figbulw[0.45em]{slide-25-f-v-vs-t.png}{%
+    \figbulw[0.45em]{slide-26-f-v-vs-t.png}{%
         \item En $t = 0$ todas tienen $|\vv| = v_0$: $f(v)$ es una \textbf{delta}
               que se sale de la figura.
         \item A los \SI{0.15}{\second} el pico ya cayó a un tercio y apareció la cola;
@@ -595,7 +611,7 @@
 \end{frame}
 
 \begin{frame}{La gran bolsa: ajuste de Maxwell-Boltzmann}
-    \figbulw[0.45em]{slide-26-f-v-gran-bolsa-ajuste.png}{%
+    \figbulw[0.45em]{slide-27-f-v-gran-bolsa-ajuste.png}{%
         \item \textbf{Un solo histograma} con todos los $|\vv|$ del estacionario de
               todas las realizaciones, barra $\pm 1$ desvío entre ellas; ajustado con
               $f(v) = (m v / k_BT)\,e^{-m v^2 / 2 k_BT}$ y $k_BT$ como
@@ -609,7 +625,7 @@
 \end{frame}
 
 \begin{frame}{Error cuadrático medio del ajuste}
-    \figbul{slide-27-E-vs-kT.png}{%
+    \figbul{slide-28-E-vs-kT.png}{%
         \item Método de la Teórica 0: se recorre $k_BT$ en una grilla y se toma el
               \textbf{mínimo} del error cuadrático medio $E(k_BT)$.
         \item El \textbf{ancho del mínimo es el error del ajuste}: $E$ se duplica
@@ -621,7 +637,7 @@
 \end{frame}
 
 \begin{frame}{Efecto de la densidad}
-    \figbulw[0.3em]{slide-28-t90-t100-vs-densidad.png}{%
+    \figbulw[0.3em]{slide-29-t90-t100-vs-densidad.png}{%
         \item \alert{Hay densidad óptima}: $\mtnov$ baja de \SI{66}{\second}
               ($\rho = 6$) a \SI{21.8}{\second} en $\rho = 86$, y vuelve a
               \SI{54.3}{\second} en $\rho = 367$.
@@ -635,7 +651,7 @@
 \end{frame}
 
 \begin{frame}{Posición óptima para cada densidad}
-    \figbulw[0.2em]{slide-29-mapa-t90-xo-N.png}{%
+    \figbulw[0.2em]{slide-30-mapa-t90-xo-N.png}{%
         \item Rojo es más rápido; la \textbf{línea negra} une la celda más rápida
               de cada densidad.
         \item \alert{De $N = 20$ a $300$ el mínimo queda entre $0{,}175$ y

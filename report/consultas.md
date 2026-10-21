@@ -20,7 +20,7 @@ esquema de integración lleve su "decisión: con qué v evalúa a(t+dt)".
 | Consulta | Qué contestaron | Qué se hizo |
 |---|---|---|
 | **A1** Velocity Verlet | Está bien evaluar con la velocidad de medio paso | Queda como estaba; la decisión va escrita al lado de las ecuaciones de cada esquema |
-| **A2** El exponente del ajuste | Si se dibuja la recta de regresión, hay que decir la pendiente | `t ∝ N^0,88` y `N^3,52`, escritos en las viñetas de la diapositiva 17 |
+| **A2** El exponente del ajuste | Si se dibuja la recta de regresión, hay que decir la pendiente | `t ∝ N^0,88` y `N^3,52`, escritos en las viñetas de la diapositiva 19 |
 | **A4** `tf = 30 s` del 2.4.a | No hace falta atenerse a las corridas del 2.1.b | Barrido propio (`make densidad`): xo = r, las densidades del mapa, 20 realizaciones, hasta convertirlas todas. Las dos curvas existen en todas las densidades y la U se ve |
 | **B3** El observable de la energía | Graficar el error en **porcentaje**, no la energía absoluta | `eps(t) = 100 (E − E0)/E0` y `eps_max` contra dt, las dos en % |
 | **B7b** Las barras de error | Desvío, no error de la media (`σ/√M` tiende a cero) | Queda el desvío estándar entre realizaciones |
@@ -28,6 +28,10 @@ esquema de integración lleve su "decisión: con qué v evalúa a(t+dt)".
 | **2.4.b** El mapa | Dibujar encima el xo óptimo de cada densidad | Línea negra con opacidad moderada sobre el mapa de calor |
 | **Tabla** | Sacar dt2 y tf, corchetes en los intervalos, `10^4` y no `1 × 10^4` | Hecho |
 | **Observables** | Definir `t_x` como el que cumple `Fu(t_x) = x/100` | Hecho, con t90 y t100 como los dos casos |
+
+Después (21/10) pidieron además, para el sistema 1, la **energía del oscilador
+contra el tiempo en valor absoluto**, no sólo el ECM: es la diapositiva 13, con
+los cuatro esquemas sobre la analítica y `dt = 5·10⁻³ s`.
 
 Lo que sigue abajo queda como registro de lo que se preguntó y de lo que se
 contesta si vuelven sobre el tema en la defensa.
@@ -176,9 +180,9 @@ Sacarla ahorra una diapositiva y ayuda con los 13 minutos.
 ### B4. La figura de energía muestra 3 de los 7 `Δt` medidos — ACTUALIZADO el 20/10: son dos figuras
 
 Hoy van dos diapositivas: la **evolución del sistema**, `E(t)` en Joule con
-4 `Δt` (`5·10⁻⁴`, `2·10⁻⁴`, `10⁻⁴` y `5·10⁻⁵ s`, diapositiva 14), que es lo que
+4 `Δt` (`5·10⁻⁴`, `2·10⁻⁴`, `10⁻⁴` y `5·10⁻⁵ s`, diapositiva 15), que es lo que
 pide el ítem 2.1.a textual, y el **error** `ε(t)` en porcentaje con 3 (sin el
-`5·10⁻⁴ s`, que ya se vio despegarse en Joule; diapositiva 15). Lo de abajo es
+`5·10⁻⁴ s`, que ya se vio despegarse en Joule; diapositiva 16). Lo de abajo es
 lo que se preguntó.
 
 

@@ -301,6 +301,21 @@ def analytic_position(parameters: dict, t: np.ndarray) -> np.ndarray:
     return amplitude * np.exp(-gamma * t / (2.0 * m)) * np.cos(angular_frequency(parameters) * t)
 
 
+def analytic_velocity(parameters: dict, t: np.ndarray) -> np.ndarray:
+    """Derivada exacta de analytic_position."""
+    m, gamma, amplitude = parameters["m"], parameters["gamma"], parameters["A"]
+    omega = angular_frequency(parameters)
+    decay = np.exp(-gamma * t / (2.0 * m))
+    return amplitude * decay * (-gamma / (2.0 * m) * np.cos(omega * t) - omega * np.sin(omega * t))
+
+
+def oscillator_energy(parameters: dict, x: np.ndarray, v: np.ndarray) -> np.ndarray:
+    """E = m v^2 / 2 + k x^2 / 2 del oscilador: la cinetica mas la del resorte.
+    El amortiguamiento la disipa, asi que no se conserva: decae como
+    exp(-gamma t / m) con ondulaciones (la potencia disipada es gamma v^2)."""
+    return 0.5 * parameters["m"] * v ** 2 + 0.5 * parameters["k"] * x ** 2
+
+
 def mean_squared_error(parameters: dict, path: Path) -> float:
     """ECM(dt): suma de las diferencias al cuadrado entre la solucion numerica
     y la analitica sobre TODOS los pasos temporales, dividida por el numero
