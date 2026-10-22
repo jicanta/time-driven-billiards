@@ -126,6 +126,9 @@ def main() -> None:
         coils[name], = axes.plot([], [], color=color, linewidth=1.6, alpha=0.9)
         masses[name], = axes.plot([], [], color=color, marker="o", markersize=16,
                                   linestyle="none")
+    # Arriba va solo el instante: el paso es el mismo con el que esta hecha la
+    # figura de r(t) que se proyecta al lado, asi que se escribe una sola vez
+    # en la diapositiva y vale para las dos.
     text = axes.text(0.0, 1.02, "", transform=axes.transAxes,
                      fontsize=plt.rcParams["font.size"], va="bottom")
 
@@ -134,8 +137,7 @@ def main() -> None:
             position = tracks[name][index]
             coils[name].set_data(*spring(WALL_X, position, lane))
             masses[name].set_data([position], [lane])
-        text.set_text(f"$t$ = {common.decimal(times[index], 2):>5} s    "
-                      f"$\\Delta t$ = ${common.scientific(arguments.paso)}$ s")
+        text.set_text(f"$t$ = {common.decimal(times[index], 2):>5} s")
         return tuple(coils.values()) + tuple(masses.values()) + (text,)
 
     common.comma_ticks(figure)
