@@ -43,7 +43,8 @@ tp-4/
 ├── docs/               # enunciado, Teórica 0 y 4, y la bibliografía de la cátedra (Gear, Heermann)
 ├── engine/             # C++17: motor regido por el paso temporal (va en el zip de entrega con animate.py y common.py)
 ├── visualization/      # Python: post-procesamiento (observables), figuras y animaciones
-├── report/             # presentacion.tex (beamer 16:9, la presentación que se entrega), comun.tex, figuras/*.tikz y guion.md; build/ ignorado
+├── report/             # presentacion.tex (beamer 16:9), comun.tex, figuras/*.tikz y guion.md; build/ ignorado
+├── presentacion/       # TP4SDS.pdf, la presentación final que se expone, y guion.md, su guion
 ├── youtube/            # titulos.md con título y descripción de cada video (los .mp4 no se versionan)
 ├── gif/                # los seis videos como GIF, para embeber en la presentación en vivo
 ├── slides-images/      # todas las imágenes de la presentación numeradas por diapositiva: figuras (las lee presentacion.tex) y esquemas TikZ renderizados
@@ -417,6 +418,14 @@ con los mismos colores (`report/comun.tex`), así que en
 diapositiva de parámetros entera, tal como queda compilada, está además en
 `capturas/` (`make capturas` la recorta del PDF).
 `report/guion.md` tiene dos o tres puntos para decir en cada diapositiva.
+
+**La presentación que se expone** es `presentacion/TP4SDS.pdf` (armada en
+Google Slides a partir de las figuras de `slides-images/` y los GIF de
+`gif/`), y su guion, ordenado por título de diapositiva, es
+`presentacion/guion.md`. La beamer de `report/` es la versión larga: tiene
+una animación por configuración, la energía en Joule, `ε_máx` contra `Δt` y
+`f(v)` por instante, figuras que en la expuesta no entraron. Los números son
+los mismos, salen de los mismos scripts.
 
 El zip de código que se entrega es el **motor de simulación** (`engine/`) más
 **el código con el que se hacen las animaciones** a partir de las salidas

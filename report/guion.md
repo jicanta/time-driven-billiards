@@ -4,6 +4,11 @@ Dos o tres puntos para decir en cada diapositiva. El número es el del pie de
 la diapositiva (el mismo con el que están numeradas las figuras en
 `slides-images/`). Las cifras son las de las figuras mostradas.
 
+Éste es el guion de la **beamer** de `report/presentacion.tex`. La
+presentación que se expone es `presentacion/TP4SDS.pdf` y su guion está en
+`presentacion/guion.md`: tiene menos diapositivas y otro orden, con los
+mismos números.
+
 ## Portada
 
 - Billar circular: dinámica molecular regida por el paso temporal, TP4 de Simulación de Sistemas.
