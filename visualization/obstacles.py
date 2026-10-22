@@ -85,9 +85,9 @@ def main() -> None:
                       fontsize=0.85 * plt.rcParams["font.size"])
     text = axes.text(0.0, 1.02, "", transform=axes.transAxes,
                      fontsize=plt.rcParams["font.size"], va="bottom")
-    # Los dos extremos del recorrido, escritos debajo de la linea: es todo lo
-    # que hay que saber para leer el barrido (arriba va solo el valor que se
-    # mueve, y el dominio no deja esquina libre para una leyenda).
+    # Los dos extremos del recorrido, escritos debajo de la linea: el rango se
+    # lee del dibujo y arriba va solo el valor que se mueve (el dominio no deja
+    # esquina libre para una leyenda).
     for position, name, align in ((radius, "$r$", "center"),
                                   (domain - radius, "$R - r$", "right")):
         axes.text(position, -0.055 * domain, name, color="#777777",
@@ -101,8 +101,7 @@ def main() -> None:
         arrow.xy = (offset, 0.0)
         label.set_position((0.5 * offset, 0.05 * domain))
         label.set_text("$x_o$")
-        text.set_text(f"$x_o$ = {common.decimal(offset, 4)} m    "
-                      f"(de $r$ a $R - r$)")
+        text.set_text(f"$x_o$ = {common.decimal(offset, 4)} m")
         return (*obstacles, arrow, label, text)
 
     common.comma_ticks(figure)
