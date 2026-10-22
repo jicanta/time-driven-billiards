@@ -60,8 +60,10 @@ def main() -> None:
     axes.set_xlim(-margin, margin)
     axes.set_ylim(-margin, margin)
     axes.set_aspect("equal")
-    axes.set_xlabel("posición $x$ (m)")
-    axes.set_ylabel("posición $y$ (m)")
+    # El simbolo con la unidad y nada mas, como en las figuras: aca el dibujo
+    # ya es el dominio y la palabra "posicion" solo come ancho de eje.
+    axes.set_xlabel("$x$ (m)")
+    axes.set_ylabel("$y$ (m)")
     axes.grid(False)
     axes.add_patch(Circle((0.0, 0.0), domain, facecolor="none", edgecolor=common.WALL,
                           linewidth=2.5, zorder=3))
