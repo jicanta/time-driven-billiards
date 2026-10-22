@@ -26,9 +26,12 @@
 #   make mapa-figuras       mapa de calor de <t90> en el plano (xo, N)
 #   make check          corrida de validacion: energia, solapamientos y escapes
 #   make una-particula  N = 1: sin choques solo se convierte si el parametro de impacto es < 3r (item 2.4.a)
-#   make animations     corridas caracteristicas, videos y cuadro fijo de cada una
+#   make animations     corridas caracteristicas, videos y cuadro fijo de cada una,
+#                           mas las dos animaciones de apoyo (make animaciones-apoyo)
+#   make animaciones-apoyo  los 4 resortes del sistema 1 oscilando a la vez (uno por esquema)
+#                           y los obstaculos recorriendo todo el rango de xo
 #   make youtube        copia los videos con nombres legibles en youtube/
-#   make gifs           los mismos cuatro videos como GIF en gif/ (para embeber en la presentacion en vivo)
+#   make gifs           los seis videos como GIF en gif/ (para embeber en la presentacion en vivo)
 #   make figuras-diapositivas  las figuras de las diapositivas (data/figuras_diapositivas);
 #                           los 4 cuadros fijos de animacion salen de make animations
 #   make slides-images      las 24 imagenes de la presentacion numeradas por diapositiva:
@@ -196,7 +199,7 @@ ZIP         := $(ENTREGA)_Codigo.zip
         energia energia-figuras energia-densa \
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
-        densidad densidad-figuras mapa mapa-figuras check una-particula animations youtube gifs figuras-diapositivas \
+        densidad densidad-figuras mapa mapa-figuras check una-particula animations animaciones-apoyo youtube gifs figuras-diapositivas \
         slides-images slides-images-tikz documentos capturas entrega clean-figures
 
 all: todo
@@ -440,6 +443,17 @@ animations: build
 	$(call ANIMAR,optimo,0.20)
 	$(call ANIMAR,borde,0.4925)
 	$(call ANIMAR,sin_obstaculos,sin)
+	$(MAKE) animaciones-apoyo
+
+# Las dos animaciones que no son corridas del billar y que van solo a la
+# charla: los cuatro resortes del sistema 1 oscilando a la vez (uno por
+# esquema, sin la analitica) y los dos obstaculos recorriendo todo el rango de
+# xo. La primera lee las trayectorias del oscilador (make oscilador); la
+# segunda es geometria y no necesita nada.
+animaciones-apoyo:
+	$(PY) visualization/springs.py --paso $(DT_POSC) --tmax $(TF_OSC) --fps $(FPS) \
+	    --estilo diapositiva
+	$(PY) visualization/obstacles.py --fps $(FPS) --estilo diapositiva
 
 youtube:
 	mkdir -p $(YOUTUBE)
@@ -459,13 +473,23 @@ youtube:
 # youtube/titulos.md.
 GIF       := gif
 GIF_WIDTH ?= 560
+# corrida : nombre del GIF : en cuantos se divide FPS. Los cuatro videos del
+# sistema 2 van a la mitad de cuadros (las particulas se siguen igual y el
+# archivo pesa la mitad); las dos animaciones de apoyo van a FPS enteros: el
+# oscilador da una vuelta cada 0,53 s y a 12 cuadros por segundo se ve a los
+# saltos, y el barrido de xo son 148 cuadros chicos.
+GIF_VIDEOS := centro:01-obstaculos-en-el-centro:2 \
+              optimo:02-obstaculos-en-la-posicion-optima:2 \
+              borde:03-obstaculos-en-el-borde:2 \
+              sin_obstaculos:04-sin-obstaculos:2 \
+              oscilador_esquemas:05-oscilador-cuatro-esquemas:1 \
+              obstaculos_xo:06-posicion-de-los-obstaculos:1
 gifs:
 	mkdir -p $(GIF)
-	@for par in centro:01-obstaculos-en-el-centro optimo:02-obstaculos-en-la-posicion-optima \
-	           borde:03-obstaculos-en-el-borde sin_obstaculos:04-sin-obstaculos; do \
-	    caso=$${par%%:*}; nombre=$${par##*:}; \
+	@for terna in $(GIF_VIDEOS); do \
+	    caso=$${terna%%:*}; resto=$${terna#*:}; nombre=$${resto%%:*}; divisor=$${resto##*:}; \
 	    ffmpeg -v error -y -i $(ANIM)/$$caso.mp4 -filter_complex \
-	        "[0:v]fps=$$(echo "$(FPS)/2" | bc -l),scale=$(GIF_WIDTH):-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=64:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
+	        "[0:v]fps=$$(echo "$(FPS)/$$divisor" | bc -l),scale=$(GIF_WIDTH):-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=64:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle" \
 	        $(GIF)/$$nombre.gif; \
 	    echo "  $(GIF)/$$nombre.gif"; \
 	done

@@ -45,7 +45,7 @@ tp-4/
 ├── visualization/      # Python: post-procesamiento (observables), figuras y animaciones
 ├── report/             # presentacion.tex (beamer 16:9, la presentación que se entrega), comun.tex, figuras/*.tikz y guion.md; build/ ignorado
 ├── youtube/            # titulos.md con título y descripción de cada video (los .mp4 no se versionan)
-├── gif/                # los mismos cuatro videos como GIF, para embeber en la presentación en vivo
+├── gif/                # los seis videos como GIF, para embeber en la presentación en vivo
 ├── slides-images/      # todas las imágenes de la presentación numeradas por diapositiva: figuras (las lee presentacion.tex) y esquemas TikZ renderizados
 └── data/               # salidas de simulación y figuras (ignoradas por git)
     ├── oscilador/      #   sistema 1: una trayectoria por esquema y por dt
@@ -85,9 +85,10 @@ make densidad              # ítem 2.4.a: barrido propio de N con xo = r, 20 rea
 make densidad-figuras      # ítem 2.4.a: ⟨t90⟩ y ⟨t100⟩ vs densidad
 make mapa                  # ítem 2.4.b: barrido (xo, N)
 make mapa-figuras          # mapa de calor de ⟨t90⟩ en el plano (xo, N)
-make animations            # corridas características, videos y cuadro fijo de cada una
+make animations            # corridas características, videos y cuadro fijo de cada una, más las de apoyo
+make animaciones-apoyo     # los 4 resortes del sistema 1 oscilando a la vez y los obstáculos recorriendo xo
 make youtube               # copia los videos con nombres legibles en youtube/
-make gifs                  # los mismos cuatro videos como GIF en gif/
+make gifs                  # los seis videos como GIF en gif/
 make oscilador-sin-amortiguamiento  # control: con gamma = 0 Beeman y Verlet dan la misma constante
 make figuras-diapositivas  # las figuras de las diapositivas (data/figuras_diapositivas/);
                            # los 4 cuadros fijos de animación salen de make animations
@@ -369,6 +370,8 @@ vale `m v0²/2 = 0,0125 J`.
 | `density.py` | 2.4.a | `⟨t90⟩` y `⟨t100⟩` contra la densidad, en dos ejes y nada más, desde el barrido propio del ítem (`make densidad`: `xo = r`, las densidades del mapa, 20 realizaciones, cada corrida hasta convertirlas todas). No usa las corridas del 2.1.b: con su `tf = 30 s` fijo la mayoría de las densidades no llega a `Fu = 0,9` y la figura no muestra ninguna densidad óptima |
 | `heatmap.py` | 2.4.b | mapa de calor de `⟨t90⟩` en el plano `(xo, N)`: eje `x` con la posición real de los obstáculos, una fila por `N` y escala de colores logarítmica (⟨t90⟩ crece más con `N` que con `xo`; en escala lineal el color lo gobierna la fila y adentro de cada una queda todo del mismo tono). Encima va el `xo` óptimo de cada densidad como una línea negra con opacidad moderada: un punto por fila, en la celda más baja de esa fila (el cuadrado más rojo). Por consola salen esa celda, el vértice de la parábola ajustada a la fila con su error (el número fino del óptimo, que va en la viñeta), qué celdas son compatibles con el mínimo y cuánto castiga la peor posición |
 | `animate.py` | — | animación (un cuadro por estado guardado, `t` y las usadas en pantalla), tira de cuadros `--snapshots` y cuadro único con el lienzo del video `--cuadro` |
+| `springs.py` | 1.1 | animación de apoyo: los cuatro resortes del sistema 1 oscilando a la vez, un carril por esquema y todos con el mismo `dt`, sin la analítica (la figura de `r(t)` ya la lleva). Es la misma trayectoria de `oscillator.py` mirada en la masa: tres esquemas se mueven como uno y Euler p-c se queda corto en cada extremo |
+| `obstacles.py` | 2.2 | animación de apoyo: los dos obstáculos recorriendo todo el rango de `xo`, de `r` (se tocan en el centro) a `R − r` (tocan la pared), con marcas en los tres `xo` de las animaciones. No es una simulación: es la geometría del barrido, y no lee ninguna corrida |
 | `single.py` | 2.4.a | `N = 1`: compara si cada realización se convierte con su parámetro de impacto inicial `b = |L|/|v|` (sin choques, `L` se conserva y sólo llega al centro si `b < 3r`) |
 | `halfstep.py` | 1.1 | prueba de la decisión de Velocity Verlet: verifica contra el motor y mide el orden que da cada una de las 4 maneras de evaluar `a(t+dt)` |
 | `check.py` | — | validación desde los estados guardados: deriva de energía, solapamiento máximo con partículas, obstáculos y pared, y escape fuera del dominio |
@@ -380,7 +383,10 @@ parámetros, y así el rótulo no se come el ancho del eje. Sólo van en palabra
 los que no tienen símbolo (el tiempo de ejecución, el ECM del ajuste). El
 nombre entra siempre en **una sola línea** (`common.fit_axis_labels()` lo
 achica hasta que entre), los números llevan coma decimal y la leyenda va
-adentro del gráfico sin tapar datos.
+adentro del gráfico sin tapar datos: donde son varias entradas largas,
+`common.legend_inside()` mide cuánto ocupa, le saca columnas o le achica la
+letra hasta que entre a lo ancho del eje y recién entonces estira el eje
+hacia arriba lo que la leyenda mide de alto.
 
 ## Presentación
 

@@ -143,9 +143,10 @@ def position_figure(root: Path, parameters: dict, step: float, window: float, ou
     axes.set_ylabel(common.AXIS_POSITION)
     axes.set_xlim(0.0, window)
     # La amplitud decae: despues del primer pico la mitad de arriba queda
-    # libre y ahi entra la leyenda, en tres columnas para que sea baja.
-    common.headroom(axes, 0.28)
-    axes.legend(loc="upper right", ncol=3, columnspacing=1.0)
+    # libre y ahi entra la leyenda, en dos columnas para que sea baja. Son
+    # cinco nombres largos: el ancho se mide y se ajusta (en tres columnas se
+    # salia del recuadro por los dos costados).
+    common.legend_inside(axes, ncol=2)
     out = out_dir / f"posicion_vs_t_dt{step:.1e}.png"
     common.save(figure, out)
     plt.close(figure)

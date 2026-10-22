@@ -318,6 +318,8 @@ es el cambio de color de una partícula, que es parte del estado.
 | `single.py` | 2.4.a | `N = 1`: conversión contra el parámetro de impacto (`make una-particula`) |
 | `halfstep.py` | 1.1 | las 4 maneras de evaluar `a(t+dt)` en Velocity Verlet y el orden de cada una (`make velocity-verlet-variantes`) |
 | `animate.py` | — | animación y cuadro fijo |
+| `springs.py` | 1.1 | animación de apoyo: los 4 resortes oscilando a la vez, uno por esquema (sin la analítica) |
+| `obstacles.py` | 2.2 | animación de apoyo: los obstáculos recorriendo todo el rango de `xo` (geometría, sin partículas) |
 | `check.py` | — | validación: deriva de energía, solapamientos y escapes |
 
 ---

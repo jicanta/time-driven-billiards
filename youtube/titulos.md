@@ -28,6 +28,14 @@ igual que acá): son para embeber en la presentación en vivo, que se proyecta
 sin links, y corren en tiempo real como el video (la mitad de los cuadros a la
 mitad de los cuadros por segundo). A YouTube se sube el `.mp4`.
 
+En `gif/` hay además dos animaciones de apoyo que **no** son videos de
+YouTube ni corridas del billar (`make animaciones-apoyo`): el `05` son los
+cuatro resortes del sistema 1 oscilando a la vez, uno por esquema y todos con
+`dt = 5·10⁻³ s`, sin la analítica (es la figura de `r(t)` mirada en la masa);
+el `06` son los dos obstáculos recorriendo todo el rango de `xo`, de `r` a
+`R − r`, que es el parámetro del barrido del ítem 2.2. Van a `FPS` enteros,
+no a la mitad: el oscilador da una vuelta cada 0,53 s.
+
 Común a todos: dominio circular de `R = 0,51 m`, `N = 100` partículas de
 `r = 0,0175 m` y `m = 0,025 kg`, `v0 = 1 m/s`, `k = 10⁴ N/m`,
 `dt = 5·10⁻⁵ s`, condición inicial al azar (semilla 7, la misma que la

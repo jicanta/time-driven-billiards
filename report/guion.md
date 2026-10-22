@@ -88,6 +88,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - Es con **un solo Δt, 5·10⁻³ s, el más largo del barrido**, y se muestran los primeros 2 s de los 5 (después las oscilaciones se amontonan y no se ve nada; la envolvente ya cayó a 0,24 m en t = 2 s). Beeman, Verlet original y Velocity Verlet caen sobre la analítica: se apartan como mucho 0,9, 1,0 y 6,4 mm sobre una amplitud de 1 m. Euler predictor-corrector se despega enseguida y **pierde amplitud**: se aparta hasta 15 cm (a 1,04 s) y a 1 s ya está 13 cm por debajo. Es el mismo error que en el ECM aparece como la curva más alta.
 - **Velocity Verlet se superpone con Verlet original y es esperado**, aunque pierda un orden por evaluar a(t + Δt) con la velocidad de medio paso. Perder un orden es cómo *escala* el error con Δt, no cuánto vale: con este paso su ECM es 40 veces el de Verlet original (1,0·10⁻⁵ contra 2,4·10⁻⁷ m²), pero eso son 6 mm contra 1 mm de apartamiento máximo sobre 1 m, menos que el grosor del trazo. Euler p-c tiene 450 veces el ECM de Velocity Verlet y por eso es el único que se ve. Los órdenes (Δt² contra Δt⁴) sólo se ven en la figura siguiente, que es logarítmica. Lo imprime `make oscilador-figuras`.
 - Con pasos más cortos Euler se acerca (con 2·10⁻³ s, 6,7 cm; con 10⁻³ s, 3 cm) y la figura ya no distingue nada: por eso el escalar que compara los esquemas es el ECM.
+- En la versión en vivo, al lado de la figura va el GIF `gif/05-oscilador-cuatro-esquemas.gif` (`make animaciones-apoyo`): las cuatro masas oscilando a la vez con este mismo Δt, una por esquema y sin la analítica. Es lo mismo que dice la figura, pero se ve en el movimiento: tres masas van juntas y la de Euler p-c se queda corta en cada extremo.
 
 ## 14. Sistema 1: error cuadrático medio contra el paso — `slide-14-ECM-vs-dt.png`
 
@@ -123,6 +124,7 @@ la diapositiva (el mismo con el que están numeradas las figuras en
 - xo = r: los dos obstáculos se tocan y forman un solo blanco de 4r de ancho en el centro.
 - Es la configuración del barrido de N y la de conversión más lenta de todo el trabajo.
 - Cuadro congelado en t = 10 s; el video completo está en el link.
+- xo es el parámetro del ítem 2.2 y va de r a R − r; en la versión en vivo, antes de las tres animaciones se puede pasar `gif/06-posicion-de-los-obstaculos.gif` (`make animaciones-apoyo`), que recorre el rango entero con los tres xo marcados: esta diapositiva es el extremo de abajo.
 
 ## 19. Tiempo de ejecución contra N — `slide-19-tiempo-ejecucion-vs-N.png`
 

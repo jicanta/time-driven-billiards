@@ -239,6 +239,40 @@ def headroom(axes, fraction: float = 0.3) -> None:
         axes.set_ylim(low, high + fraction / (1.0 - fraction) * span)
 
 
+def legend_inside(axes, ncol: int = 1, minimum: float = 11.0, margin: float = 0.06,
+                  **kwargs):
+    """Leyenda DENTRO del area de dibujo y sin tapar datos (devolucion del TP2,
+    D13), midiendo cuanto ocupa en vez de suponerlo.
+
+    Con el ancho del lienzo de las diapositivas una leyenda de varias columnas
+    se pasa del eje por los dos costados (pasaba en r(t) del oscilador: cinco
+    nombres largos en tres columnas, media leyenda afuera del recuadro). Aca se
+    prueba con `ncol` columnas y se achica la letra hasta `minimum` hasta que
+    entre a lo ancho del eje; si al llegar a `minimum` sigue sin entrar, se
+    saca una columna y se vuelve a empezar con el cuerpo original. Despues se
+    estira el eje hacia arriba justo lo que ocupa la leyenda, que es lo que la
+    deja adentro y encima de espacio vacio."""
+    figure = axes.get_figure()
+    base = float(matplotlib.rcParams["legend.fontsize"])
+    kwargs.setdefault("loc", "upper right")
+    kwargs.setdefault("columnspacing", 1.0)
+    for columns in range(max(1, ncol), 0, -1):
+        size = base
+        while True:
+            legend = axes.legend(ncol=columns, fontsize=size, **kwargs)
+            figure.canvas.draw()
+            renderer = figure.canvas.get_renderer()
+            room = axes.get_window_extent(renderer)
+            box = legend.get_window_extent(renderer)
+            fits = box.width <= (1.0 - margin) * room.width
+            if fits or size <= minimum:
+                break
+            size -= 0.5
+        if fits or columns == 1:
+            headroom(axes, min(0.6, box.height / room.height + margin))
+            return legend
+
+
 def save(figure, path) -> None:
     comma_ticks(figure)
     fit_axis_labels(figure)
