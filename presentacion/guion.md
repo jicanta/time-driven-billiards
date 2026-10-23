@@ -107,7 +107,7 @@ cierra dice las conclusiones.
 - Mismo problema, dos paradigmas, la misma computadora descargada: 10 realizaciones por N, t_f = 30 s, x_o = r.
 - **Paso temporal: t ∝ N^0,88**, casi lineal, porque siempre son 600 000 pasos y la celda de índice deja cada paso en O(N). **Eventos (TP3): t ∝ N^3,52**, porque cada choque rehace parte del calendario y los choques crecen con N. Las punteadas son esos dos ajustes.
 - **Se cruzan cerca de N = 470**: por debajo conviene eventos, por arriba conviene paso temporal. A N = 600 los eventos cuestan **2,9 veces más** (42,3 s contra 14,8 s).
-- Las barras de desvío están dibujadas pero no se ven: la figura abarca cuatro décadas y σ/⟨t⟩ es como mucho el 4 %, que en logarítmica queda adentro del marcador. **Decirlo**, porque no está escrito en la figura. Y es el desvío entre realizaciones, no el error de la media.
+- Las barras de desvío están dibujadas pero no se ven: son el **desvío estándar entre las 10 realizaciones** de cada N (la raíz de la varianza muestral, con M − 1; **no** es el error de la media, no está dividido por √10, así que no se achica por hacer más realizaciones) y valen como mucho el **4 % del tiempo medio**. En una figura que abarca cuatro décadas en logarítmica, una barra del 4 % mide menos que el marcador. **Decirlo**, porque no está escrito en la figura.
 - Si preguntan por qué el desvío es tan chico: con paso fijo todas las realizaciones de un mismo N hacen **exactamente el mismo trabajo** (600 000 pasos, el mismo barrido de celdas); lo único que cambia es la condición inicial. En eventos el trabajo sí depende de la semilla, y por eso ahí el desvío es mayor.
 
 ## Animación (17)
@@ -150,7 +150,7 @@ cierra dice las conclusiones.
 - A los **0,5 s** la curva ya cae **sobre la de 30 s**: el transitorio dura medio segundo y de ahí en adelante todas se superponen. Por eso son cuatro instantes y no más.
 - f(v) se **ensancha sin que cambie E**: el sistema es conservativo, lo que se redistribuye entre partículas es la energía, no se pierde.
 - **Si preguntan por qué se simula hasta 30 s si el estacionario llega en medio segundo**: no se espera 30 s para llegar, se usan para tener de dónde sacar estadística. El ajuste de la diapositiva siguiente se hace sobre la **gran bolsa** del tramo estacionario (t ≥ 10 s): 401 cuadros × 30 realizaciones × 100 partículas = 1,2·10⁶ muestras, y de ahí sale que el histograma salga suave y el ajuste dé ±0,9 %. Y que f(v) a los 30 s sea la misma que a los 0,5 s es **la prueba de que es estacionario** y no una deriva lenta. Con N = 100, esos 30 s son segundos de cómputo.
-- Cada curva es **un solo histograma de la bolsa** del instante —todas las partículas de todas las realizaciones juntas, como si fuera una única realización grande—, no el promedio de 30 histogramas: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y el desvío entre realizaciones en un instante suelto es del 41 %, que taparía la forma. En la gran bolsa baja al 4,8 % y ahí sí va dibujado como barra.
+- Cada curva es **un solo histograma de la bolsa** del instante —todas las partículas de todas las realizaciones juntas, como si fuera una única realización grande—, no el promedio de 30 histogramas: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y el desvío entre realizaciones en un instante suelto es del 51 %, que taparía la forma. En la gran bolsa baja al 4,8 %, y tampoco se dibuja: se dice si lo preguntan.
 
 ## Rapidez media según t — **pasarla a respaldo**
 
@@ -161,7 +161,7 @@ cierra dice las conclusiones.
 
 ## Ajuste Maxwell-Boltzmann (21)
 
-- A la derecha, la **gran bolsa**: un solo histograma con todos los |v| del estacionario (t ≥ 10 s) de todas las realizaciones, **30 realizaciones × 401 cuadros × 100 partículas = 1,2·10⁶ muestras**, 40 intervalos y área 1, **como si fuera una sola corrida grande**. Encima, Maxwell-Boltzmann en 2D con k_BT como único parámetro libre.
+- A la derecha, la **gran bolsa**: un solo histograma con todos los |v| del estacionario de todas las realizaciones. **No es un instante**: es todo el tramo de t = 10 s a 30 s, y la leyenda de la figura lo dice (t ≥ 10 s, 30 realizaciones); **30 realizaciones × 401 cuadros × 100 partículas = 1,2·10⁶ muestras**, 40 intervalos y área 1, **como si fuera una sola corrida grande**. Encima, Maxwell-Boltzmann en 2D con k_BT como único parámetro libre.
 - **Sin barra de error, a propósito**: juntar todas las realizaciones en una bolsa es la alternativa a promediar 30 histogramas y dibujar su dispersión — lo que se ve es una medición con 30 veces más muestras. Si preguntan: el desvío entre realizaciones se mide igual, 4,8 % por intervalo acá y 51 % en un instante suelto.
 - A la izquierda, cómo se ajusta, a la manera de la Teórica 0: se recorre k_BT en una grilla y se toma el **mínimo del error cuadrático medio** E(k_BT). Da **k_BT = 12,41 mJ**.
 - Cada punto azul **es un k_BT probado**: la grilla son 4001 valores entre 2,5 y 30,8 mJ, uno cada 7 µJ, y en cada uno se evalúa el error contra el histograma medido. En la figura va uno de cada 66, porque los 4001 enteros serían una banda maciza (hay casi cuatro por píxel); **decirlo**, porque no está escrito en la figura. No es una curva ajustada ni un método iterativo: es un **barrido**, y el mínimo es el menor de esos valores.
@@ -220,7 +220,7 @@ texto, para pegar:
 
 - **¿Por qué Verlet en el billar si en la figura gana Beeman?** Porque el enunciado del sistema 2 lo dice textual, y porque la ventaja de Beeman se mide en el oscilador, donde la fuerza depende de la velocidad. En el billar la fuerza es el resorte de contacto y depende **sólo de las posiciones**: medido con γ = 0, las constantes de error de los dos son iguales dentro del redondeo.
 - **¿Por qué la velocidad de Velocity Verlet es la de medio paso?** Ver la viñeta larga de "ECM vs dt". Consulta validada por la cátedra el 19/10.
-- **¿Las barras son el error de la media?** No, son el **desvío estándar entre realizaciones** en todas las figuras del trabajo.
+- **¿Las barras son el error de la media?** No, son el **desvío estándar entre realizaciones** en todas las figuras del trabajo: la raíz de la varianza muestral (con M − 1), sin dividir por √M.
 - **¿Por qué la gran bolsa junta cuadros de la misma corrida, que están correlacionados?** Porque lo que hace falta es la **forma** de f(v) en el estacionario, y el promedio temporal de un estado estacionario es el mismo promedio de ensamble. Para los escalares con error (t₉₀, tiempos de ejecución) el promedio es sobre realizaciones independientes.
 - **¿Por qué 30 s de simulación si el estacionario se alcanza en medio segundo?** Ver la viñeta de la diapositiva de f(v): los 30 s son para la estadística de la gran bolsa (1,2·10⁶ muestras) y para mostrar que a los 30 s sigue siendo la misma distribución. El corte en t ≥ 10 s es un margen conservador: el estacionario empieza en 0,4 s.
 - **¿Cuántas realizaciones hay en cada figura?** 15 en el barrido de x_o, 30 en velocidades, 20 en densidad y en el mapa, 10 en los tiempos de ejecución.
