@@ -129,12 +129,30 @@ cierra dice las conclusiones.
 - El mínimo es un **plateau ancho**, de 0,15 a 0,35 m: esos puntos empatan dentro del desvío. No es un punto, es una zona.
 - Con N = 20 la curva baja entera (menos partículas, más tiempo por partícula, pero menos bloqueo) y **el mínimo cae en el mismo lugar**: la posición óptima no depende de la frecuencia de choques.
 
-## Distribución de f(v) — rapidez media (20)
+## Distribución de f(v) (20)
+
+> **Cambiar la figura de esta diapositiva**: el ítem 2.3 pide "la distribución
+> de probabilidad del módulo de la velocidad f(v) **para distintos instantes
+> de tiempo, desde t = 0 hasta alcanzar el estado estacionario**", o sea los
+> **histogramas**. Hoy la diapositiva muestra la rapidez media contra el
+> tiempo, que es un observable de apoyo y no lo que el ítem pide. Va
+> `slides-images/slide-26-f-v-vs-t.png`, que tiene f(v) en cuatro instantes.
+> La rapidez media conviene dejarla como diapositiva de respaldo, después del
+> "Muchas gracias": contesta "¿desde cuándo es estacionario?".
+
+- **f(v) en cuatro instantes**, cada uno un histograma de la bolsa de ese instante (30 realizaciones × 100 partículas = 3000 muestras). Sistema **sin obstáculos**, N = 100.
+- En **t = 0** todas tienen |v| = v0: f(v) es una **delta** en 1 m/s que se sale de la figura (mide 11,3 s/m, que es 1 sobre el ancho del intervalo).
+- A los **0,15 s** el pico ya se derrumbó a 2,45 s/m —2,7 veces el del estacionario— y apareció la **cola de velocidades bajas**.
+- A los **0,5 s** la curva ya cae **sobre la de 30 s**: el transitorio dura medio segundo y de ahí en adelante todas se superponen. Por eso son cuatro instantes y no más.
+- f(v) se **ensancha sin que cambie E**: el sistema es conservativo, lo que se redistribuye entre partículas es la energía, no se pierde.
+- Cada curva es **un solo histograma de la bolsa** del instante, no el promedio de 30 histogramas: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y el desvío entre realizaciones en un instante suelto es del 41 %, que taparía la forma. En la gran bolsa baja al 4,8 % y ahí sí va dibujado como barra.
+
+## Rapidez media según t — **pasarla a respaldo**
 
 - Sistema **sin obstáculos**, N = 100, 30 realizaciones. Un escalar por instante: la rapidez media de la bolsa de ese instante, con el desvío entre realizaciones como banda.
 - Arranca **exactamente en v0 = 1 m/s** (todas nacen con |v| = v0) y baja hasta 0,88: la energía no cambia —el sistema es conservativo—, pero f(v) se **ensancha**, y la media de |v| no es la raíz de la media de v². Desde 0,4 s ya está en el estacionario y queda plana hasta los 30 s.
 - La punteada roja es una **verificación independiente**: Maxwell-Boltzmann en 2D con el k_BT que se ajusta en la diapositiva siguiente predice ⟨|v|⟩ = √(πk_BT/2m) = 0,883 m/s, y lo medido en el estacionario es 0,881 m/s, 0,2 % de diferencia. El ajuste usa la forma entera de f(v); esto usa un solo momento.
-- Si se agrega la figura de f(v) por instante (ver la revisión del mazo): en t = 0 es una delta en v0; a los 0,15 s el pico ya bajó a 2,45 s/m, 2,7 veces el del estacionario, y apareció la cola de velocidades bajas; desde 0,5 s las curvas ya no se distinguen entre sí.
+- Es la figura que contesta **desde cuándo es estacionario**, que es lo que hace falta para justificar la bolsa del ajuste (t ≥ 10 s). Como diapositiva de respaldo alcanza con eso.
 
 ## Ajuste Maxwell-Boltzmann (21)
 
@@ -211,7 +229,7 @@ son idénticas a las de `slides-images/`, y los tres GIF son idénticos a
 
 1. **Falta la diapositiva de uso de agentes de IA**, que el **ítem 2.5 del enunciado pide explícitamente** como diapositiva extra al final. Va después de Conclusiones; el texto está más arriba, en su sección del guion.
 2. **Orden**: "Evolución del sistema" y "ECM vs dt" están hoy **antes de Introducción**, y las dos llevan el rótulo *Resultados* arriba a la derecha. Van después del separador **Resultados**, delante de "Conservación de la energía": así Resultados sigue el orden del enunciado (sistema 1 → paso → costo → obstáculos → velocidades → densidad).
-3. **"Distribución de f(v)" (20)**: el título no es lo que muestra la figura, que es la rapidez media ⟨|v|⟩ contra el tiempo. O se cambia el título, o se agrega al lado `slides-images/slide-26-f-v-vs-t.png`, que es f(v) en tres instantes y es lo que el ítem 2.3 pide ver.
+3. **"Distribución de f(v)" (20)**: la figura es la rapidez media ⟨|v|⟩ contra el tiempo, y el ítem 2.3 pide **los histogramas de f(v) en distintos instantes, desde t = 0 hasta el estacionario**. Poner `slides-images/slide-26-f-v-vs-t.png` (f(v) en cuatro instantes) y dejar la rapidez media como diapositiva de respaldo después del "Muchas gracias", para contestar desde cuándo es estacionario.
 4. **Falta la figura con la que se elige el paso**: la conclusión 1 ("hace falta Δt = 5·10⁻⁵ s") se apoya en ε_máx contra Δt, que es `slides-images/slide-17-error-maximo-vs-dt.png` y no está en el mazo. Con la de la 15 sola se puede decir igual, pero esa figura es la evidencia directa.
 5. **"Animación" (17)**: dice `t_max = 100 s`, pero el GIF es de **20 s** de simulación (los 100 s son el t_max del barrido de x_o). Poner `t_f = 20 s`.
 6. **"t₉₀ en función de x₀" (19)**: dice `N = 100`, pero la figura tiene **N = 20 y N = 100**.

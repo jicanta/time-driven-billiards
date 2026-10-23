@@ -66,7 +66,9 @@ import common
 # Un color por instante dibujado: el arranque en negro, los intermedios y el
 # ultimo (el estacionario) en el rojo de las usadas, que es el que se compara
 # con el ajuste de la figura siguiente.
-COLORS = ["#111111", "#ff7f0e", common.USED]
+# Un color por instante dibujado, en el orden de --instantes; el ultimo es
+# siempre el estacionario y va en rojo y mas grueso.
+COLORS = ["#111111", "#ff7f0e", "#2ca02c", common.USED]
 
 
 def load(root: Path):
@@ -123,9 +125,13 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--velocidades", type=Path, default=common.SPEEDS)
-    parser.add_argument("--instantes", type=str, default="0,0.15",
+    parser.add_argument("--instantes", type=str, default="0,0.15,0.5",
                         help="instantes (s) de las distribuciones intermedias; el "
-                             "ultimo cuadro guardado se agrega siempre")
+                             "ultimo cuadro guardado (el estacionario) se agrega "
+                             "siempre. El 0,5 s esta para que se VEA llegar al "
+                             "estacionario: su curva ya cae sobre la de 30 s, que "
+                             "es lo que el item pide mostrar ('desde t = 0 hasta "
+                             "alcanzar el estado estacionario')")
     parser.add_argument("--estacionario", type=float, default=20.0,
                         help="instante desde el cual se promedia para el ajuste")
     parser.add_argument("--bins", type=int, default=40)
