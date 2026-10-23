@@ -153,9 +153,9 @@ cierra dice las conclusiones.
 
 ## Rapidez media según t — **pasarla a respaldo**
 
-- Sistema **sin obstáculos**, N = 100, 30 realizaciones. Un escalar por instante: la rapidez media de la bolsa de ese instante, con el desvío entre realizaciones como banda.
+- Sistema **sin obstáculos**, N = 100, 30 realizaciones. Un escalar por instante: la rapidez media de las 100 partículas, promediada sobre las 30 realizaciones — el **promedio de los promedios**. Una sola curva: sin banda de desvío, sin la línea de v0 y sin la de Maxwell-Boltzmann.
 - Arranca **exactamente en v0 = 1 m/s** (todas nacen con |v| = v0) y baja hasta 0,88: la energía no cambia —el sistema es conservativo—, pero f(v) se **ensancha**, y la media de |v| no es la raíz de la media de v². Desde 0,4 s ya está en el estacionario y queda plana hasta los 30 s.
-- La punteada roja es una **verificación independiente**: Maxwell-Boltzmann en 2D con el k_BT que se ajusta en la diapositiva siguiente predice ⟨|v|⟩ = √(πk_BT/2m) = 0,883 m/s, y lo medido en el estacionario es 0,881 m/s, 0,2 % de diferencia. El ajuste usa la forma entera de f(v); esto usa un solo momento.
+- **Verificación independiente, para decirla** (ya no está dibujada): Maxwell-Boltzmann en 2D con el k_BT que se ajusta en la diapositiva siguiente predice ⟨|v|⟩ = √(πk_BT/2m) = 0,883 m/s, y lo medido en el estacionario es 0,881 m/s, 0,2 % de diferencia. El ajuste usa la forma entera de f(v); esto usa un solo momento.
 - Es la figura que contesta **desde cuándo es estacionario**, que es lo que hace falta para justificar la bolsa del ajuste (t ≥ 10 s). Como diapositiva de respaldo alcanza con eso.
 
 ## Ajuste Maxwell-Boltzmann (21)

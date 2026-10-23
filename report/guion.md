@@ -185,11 +185,11 @@ mismos números.
 
 ## 25. Rapidez media contra el tiempo — `slide-25-v-medio-vs-t.png`
 
-- Un escalar por instante: la rapidez media ⟨|v|⟩ de las 100 partículas de las 30 realizaciones (la bolsa de ese instante), con el desvío entre realizaciones como banda: ⟨|v|⟩ se calcula por realización y se promedia. Es la misma dispersión que se mide (y se imprime) en la gran bolsa, que no la dibuja.
-- Arranca **exactamente en v0** en t = 0 (todas nacen con |v| = v0) y baja mientras f(v) se ensancha: la energía no cambia (E se conserva), pero la media de |v| no es la raíz de la media de v², y cuanto más ancha es f(v) más chica queda ⟨|v|⟩. En el primer cuadro guardado, 0,05 s, ya hubo choques y la media ya bajó a 0,97. Desde 0,4 s está dentro de la banda del estacionario y sigue plana hasta los 30 s (la figura muestra los primeros 2 s, que es donde pasa algo).
+- Un escalar por instante: la rapidez media ⟨|v|⟩ de las 100 partículas de las 30 realizaciones (la bolsa de ese instante). ⟨|v|⟩ se calcula por realización y se promedia: es el **promedio de los promedios**, una sola curva y nada más. Sin banda de desvío, sin la horizontal de v0 y sin la de Maxwell-Boltzmann: lo que la figura muestra es el promedio, y las otras dos se dicen.
+- Arranca **exactamente en v0** en t = 0 (todas nacen con |v| = v0) y baja mientras f(v) se ensancha: la energía no cambia (E se conserva), pero la media de |v| no es la raíz de la media de v², y cuanto más ancha es f(v) más chica queda ⟨|v|⟩. En el primer cuadro guardado, 0,05 s, ya hubo choques y la media ya bajó a 0,97. Desde 0,4 s ya no se distingue del estacionario (está dentro del desvío, que se mide aunque no se dibuje) y sigue plana hasta los 30 s; la figura muestra los primeros 2 s, que es donde pasa algo.
 - La gran bolsa del ajuste toma t ≥ 10 s: es estacionario desde mucho antes, el margen es gratis porque la corrida llega a 30 s. Va en la línea de condiciones de la diapositiva del ajuste, no dibujado acá.
 - La línea roja punteada es la verificación: Maxwell-Boltzmann en 2D con el kBT ajustado en la diapositiva 27 predice ⟨|v|⟩ = √(πkBT/2m) = 0,883 m/s, y la medida en el estacionario es 0,881 m/s (0,2 %). El ajuste usa la forma entera de f(v); esto usa un solo momento, por eso es independiente.
-- Si preguntan por qué la banda es tan ancha (±0,014 m/s) frente a lo chica que es la diferencia entre instantes: es el desvío entre realizaciones de un promedio de 100 partículas, no el error de la media.
+- Si preguntan por la dispersión entre realizaciones: es ±0,014 m/s, y lo imprime `make velocidades-figuras`. Es el desvío entre realizaciones de un promedio de 100 partículas, no el error de la media; no se dibuja porque la figura es el promedio.
 
 ## 26. Distribución del módulo de la velocidad — `slide-26-f-v-vs-t.png`
 

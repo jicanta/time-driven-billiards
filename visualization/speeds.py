@@ -267,24 +267,20 @@ def main() -> None:
     per_frame = speeds.mean(axis=2)                       # (M, F)
     mean_speed = per_frame.mean(axis=0)
     spread_speed = per_frame.std(axis=0, ddof=1) if runs > 1 else np.zeros_like(mean_speed)
+    # UNA SOLA CURVA, el promedio de los promedios: la rapidez media de cada
+    # instante y nada mas. Sin banda de desvio (lo que se grafica es el
+    # promedio sobre las realizaciones, no su dispersion), sin la horizontal
+    # de v0 (la curva arranca ahi y se lee en el eje) y sin la de
+    # Maxwell-Boltzmann (es una verificacion y se dice: 0,883 m/s predicho
+    # contra 0,881 medido). Sin leyenda: hay una sola curva y el eje la nombra.
     figure, axes = plt.subplots()
-    axes.plot(times, mean_speed, color=common.FRESH,
-              label="$\\langle |\\vec{v}| \\rangle$ por instante")
-    axes.fill_between(times, mean_speed - spread_speed, mean_speed + spread_speed,
-                      color=common.FRESH, alpha=0.15, linewidth=0)
-    axes.axhline(static["v0"], color="#555555", linestyle=":", linewidth=1.4,
-                 label="$v_0$")
-    # La formula sqrt(pi kT / 2m) va en la vineta; en la leyenda, el numero.
-    axes.axhline(predicted_mean, color=common.USED, linestyle="--", linewidth=1.8,
-                 label=f"Maxwell-Boltzmann: {common.decimal(predicted_mean, 3)} m/s")
+    axes.plot(times, mean_speed, color=common.FRESH)
     axes.set_xlim(0.0, arguments.ventana)
     axes.set_xlabel(common.AXIS_TIME)
     axes.set_ylabel(common.AXIS_MEAN_SPEED)
-    low = min(mean_speed.min(), predicted_mean)
-    axes.set_ylim(low - 0.2 * (static["v0"] - low), static["v0"] + 0.18 * (static["v0"] - low))
-    # La leyenda, en el hueco entre v0 y el estacionario, a la derecha del
-    # transitorio: ahi no hay nada dibujado.
-    axes.legend(loc="upper right", bbox_to_anchor=(0.99, 0.93))
+    shown = times <= arguments.ventana
+    low = float(mean_speed[shown].min())
+    axes.set_ylim(low - 0.12 * (static["v0"] - low), static["v0"] + 0.08 * (static["v0"] - low))
     mean_figure = out_dir / f"v_medio_vs_t_N{count}_M{runs}.png"
     common.save(figure, mean_figure)
     plt.close(figure)
