@@ -258,18 +258,14 @@ def main() -> None:
 
     figure, axes = plt.subplots()
     # El ajuste es un BARRIDO: se evalua el error en cada valor de kT de la
-    # grilla y se toma el menor. La grilla tiene tantos valores (4001, uno
-    # cada 7 uJ) que dibujada entera es una banda maciza -- entran casi cuatro
-    # puntos por pixel del eje --, asi que va la linea con un marcador cada
-    # tantos, y la leyenda dice cuantos son y cuantos se dibujan: sin eso la
-    # curva se lee como una funcion continua ajustada, que es justo lo que no
-    # es.
+    # grilla y se toma el menor. Va dibujado como puntos sueltos, sin linea
+    # que los una, porque es lo que es: un valor medido por cada kT probado.
+    # No estan los 4001 de la grilla (uno cada 7 uJ: entran casi cuatro por
+    # pixel del eje y saldria una banda maciza) sino uno de cada POINTS_EVERY,
+    # que alcanza para ver la forma de E(kT) y que son puntos.
     every = max(1, len(grid) // 60)
-    axes.plot(1000 * grid, error, color=common.FRESH, zorder=2)
     axes.plot(1000 * grid[::every], error[::every], color=common.FRESH, marker="o",
-              markersize=4, linestyle="none", zorder=3,
-              label=f"grilla de {len(grid)} valores de $k_BT$ "
-                    f"(se dibuja 1 de cada {every})")
+              markersize=4, linestyle="none", zorder=3)
     axes.plot([1000 * thermal], [error.min()], marker="o", color=common.USED, markersize=9,
               linestyle="none", zorder=4,
               label=f"mínimo en $k_BT$ = {common.decimal(1000 * thermal, 2)} mJ")

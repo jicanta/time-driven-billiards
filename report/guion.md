@@ -211,7 +211,7 @@ mismos números.
 
 ## 28. Error cuadrático medio del ajuste — `slide-28-E-vs-kT.png`
 
-- Método de la Teórica 0: se recorre kBT en una grilla y se toma el mínimo de E(kBT). Los puntos azules **son la grilla**: 4001 valores entre 2,5 y 30,8 mJ, uno cada 7 µJ; se dibuja uno de cada 66 (enteros son una banda maciza, casi cuatro por píxel). Es un barrido, no un método iterativo ni una curva ajustada, y la leyenda lo dice. Los ejes son el símbolo con la unidad, como en el resto: E(kBT) es el error cuadrático medio del ajuste (el argumento lo distingue de la energía total E(t)) y kBT la energía térmica, los dos nombrados en la viñeta.
+- Método de la Teórica 0: se recorre kBT en una grilla y se toma el mínimo de E(kBT). Cada punto azul es un kBT probado: la grilla son 4001 valores entre 2,5 y 30,8 mJ, uno cada 7 µJ, y se dibuja uno de cada 66 (los 4001 son una banda maciza, casi cuatro por píxel). Van como puntos sueltos, sin línea que los una, justamente para que se lea como el barrido que es y no como una curva ajustada; cuántos son hay que **decirlo**, no está en la figura. Los ejes son el símbolo con la unidad, como en el resto: E(kBT) es el error cuadrático medio del ajuste (el argumento lo distingue de la energía total E(t)) y kBT la energía térmica, los dos nombrados en la viñeta.
 - **El ancho del mínimo es el error del ajuste**, que es lo que esta figura agrega: E se duplica ya en 12,31 y 12,53 mJ, o sea kBT = 12,41 ± 0,11 mJ, un 0,9 %. Es la forma de ponerle error a un ajuste de un parámetro sin más que la curva E(parámetro).
 - "Energía térmica" es el nombre que le da el enunciado a kBT: es el único parámetro libre del ajuste, no una temperatura medida.
 
