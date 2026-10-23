@@ -38,6 +38,7 @@
 #                           copia las 18 figuras y renderiza los 6 esquemas TikZ
 #   make slides-images-tikz renderiza a PNG los esquemas TikZ de las diapositivas (report/figuras)
 #   make documentos     compila report/presentacion.tex (la presentación, lee slides-images/)
+#   make guion          presentacion/guion.md -> presentacion/guion.pdf (el guion, paginado)
 #   make capturas       PNG de diapositivas sueltas (la tabla de parametros) en capturas/
 #   make entrega        SdS_TP4_2026Q2G10S2_Codigo.zip (< 100 KB) y ..._Presentación.pdf (la beamer)
 #   make todo           oscilador + energia(+densa) + bench + obstaculos + velocidades + mapa
@@ -200,7 +201,7 @@ ZIP         := $(ENTREGA)_Codigo.zip
         bench bench-tp3 \
         bench-figuras obstaculos obstaculos-figuras velocidades velocidades-figuras \
         densidad densidad-figuras mapa mapa-figuras check una-particula animations animaciones-apoyo youtube gifs figuras-diapositivas \
-        slides-images slides-images-tikz documentos capturas entrega clean-figures
+        slides-images slides-images-tikz documentos guion capturas entrega clean-figures
 
 all: todo
 
@@ -572,6 +573,14 @@ documentos:
 	mkdir -p $(DOCS)
 	$(TEXC) report/presentacion.tex --outdir $(DOCS)
 	@echo "  $(DOCS)/presentacion.pdf"
+
+# El guion de la presentacion que se expone, de Markdown a PDF (paginado, para
+# leerlo en el celular o imprimirlo). Se versiona junto al mazo. El de la
+# beamer sale igual: make guion ENTRADA=report/guion.md SALIDA=report/build/guion.pdf
+ENTRADA ?= presentacion/guion.md
+SALIDA  ?= presentacion/guion.pdf
+guion:
+	$(PY) presentacion/guion_a_pdf.py --entrada $(ENTRADA) --salida $(SALIDA)
 
 # El motor, como pide la consigna (c), mas el codigo con el que se hacen las
 # animaciones a partir de las salidas primarias (pedido de la catedra sobre el
