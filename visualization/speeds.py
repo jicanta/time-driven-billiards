@@ -295,13 +295,12 @@ def main() -> None:
     figure, axes = plt.subplots()
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
              edgecolor=common.FRESH, label="gran bolsa (simulación)")
-    # El desvio entre realizaciones, intervalo por intervalo, con el estilo de
-    # barra comun al resto del trabajo: la misma dispersion que la banda de la
-    # rapidez media, que sale de la misma bolsa. Es chica (del 5 %: cada
-    # realizacion aporta 40 000 muestras) y asi se ve que lo es.
-    if spread is not None:
-        axes.errorbar(centers, density, yerr=spread, color=common.FRESH, zorder=2.5,
-                      label="_nolegend_", **common.ERRORBAR)
+    # SIN barra de error, que es el sentido de juntar todas las realizaciones
+    # en una sola bolsa: el histograma no es el promedio de M curvas con su
+    # dispersion, es UNA medicion con M veces mas muestras. El desvio entre
+    # realizaciones se sigue midiendo y se imprime (4,8 % por intervalo), que
+    # es la respuesta si preguntan cuanto dispersa una realizacion sola, pero
+    # dibujarlo encima de la bolsa mezcla las dos lecturas.
     fine = np.linspace(edges[0], edges[-1], 400)
     axes.plot(fine, common.maxwell_boltzmann(fine, thermal, mass), color=common.USED,
               linewidth=2.4, label="Maxwell-Boltzmann")

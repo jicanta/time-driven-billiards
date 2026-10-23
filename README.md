@@ -342,13 +342,15 @@ se dibuja.
 
 La figura de la evolución muestra **instantes**, cada uno con su `t` exacto
 (el último cuadro guardado hace de estacionario): un `t ≥ algo` es un promedio
-sobre cuadros, no un instante. La gran bolsa lleva barra de error por
-intervalo, y es el **desvío estándar entre realizaciones** (el histograma de
-cada una por separado), la misma convención que el resto del trabajo y la
-misma dispersión que la banda de la rapidez media. En un instante suelto ese
-desvío es grande (51 % en promedio: cada realización reparte `N = 100`
-partículas en 40 intervalos) y por eso ahí no se dibuja; en la gran bolsa,
-que junta todos los cuadros desde `t = 10 s`, baja al 4,8 %.
+sobre cuadros, no un instante. **Ninguno de los dos histogramas lleva barra de
+error**, y es a propósito: juntar todas las realizaciones en una sola bolsa es
+justamente la alternativa a promediar `M` histogramas con su dispersión. Lo
+que se dibuja es **una medición con `M` veces más muestras**, no el promedio de
+`M` mediciones. El desvío entre realizaciones se mide igual y se imprime, que
+es la respuesta si preguntan cuánto dispersa una realización sola: 51 % en
+promedio en un instante suelto (cada realización reparte `N = 100` partículas
+en 40 intervalos) y 4,8 % en la gran bolsa, que junta todos los cuadros desde
+`t = 10 s`.
 
 La estacionaria se ajusta con Maxwell-Boltzmann en dos dimensiones,
 `f(v) = (m v / kT) exp(−m v²/2kT)`, con `kT` como único parámetro libre y por

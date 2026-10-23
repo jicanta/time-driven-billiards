@@ -399,8 +399,12 @@ es el cambio de color de una partícula, que es parte del estado.
 - Cada histograma es **uno solo sobre la bolsa** de `N × M` muestras (y
   `× cuadros` en el estacionario), una sola bolsa (la cátedra, 19/10): el
   histograma de una realización sola es ruido y promediar `M` curvas ruidosas
-  tapa la forma de `f(v)`. En los instantes va sin barras (el desvío es del
-  51 %); en la gran bolsa, con el desvío entre realizaciones (4,8 %).
+  tapa la forma de `f(v)`. **Ninguno de los dos lleva barras**: la bolsa es
+  una medición con `M` veces más muestras, no el promedio de `M` mediciones
+  (es el sentido de juntarlas). El desvío entre realizaciones se mide y se
+  imprime igual: 51 % en un instante suelto, 4,8 % en la gran bolsa.
+- Los instantes van en dos figuras: superpuestos y uno por panel, con el
+  estacionario de fondo en gris (la cátedra viene pidiendo los paneles).
 - Ajuste de `kT` por el mínimo del error cuadrático medio (Teórica 0) y
   comparación con `m ⟨v²⟩/2 = m v0²/2`.
 

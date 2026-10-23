@@ -185,7 +185,7 @@ mismos números.
 
 ## 25. Rapidez media contra el tiempo — `slide-25-v-medio-vs-t.png`
 
-- Un escalar por instante: la rapidez media ⟨|v|⟩ de las 100 partículas de las 30 realizaciones (la bolsa de ese instante), con el desvío entre realizaciones como banda: ⟨|v|⟩ se calcula por realización y se promedia. Es la misma dispersión que dibuja la barra de error de la gran bolsa, dos diapositivas más adelante.
+- Un escalar por instante: la rapidez media ⟨|v|⟩ de las 100 partículas de las 30 realizaciones (la bolsa de ese instante), con el desvío entre realizaciones como banda: ⟨|v|⟩ se calcula por realización y se promedia. Es la misma dispersión que se mide (y se imprime) en la gran bolsa, que no la dibuja.
 - Arranca **exactamente en v0** en t = 0 (todas nacen con |v| = v0) y baja mientras f(v) se ensancha: la energía no cambia (E se conserva), pero la media de |v| no es la raíz de la media de v², y cuanto más ancha es f(v) más chica queda ⟨|v|⟩. En el primer cuadro guardado, 0,05 s, ya hubo choques y la media ya bajó a 0,97. Desde 0,4 s está dentro de la banda del estacionario y sigue plana hasta los 30 s (la figura muestra los primeros 2 s, que es donde pasa algo).
 - La gran bolsa del ajuste toma t ≥ 10 s: es estacionario desde mucho antes, el margen es gratis porque la corrida llega a 30 s. Va en la línea de condiciones de la diapositiva del ajuste, no dibujado acá.
 - La línea roja punteada es la verificación: Maxwell-Boltzmann en 2D con el kBT ajustado en la diapositiva 27 predice ⟨|v|⟩ = √(πkBT/2m) = 0,883 m/s, y la medida en el estacionario es 0,881 m/s (0,2 %). El ajuste usa la forma entera de f(v); esto usa un solo momento, por eso es independiente.
@@ -202,7 +202,8 @@ mismos números.
 
 ## 27. La gran bolsa: ajuste de Maxwell-Boltzmann — `slide-27-f-v-gran-bolsa-ajuste.png`
 
-- **Ésta es la figura de la gran bolsa**: un solo histograma con todos los |v| del estacionario (t ≥ 10 s) de todas las realizaciones, 1,2·10⁶ muestras. La barra de error de cada intervalo es el desvío estándar entre las 30 realizaciones (el histograma de cada una por separado): 4,8 % en promedio, la misma dispersión que la banda de la rapidez media. Es chica porque cada realización aporta 40 000 muestras, y se ve que es chica. Encima, Maxwell-Boltzmann en dos dimensiones con kBT como único parámetro libre.
+- **Ésta es la figura de la gran bolsa**: un solo histograma con todos los |v| del estacionario (t ≥ 10 s) de todas las realizaciones, 1,2·10⁶ muestras, **como si fuera una sola corrida grande**. Encima, Maxwell-Boltzmann en dos dimensiones con kBT como único parámetro libre.
+- **No lleva barra de error, y es el punto**: la alternativa era promediar los 30 histogramas y dibujar su dispersión; juntar las realizaciones en una bolsa cambia eso por una sola medición con 30 veces más muestras. Si preguntan por la dispersión: el desvío entre realizaciones se mide y lo imprime `make velocidades-figuras`, 4,8 % por intervalo acá (cada realización aporta 40 000 muestras) y 51 % en un instante suelto.
 - Las tres energías del análisis que pide el ítem (las imprime `make velocidades-figuras`): la inicial **½ m v0² = 12,50 mJ** (exacta: todas arrancan con |v| = v0), la del estacionario **½ m ⟨v²⟩ = 12,32 mJ** y el ajuste **kBT = 12,41 mJ**.
 - kBT contra ½ m v0²: −0,7 %. Contra ½ m ⟨v²⟩: +0,7 %. El ajuste cae entre las dos.
 - ½ m ⟨v²⟩ es 1,4 % menor que ½ m v0² porque E se conserva pero no toda es cinética: en promedio ese 1,4 % está en los resortes de los contactos. Por eso kBT, que ajusta la forma de f(v), no tiene por qué dar exactamente ninguna de las dos.

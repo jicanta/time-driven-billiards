@@ -160,7 +160,8 @@ cierra dice las conclusiones.
 
 ## Ajuste Maxwell-Boltzmann (21)
 
-- A la derecha, la **gran bolsa**: un solo histograma con todos los |v| del estacionario (t ≥ 10 s) de todas las realizaciones, **30 realizaciones × 401 cuadros × 100 partículas = 1,2·10⁶ muestras**, 40 intervalos y área 1. Encima, Maxwell-Boltzmann en 2D con k_BT como único parámetro libre. La barra de cada intervalo es el desvío entre realizaciones: 4,8 %, la misma dispersión que la banda de la figura anterior.
+- A la derecha, la **gran bolsa**: un solo histograma con todos los |v| del estacionario (t ≥ 10 s) de todas las realizaciones, **30 realizaciones × 401 cuadros × 100 partículas = 1,2·10⁶ muestras**, 40 intervalos y área 1, **como si fuera una sola corrida grande**. Encima, Maxwell-Boltzmann en 2D con k_BT como único parámetro libre.
+- **Sin barra de error, a propósito**: juntar todas las realizaciones en una bolsa es la alternativa a promediar 30 histogramas y dibujar su dispersión — lo que se ve es una medición con 30 veces más muestras. Si preguntan: el desvío entre realizaciones se mide igual, 4,8 % por intervalo acá y 51 % en un instante suelto.
 - A la izquierda, cómo se ajusta, a la manera de la Teórica 0: se recorre k_BT en una grilla y se toma el **mínimo del error cuadrático medio** E(k_BT). Da **k_BT = 12,41 mJ**.
 - Cada punto azul **es un k_BT probado**: la grilla son 4001 valores entre 2,5 y 30,8 mJ, uno cada 7 µJ, y en cada uno se evalúa el error contra el histograma medido. En la figura va uno de cada 66, porque los 4001 enteros serían una banda maciza (hay casi cuatro por píxel); **decirlo**, porque no está escrito en la figura. No es una curva ajustada ni un método iterativo: es un **barrido**, y el mínimo es el menor de esos valores.
 - El **ancho del mínimo es el error del ajuste**: E se duplica ya en 12,31 y 12,53 mJ, o sea 12,41 ± 0,11 mJ, un 0,9 %.
