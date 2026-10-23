@@ -330,9 +330,13 @@ def main() -> None:
     print(f"bolsa del estacionario (t ≥ {arguments.estacionario:g} s): {runs} x {frames} "
           f"cuadros x {count} partículas = {per_pool} muestras "
           f"({per_run.shape[1]} por realización)")
-    print(f"desvío entre realizaciones (intervalos con f(v) > 10 % del máximo): "
-          f"instante suelto {relative(instant_density, instant_spread):.1%} (no se dibuja), "
-          f"gran bolsa {relative(density, spread):.1%} (la barra de error de su figura)")
+    # Ninguna de las dos figuras lo dibuja (las bolsas reemplazan al promedio
+    # de M histogramas con su dispersion): se mide y se imprime, que es la
+    # respuesta si preguntan cuanto dispersa una realizacion sola.
+    print(f"desvío entre realizaciones (intervalos con f(v) > 10 % del máximo), "
+          f"medido pero no dibujado: instante suelto "
+          f"{relative(instant_density, instant_spread):.1%}, "
+          f"gran bolsa {relative(density, spread):.1%}")
     doubling = grid[error <= 2.0 * error.min()]
     print(f"kT ajustado        = {thermal:.6f} J  (el error cuadrático medio del ajuste se "
           f"duplica en {1000 * doubling.min():.2f} y {1000 * doubling.max():.2f} mJ)")
