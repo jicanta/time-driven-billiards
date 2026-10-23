@@ -17,8 +17,8 @@
 #   make obstaculos     item 2.2: barrido de xo con N = 100 y N = 20
 #   make obstaculos-figuras <t90> vs xo y Fu(t) de los tres xo tipicos, en una figura
 #   make velocidades    item 2.3: N = 100 sin obstaculos, cuadros hasta el estacionario
-#   make velocidades-figuras  rapidez media vs t, f(v) por instante, la gran bolsa con el
-#                           ajuste de Maxwell-Boltzmann y E(kT)
+#   make velocidades-figuras  rapidez media vs t, f(v) por instante, la estacionaria
+#                           (t = 30 s) con el ajuste de Maxwell-Boltzmann y E(kT)
 #   make densidad       item 2.4.a: barrido de N con xo = r y tmax largo, sin corte
 #   make densidad-figuras   item 2.4.a: <t90> y <t100> vs densidad
 #   make mapa           item 2.4.b: barrido (xo, N) (el enunciado lo da como opcional; se hace)

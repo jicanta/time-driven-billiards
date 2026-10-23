@@ -109,10 +109,10 @@ ordenado por diapositiva.
 
 ## Ajuste Maxwell-Boltzmann — 1:00
 
-- Para el ajuste juntamos **todo el tramo estacionario, de 10 a 30 s, de las 30 realizaciones** en un solo histograma: 1,2·10⁶ muestras, como una sola corrida grande. Lo dice la leyenda.
+- La estacionaria es **la de t = 30 s**, el último instante: las 100 partículas de las 30 realizaciones en un solo histograma, 3000 muestras. Lo dice la leyenda.
 - Encima, Maxwell-Boltzmann en 2D, f(v) = (mv/k_BT)·exp(−mv²/2k_BT), con **k_BT como único parámetro libre**.
-- Ajuste a la manera de la Teórica 0: se recorre k_BT en una grilla y se toma el **mínimo del error cuadrático medio** E(k_BT), la figura de la izquierda. Da **k_BT = 12,41 mJ**; el ancho del mínimo es el error: ± 0,11 mJ, un 0,9 %.
-- La comparación que pide el ítem: ½mv0² = **12,50 mJ**, un 0,7 % más. El ½m⟨v²⟩ medido es 12,32 mJ, un poco menos: E se conserva, pero el 1,4 % está en promedio en los resortes de los contactos abiertos. El ajuste cae entre las dos.
+- Ajuste a la manera de la Teórica 0: se recorre k_BT en una grilla y se toma el **mínimo del error cuadrático medio** E(k_BT), la figura de la izquierda. Da **k_BT = 12,45 mJ**; el ancho del mínimo es el error: ± 1,04 mJ, un 8 %.
+- La comparación que pide el ítem: ½mv0² = **12,50 mJ**, un 0,4 % más. El ½m⟨v²⟩ medido es 12,35 mJ, un poco menos: E se conserva, pero el 1,2 % está en promedio en los resortes de los contactos abiertos. El ajuste cae entre las dos, y las dos dentro de su error.
 
 ## Densidad óptima — 0:50
 
@@ -134,7 +134,7 @@ ordenado por diapositiva.
 2. Por conservación de la energía, **Δt = 5·10⁻⁵ s**: error del 0,04 % a N = 300 y 0,03 % a N = 700.
 3. El paso temporal escala como **N^0,88** y los eventos como **N^3,52**: se cruzan en N ≈ 470, y a N = 600 el paso temporal es 2,9 veces más rápido.
 4. Hay **posición óptima**, entre 0,2 y 0,3 m, la misma de N = 20 a 300; con los obstáculos en el centro hay **densidad óptima**, ρ = 86 con ⟨t₉₀⟩ = 21,8 s.
-5. f(v) llega a Maxwell-Boltzmann en medio segundo, con **k_BT = 12,4 mJ**, a 0,7 % de ½mv0².
+5. f(v) llega a Maxwell-Boltzmann en medio segundo, con **k_BT = 12,45 ± 1,04 mJ**, a 0,4 % de ½mv0².
 
 ## Uso de agentes de IA — 0:15
 
@@ -174,11 +174,11 @@ ordenado por diapositiva.
 
 ### Velocidades
 
-- **¿Por qué un solo histograma y no el promedio de 30 con su desvío?** Porque el histograma de una realización sola (100 partículas en 40 intervalos) es ruido: el desvío entre realizaciones en un instante suelto es del **51 %** por intervalo y taparía la forma. En la gran bolsa baja al **4,8 %**, y tampoco se dibuja: la bolsa reemplaza al promedio de M histogramas con su dispersión (B7, 19/10).
-- **¿Por qué 30 s de simulación si el estacionario llega en medio segundo?** No se espera 30 s para llegar: se usan para tener de dónde sacar estadística (1,2·10⁶ muestras) y para mostrar que a los 30 s sigue siendo la misma distribución. El corte en t ≥ 10 s es un margen conservador: el estacionario empieza en 0,4 s.
-- **¿Por qué juntar cuadros de la misma corrida, que están correlacionados?** Porque lo que hace falta es la **forma** de f(v) en el estacionario, y el promedio temporal de un estado estacionario es el mismo promedio de ensamble. Los escalares con error (t₉₀, tiempos) sí se promedian sobre realizaciones independientes.
-- **Desde cuándo es estacionario** (figura de respaldo, rapidez media contra t): arranca exactamente en v0 = 1 m/s y baja hasta 0,88 m/s, estacionaria desde 0,4 s y plana hasta los 30 s. Verificación independiente: Maxwell-Boltzmann con el k_BT ajustado predice ⟨|v|⟩ = √(πk_BT/2m) = 0,883 m/s; medido, 0,881 (0,2 %).
-- La grilla del ajuste son 4001 valores de k_BT entre 2,5 y 30,8 mJ, uno cada 7 µJ; en la figura va uno de cada 66 para que se lea como el barrido que es. El error "se duplica" en 12,31 y 12,53 mJ.
+- **¿Por qué un solo histograma y no el promedio de 30 con su desvío?** Porque el histograma de una realización sola (100 partículas en 40 intervalos) es ruido: el desvío entre realizaciones en un instante es del **51 %** por intervalo y taparía la forma. Juntar las 30 en una bolsa reemplaza al promedio de 30 histogramas con su dispersión (es lo que pidió la cátedra el 19/10, B7), y por eso no lleva barra.
+- **¿Por qué el ajuste es sobre un solo instante, t = 30 s?** Porque es lo que pide el ítem: f(v) en instantes, promediando sobre realizaciones, y "la distribución estacionaria obtenida" es la del último. Un promedio sobre cuadros de la misma corrida no es un instante y el enunciado no lo pide. **Si preguntan cuánto cambia con más estadística** (sólo si preguntan): juntando todos los cuadros de t = 10 a 30 s, 1,2·10⁶ muestras, el ajuste da 12,41 ± 0,11 mJ y el desvío entre realizaciones baja al 4,8 %; el valor es el mismo dentro del error del instante. Lo imprime `make velocidades-figuras`.
+- **¿Por qué 30 s de simulación si el estacionario llega en medio segundo?** Porque que f(v) a los 30 s sea la misma que a los 0,5 s es la prueba de que es estacionario y no una deriva lenta; con N = 100 son segundos de cómputo.
+- **Desde cuándo es estacionario** (figura de respaldo, rapidez media contra t): arranca exactamente en v0 = 1 m/s y baja hasta 0,88 m/s, estacionaria desde 0,4 s y plana hasta los 30 s. Verificación independiente: Maxwell-Boltzmann con el k_BT ajustado predice ⟨|v|⟩ = √(πk_BT/2m) = 0,884 m/s; medido, 0,881 (0,4 %).
+- La grilla del ajuste son 4001 valores de k_BT entre 2,5 y 30,8 mJ, uno cada 7 µJ; en la figura va uno de cada 66 para que se lea como el barrido que es. El error "se duplica" en 11,46 y 13,54 mJ.
 - El pico de la delta en t = 0 mide 11,3 s/m (1 sobre el ancho del intervalo); a 0,15 s, 2,45 s/m.
 
 ### Densidad y mapa
@@ -194,10 +194,11 @@ ordenado por diapositiva.
 
 ## Revisión del mazo (contra el PDF exportado el 22/10)
 
-Las imágenes estaban todas al día en esa exportación, salvo la de la gran
-bolsa, que **hoy cambió de leyenda** ("simulación, t ≥ 10 s, 30
-realizaciones", en vez de "gran bolsa (simulación)"): volver a pegar
-`slides-images/slide-27-f-v-gran-bolsa-ajuste.png`.
+Las imágenes estaban todas al día en esa exportación, salvo las dos del
+ajuste, que **hoy cambiaron**: el ajuste es ahora sobre el instante t = 30 s
+(leyenda "simulación, t = 30 s, 30 realizaciones") y E(k_BT) con él. Volver a
+pegar `slides-images/slide-27-f-v-gran-bolsa-ajuste.png` y
+`slides-images/slide-28-E-vs-kT.png`, y los números: k_BT = 12,45 ± 1,04 mJ.
 
 1. **Falta la diapositiva de uso de agentes de IA**, que el ítem 2.5 del enunciado pide como diapositiva extra al final. Va después de Conclusiones; el texto está en su sección del guion.
 2. **Orden**: "Evolución del sistema" y "ECM vs dt" estaban **antes de Introducción**, con el rótulo *Resultados*. Van después del separador Resultados, delante de "Conservación de la energía".
@@ -209,4 +210,4 @@ realizaciones", en vez de "gran bolsa (simulación)"): volver a pegar
 8. **Conclusiones**: "a mayor N, un menor x₀" está sobredicho (lo medido es −1,8 ± 0,7 cm por década, el mismo óptimo de N = 20 en adelante). Usar las cinco de este guion: incluyen la del sistema 1 y la de Maxwell-Boltzmann, que faltaban.
 9. **"Muchas gracias"**: la guía (§2.6) dice que no se escribe "¿Preguntas?" en la diapositiva de cierre. Sacarlo.
 10. **Formato** (la cátedra lo marca): coma decimal y unidades, `0.1%` → `0,1 %`, `5x10-5` → `5·10⁻⁵ s`, `12.5mJ` → `12,5 mJ`; `K_bT` → `k_BT`; "Tiempo ejecución" → "Tiempo de ejecución"; "t90 Según x0 y N" → "t₉₀ según x₀ y N".
-11. **Cada figura con sus condiciones al costado** (guía §1.7): tiempo de ejecución (x_o = r, t_f = 30 s, 10 realizaciones por N), densidad óptima (x_o = r, 20 realizaciones, hasta convertirlas todas), mapa (3200 corridas, t_max = 300 s), Maxwell-Boltzmann (t de 10 a 30 s, 30 realizaciones, 1,2·10⁶ muestras).
+11. **Cada figura con sus condiciones al costado** (guía §1.7): tiempo de ejecución (x_o = r, t_f = 30 s, 10 realizaciones por N), densidad óptima (x_o = r, 20 realizaciones, hasta convertirlas todas), mapa (3200 corridas, t_max = 300 s), Maxwell-Boltzmann (N = 100, sin obstáculos, t = 30 s, 30 realizaciones, 3000 muestras).

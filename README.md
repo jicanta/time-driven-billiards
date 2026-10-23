@@ -81,7 +81,7 @@ make bench-figuras         # tiempo de ejecución vs N de los dos paradigmas
 make obstaculos            # ítem 2.2: barrido de xo con N = 100 y N = 20
 make obstaculos-figuras    # ⟨t90⟩ vs xo y Fu(t) de los tres xo típicos, en una sola figura
 make velocidades           # ítem 2.3: N = 100 sin obstáculos, cuadros hasta el estacionario
-make velocidades-figuras   # rapidez media vs t, f(v) por instante, la gran bolsa con el ajuste de Maxwell-Boltzmann y E(kT)
+make velocidades-figuras   # rapidez media vs t, f(v) por instante, la estacionaria (t = 30 s) con el ajuste de Maxwell-Boltzmann y E(kT)
 make densidad              # ítem 2.4.a: barrido propio de N con xo = r, 20 realizaciones, hasta convertirlas todas
 make densidad-figuras      # ítem 2.4.a: ⟨t90⟩ y ⟨t100⟩ vs densidad
 make mapa                  # ítem 2.4.b: barrido (xo, N)
@@ -330,27 +330,29 @@ ejecución con el error aceptado: `dt = 5·10⁻⁵ s`, que deja `0,04 %` a
 ## Ítem 2.3: distribución de velocidades
 
 Cada histograma es **uno solo, sobre una bolsa de muestras**: los `|v|` de las
-`N` partículas de las `M` realizaciones, todos juntos (`N × M = 3000` por
-instante); la estacionaria suma además todos los cuadros con `t ≥ 10 s`
-(promedio temporal, que para un estado estacionario es el mismo promedio de
-ensamble): `30 × 401 × 100 = 1,2·10⁶` muestras. No es el promedio de los `M`
+`N` partículas de las `M` realizaciones de ese instante, todos juntos
+(`N × M = 3000`); la estacionaria que se ajusta es la del último cuadro,
+`t = 30 s`, la misma bolsa de un instante. No es el promedio de los `M`
 histogramas de cada realización con su desvío como barra: con 100 partículas en
 40 intervalos, el histograma de una realización sola es ruido, y promediar `M`
 curvas ruidosas con barras del 50 % tapa la forma de `f(v)`. El desvío entre
 realizaciones se sigue midiendo y se imprime; en la figura de los instantes no
 se dibuja.
 
-La figura de la evolución muestra **instantes**, cada uno con su `t` exacto
-(el último cuadro guardado hace de estacionario): un `t ≥ algo` es un promedio
-sobre cuadros, no un instante. **Ninguno de los dos histogramas lleva barra de
+Todas las figuras muestran **instantes**, cada uno con su `t` exacto (el
+último cuadro guardado hace de estacionario, también en el ajuste): un
+`t ≥ algo` es un promedio sobre cuadros de la misma corrida, no un instante, y
+el enunciado no lo pide. Ese promedio (`30 × 401 × 100 = 1,2·10⁶` muestras con
+`t ≥ 10 s`, `ESTACIONARIO` en el Makefile) se sigue calculando y `speeds.py` lo
+imprime como respaldo, con su propio ajuste, para contestar cuánto cambia
+`kT` con más estadística. **Ninguno de los dos histogramas lleva barra de
 error**, y es a propósito: juntar todas las realizaciones en una sola bolsa es
 justamente la alternativa a promediar `M` histogramas con su dispersión. Lo
 que se dibuja es **una medición con `M` veces más muestras**, no el promedio de
 `M` mediciones. El desvío entre realizaciones se mide igual y se imprime, que
 es la respuesta si preguntan cuánto dispersa una realización sola: 51 % en
-promedio en un instante suelto (cada realización reparte `N = 100` partículas
-en 40 intervalos) y 4,8 % en la gran bolsa, que junta todos los cuadros desde
-`t = 10 s`.
+promedio por intervalo (cada realización reparte `N = 100` partículas en 40
+intervalos); en el promedio de respaldo sobre todos los cuadros baja al 4,8 %.
 
 La estacionaria se ajusta con Maxwell-Boltzmann en dos dimensiones,
 `f(v) = (m v / kT) exp(−m v²/2kT)`, con `kT` como único parámetro libre y por

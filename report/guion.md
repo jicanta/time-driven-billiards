@@ -74,7 +74,7 @@ mismos números.
 
 - Conversión: Fu(t) = Nu/N. **t_x es el instante en que la conversión llega al x %**, el que cumple Fu(t_x) = x/100; medimos t90 y t100, que son ese t_x con x = 90 y x = 100. Decirlo así, con la definición general primero: los dos observables del trabajo son el mismo con distinto x.
 - Energía total (cinética más elástica de los contactos), y su **error relativo en porcentaje** ε(t) = 100·(E(t) − E0)/E0. El escalar que resume cada corrida es ε_máx = máx|ε(t)|, un número por Δt.
-- f(v) en 40 intervalos, **un solo histograma por bolsa**: todos los |v| de las N partículas de las M realizaciones juntos; la **gran bolsa** del estacionario junta además todos los cuadros con t ≥ 10 s. La rapidez media ⟨|v|⟩ de la bolsa de cada instante es el escalar que dice desde cuándo es estacionario. Para el sistema 1, el ECM contra la solución analítica.
+- f(v) en 40 intervalos, **un solo histograma por bolsa**: todos los |v| de las N partículas de las M realizaciones de ese instante juntos; la estacionaria que se ajusta es la del último instante, t = 30 s. La rapidez media ⟨|v|⟩ de la bolsa de cada instante es el escalar que dice desde cuándo es estacionario. Para el sistema 1, el ECM contra la solución analítica.
 - Promedios sobre M realizaciones, con el **desvío estándar** entre ellas como barra de error (no el error de la media σ/√M).
 
 ## 11. Casos estudiados
@@ -187,34 +187,33 @@ mismos números.
 
 - Un escalar por instante: la rapidez media ⟨|v|⟩ de las 100 partículas de las 30 realizaciones (la bolsa de ese instante). ⟨|v|⟩ se calcula por realización y se promedia: es el **promedio de los promedios**, una sola curva y nada más. Sin banda de desvío, sin la horizontal de v0 y sin la de Maxwell-Boltzmann: lo que la figura muestra es el promedio, y las otras dos se dicen.
 - Arranca **exactamente en v0** en t = 0 (todas nacen con |v| = v0) y baja mientras f(v) se ensancha: la energía no cambia (E se conserva), pero la media de |v| no es la raíz de la media de v², y cuanto más ancha es f(v) más chica queda ⟨|v|⟩. En el primer cuadro guardado, 0,05 s, ya hubo choques y la media ya bajó a 0,97. Desde 0,4 s ya no se distingue del estacionario (está dentro del desvío, que se mide aunque no se dibuje) y sigue plana hasta los 30 s; la figura muestra los primeros 2 s, que es donde pasa algo.
-- La gran bolsa del ajuste toma t ≥ 10 s: es estacionario desde mucho antes, el margen es gratis porque la corrida llega a 30 s. Va en la línea de condiciones de la diapositiva del ajuste, no dibujado acá.
-- La línea roja punteada es la verificación: Maxwell-Boltzmann en 2D con el kBT ajustado en la diapositiva 27 predice ⟨|v|⟩ = √(πkBT/2m) = 0,883 m/s, y la medida en el estacionario es 0,881 m/s (0,2 %). El ajuste usa la forma entera de f(v); esto usa un solo momento, por eso es independiente.
+- Es la figura que justifica que el último cuadro, t = 30 s, sea estacionario: lo es desde 0,4 s.
+- La verificación (dicha, no dibujada): Maxwell-Boltzmann en 2D con el kBT ajustado en la diapositiva 27 predice ⟨|v|⟩ = √(πkBT/2m) = 0,884 m/s, y la medida en el estacionario es 0,881 m/s (0,4 %). El ajuste usa la forma entera de f(v); esto usa un solo momento, por eso es independiente.
 - Si preguntan por la dispersión entre realizaciones: es ±0,014 m/s, y lo imprime `make velocidades-figuras`. Es el desvío entre realizaciones de un promedio de 100 partículas, no el error de la media; no se dibuja porque la figura es el promedio.
 
 ## 26. Distribución del módulo de la velocidad — `slide-26-f-v-vs-t.png`
 
 - En t = 0 f(v) es una delta en v0 que se sale de la figura.
 - A los 0,15 s el pico ya bajó a 2,45 s/m, 2,7 veces el del estacionario (0,90 s/m; la delta de t = 0 mide 11,3 s/m, que es 1 sobre el ancho del intervalo), y apareció la cola de velocidades bajas. La de 0,5 s **ya cae sobre la de 30 s**, que es el estacionario: ésa es la que muestra que el transitorio dura medio segundo, y por eso están estas cuatro y no más (de 0,5 s en adelante se superponen todas).
-- Las tres son instantes exactos, cada uno con su t: el estacionario se muestra como el último cuadro guardado, no como un promedio sobre cuadros. Ese promedio se usa en la figura del ajuste, que es donde hace falta la estadística.
+- Las cuatro son instantes exactos, cada uno con su t: el estacionario es el último cuadro guardado, t = 30 s, y es la misma bolsa que se ajusta en la diapositiva siguiente.
 - f(v) se ensancha sin que cambie E: el sistema es conservativo.
-- Si preguntan **por qué se simula hasta 30 s si el estacionario llega en medio segundo**: no se espera 30 s para llegar. Los 30 s son para la estadística de la gran bolsa del ajuste (t ≥ 10 s: 401 cuadros × 30 realizaciones × 100 partículas = 1,2·10⁶ muestras) y porque que f(v) a los 30 s sea la misma que a los 0,5 s es la prueba de que es estacionario y no una deriva lenta. El corte en 10 s es un margen conservador: el estacionario empieza en 0,4 s.
-- Cada curva es **un solo histograma de una bolsa**: los |v| de las 100 partículas de las 30 realizaciones de ese instante, todos juntos, 3000 muestras (la bolsa de un instante; la **gran bolsa** de la diapositiva siguiente junta además todos los cuadros del estacionario). No es el promedio de 30 histogramas con su desvío como barra: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y promediarlos con barras del 51 % tapaba la forma de f(v), que es lo que la figura muestra. Decir cuántas realizaciones y cuántas muestras entran en la bolsa: está en la línea de condiciones.
-- Si preguntan por el desvío entre realizaciones en esta figura: se mide y lo imprime `make velocidades-figuras` (51 % en un instante suelto), pero acá no se dibuja porque taparía la curva; en la gran bolsa baja al 4,8 % y ahí sí va como barra.
+- Si preguntan **por qué se simula hasta 30 s si el estacionario llega en medio segundo**: porque que f(v) a los 30 s sea la misma que a los 0,5 s es la prueba de que es estacionario y no una deriva lenta; con N = 100 son segundos de cómputo.
+- Cada curva es **un solo histograma de una bolsa**: los |v| de las 100 partículas de las 30 realizaciones de ese instante, todos juntos, 3000 muestras. No es el promedio de 30 histogramas con su desvío como barra: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y promediarlos con barras del 51 % tapaba la forma de f(v), que es lo que la figura muestra. Decir cuántas realizaciones y cuántas muestras entran en la bolsa: está en la línea de condiciones.
+- Si preguntan por el desvío entre realizaciones en esta figura: se mide y lo imprime `make velocidades-figuras` (51 % por intervalo), pero no se dibuja porque taparía la curva.
 
-## 27. La gran bolsa: ajuste de Maxwell-Boltzmann — `slide-27-f-v-gran-bolsa-ajuste.png`
+## 27. Ajuste de Maxwell-Boltzmann — `slide-27-f-v-gran-bolsa-ajuste.png`
 
-- **Ésta es la figura de la gran bolsa**: un solo histograma con todos los |v| del estacionario (t ≥ 10 s) de todas las realizaciones, 1,2·10⁶ muestras, **como si fuera una sola corrida grande**. Encima, Maxwell-Boltzmann en dos dimensiones con kBT como único parámetro libre.
-- **No lleva barra de error, y es el punto**: la alternativa era promediar los 30 histogramas y dibujar su dispersión; juntar las realizaciones en una bolsa cambia eso por una sola medición con 30 veces más muestras. Si preguntan por la dispersión: el desvío entre realizaciones se mide y lo imprime `make velocidades-figuras`, 4,8 % por intervalo acá (cada realización aporta 40 000 muestras) y 51 % en un instante suelto.
-- Las tres energías del análisis que pide el ítem (las imprime `make velocidades-figuras`): la inicial **½ m v0² = 12,50 mJ** (exacta: todas arrancan con |v| = v0), la del estacionario **½ m ⟨v²⟩ = 12,32 mJ** y el ajuste **kBT = 12,41 mJ**.
-- kBT contra ½ m v0²: −0,7 %. Contra ½ m ⟨v²⟩: +0,7 %. El ajuste cae entre las dos.
-- ½ m ⟨v²⟩ es 1,4 % menor que ½ m v0² porque E se conserva pero no toda es cinética: en promedio ese 1,4 % está en los resortes de los contactos. Por eso kBT, que ajusta la forma de f(v), no tiene por qué dar exactamente ninguna de las dos.
-- La bolsa del estacionario: **30 realizaciones × 401 cuadros (t ≥ 10 s) × 100 partículas = 1,2·10⁶ muestras**, un solo histograma de 40 intervalos y área 1. Decir los tres factores: es de donde sale que la curva se superponga tan bien con Maxwell-Boltzmann.
-- Los cuadros de una misma realización están correlacionados entre sí; igual se juntan, porque lo que hace falta acá es la forma de f(v) en el estacionario y el promedio temporal de un estado estacionario es el mismo promedio de ensamble.
+- **La estacionaria es la de t = 30 s**, el último instante: un solo histograma con las 100 partículas de las 30 realizaciones juntas, 3000 muestras, 40 intervalos y área 1. Es la misma curva roja de la diapositiva anterior. Encima, Maxwell-Boltzmann en dos dimensiones con kBT como único parámetro libre.
+- **No lleva barra de error, y es el punto**: la alternativa era promediar los 30 histogramas y dibujar su dispersión; juntar las realizaciones en una bolsa cambia eso por una sola medición con 30 veces más muestras. Si preguntan por la dispersión: el desvío entre realizaciones se mide y lo imprime `make velocidades-figuras`, 51 % por intervalo.
+- Las tres energías del análisis que pide el ítem (las imprime `make velocidades-figuras`): la inicial **½ m v0² = 12,50 mJ** (exacta: todas arrancan con |v| = v0), la del estacionario **½ m ⟨v²⟩ = 12,35 mJ** y el ajuste **kBT = 12,45 mJ**.
+- kBT contra ½ m v0²: −0,4 %. Contra ½ m ⟨v²⟩: +0,8 %. El ajuste cae entre las dos, y las dos entran en su error (± 1,04 mJ).
+- ½ m ⟨v²⟩ es 1,2 % menor que ½ m v0² porque E se conserva pero no toda es cinética: en promedio ese 1,2 % está en los resortes de los contactos. Por eso kBT, que ajusta la forma de f(v), no tiene por qué dar exactamente ninguna de las dos.
+- **Sólo si preguntan** por qué un instante y no más estadística: es lo que pide el ítem (f(v) en instantes, promediando sobre realizaciones, y se ajusta "la distribución estacionaria obtenida"). Juntando todos los cuadros de t = 10 a 30 s (1,2·10⁶ muestras) el ajuste da 12,41 ± 0,11 mJ, el mismo valor dentro del error; lo imprime `make velocidades-figuras` como respaldo, no se dibuja.
 
 ## 28. Error cuadrático medio del ajuste — `slide-28-E-vs-kT.png`
 
 - Método de la Teórica 0: se recorre kBT en una grilla y se toma el mínimo de E(kBT). Cada punto azul es un kBT probado: la grilla son 4001 valores entre 2,5 y 30,8 mJ, uno cada 7 µJ, y se dibuja uno de cada 66 (los 4001 son una banda maciza, casi cuatro por píxel). Van como puntos sueltos, sin línea que los una, justamente para que se lea como el barrido que es y no como una curva ajustada; cuántos son hay que **decirlo**, no está en la figura. Los ejes son el símbolo con la unidad, como en el resto: E(kBT) es el error cuadrático medio del ajuste (el argumento lo distingue de la energía total E(t)) y kBT la energía térmica, los dos nombrados en la viñeta.
-- **El ancho del mínimo es el error del ajuste**, que es lo que esta figura agrega: E se duplica ya en 12,31 y 12,53 mJ, o sea kBT = 12,41 ± 0,11 mJ, un 0,9 %. Es la forma de ponerle error a un ajuste de un parámetro sin más que la curva E(parámetro).
+- **El ancho del mínimo es el error del ajuste**, que es lo que esta figura agrega: E se duplica en 11,46 y 13,54 mJ, o sea kBT = 12,45 ± 1,04 mJ, un 8 %. Es grande porque la bolsa de un instante tiene 3000 muestras y el histograma es ruidoso; con el ajuste ancho, ½ m v0² y ½ m ⟨v²⟩ entran las dos. Es la forma de ponerle error a un ajuste de un parámetro sin más que la curva E(parámetro).
 - "Energía térmica" es el nombre que le da el enunciado a kBT: es el único parámetro libre del ajuste, no una temperatura medida.
 
 ## 29. Efecto de la densidad — `slide-29-t90-t100-vs-densidad.png`
@@ -250,7 +249,7 @@ mismos números.
 
 - Beeman y Verlet original son de segundo orden en el oscilador; Beeman es el mejor. Δt = 5·10⁻⁵ s por conservación de la energía: deja el error de E en 0,04 % a N = 300 y 0,03 % a N = 700.
 - El costo del paso temporal crece casi lineal con N (t ∝ N^0,88) y el de los eventos mucho más rápido (N^3,52): se cruzan cerca de N = 470.
-- Hay un xo óptimo, 0,237 ± 0,011 m, el mismo de N = 20 a 300; f(v) llega a Maxwell-Boltzmann en medio segundo con kBT = 12,41 ± 0,11 mJ ≈ mv0²/2 (y la rapidez media medida, 0,881 m/s, está a 0,2 % de la que predice con ese kBT); y con los obstáculos en el centro hay una densidad óptima en ρ = 86 partículas/m² (N = 70), donde ⟨t90⟩ = 21,8 s contra 66 s a ρ = 6 y 54 s a ρ = 367.
+- Hay un xo óptimo, 0,237 ± 0,011 m, el mismo de N = 20 a 300; f(v) llega a Maxwell-Boltzmann en medio segundo con kBT = 12,45 ± 1,04 mJ ≈ mv0²/2 (y la rapidez media medida, 0,881 m/s, está a 0,4 % de la que predice con ese kBT); y con los obstáculos en el centro hay una densidad óptima en ρ = 86 partículas/m² (N = 70), donde ⟨t90⟩ = 21,8 s contra 66 s a ρ = 6 y 54 s a ρ = 367.
 
 ## 33. Uso de agentes de IA
 

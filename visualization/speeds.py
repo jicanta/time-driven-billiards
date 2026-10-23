@@ -5,8 +5,8 @@ modulo v0, asi que f(v) es una delta en t = 0 y se va ensanchando hasta el
 estado estacionario.
 
 Cada histograma se arma de UNA SOLA BOLSA de muestras: los |v| de las N
-particulas de las M realizaciones, todos juntos en el mismo histograma (N x M
-muestras por instante, y N x M x cuadros en el estacionario). No es el promedio
+particulas de las M realizaciones de ESE instante, todos juntos en el mismo
+histograma (N x M muestras por instante). No es el promedio
 de los M histogramas de cada realizacion con su desvio como barra: con N = 100
 particulas repartidas en 40 intervalos, el histograma de una realizacion sola
 es ruido, y promediar M curvas ruidosas con barras del 50 % tapa la forma de
@@ -18,19 +18,17 @@ hace falta para saber de donde sale.
 El desvio entre realizaciones se sigue midiendo (el histograma de cada
 realizacion por separado y el desvio estandar entre ellos, intervalo por
 intervalo) y este script lo imprime. En la figura de los instantes no se
-dibuja, porque es del 51 % y tapa la forma de f(v); en la gran bolsa, que
-junta todos los cuadros y lo baja al 5 %, va como barra de error con el mismo
-criterio que la banda de la rapidez media: es la misma bolsa, con la misma
-dispersion entre realizaciones.
+dibuja, porque es del 51 % y tapa la forma de f(v).
 
-La figura de la evolucion muestra INSTANTES, cada uno con su t exacto,
-incluido el ultimo: un "t >= algo" no es un instante sino un promedio sobre
-muchos cuadros, y en una figura que se llama "f(v) para distintos instantes"
-confunde. El promedio sobre cuadros se usa, pero donde hace falta, que es el
-ajuste: la estacionaria junta todos los cuadros con t >= --estacionario
-(promedio temporal, que para un estado estacionario es el mismo promedio de
-ensamble) y asi tiene estadistica suficiente: su bolsa tiene 400 veces mas
-muestras que la de un instante suelto.
+Todas las figuras muestran INSTANTES, cada uno con su t exacto, incluido el
+estacionario que se ajusta: es el ULTIMO CUADRO GUARDADO (t = 30 s), con las N
+particulas de las M realizaciones en una sola bolsa, y nada mas. Es lo que
+pide el enunciado ("la distribucion estacionaria obtenida", promediando sobre
+realizaciones): un "t >= algo" no es un instante sino un promedio sobre
+cuadros de la misma corrida, y no hay nada en el enunciado que lo pida. Ese
+promedio temporal (todos los cuadros con t >= --estacionario, 400 veces mas
+muestras) se sigue calculando y se IMPRIME como respaldo, para contestar si
+preguntan cuanto cambia el ajuste con mas estadistica: no se dibuja.
 
 Antes de la bolsa del estacionario va la rapidez media contra el tiempo: un
 escalar por cuadro (la media de |v| de la bolsa de ese instante, con el desvio
@@ -38,9 +36,9 @@ entre realizaciones como banda) que dice cuando empieza el estacionario. Con
 el kT ajustado, Maxwell-Boltzmann predice <|v|> = sqrt(pi kT / 2m): es una
 verificacion independiente del ajuste.
 
-La estacionaria (LA GRAN BOLSA: todos los cuadros con t >= --estacionario de
-todas las realizaciones, en un solo histograma) se ajusta con la distribucion
-de Maxwell-Boltzmann en dos dimensiones
+La estacionaria (la bolsa del ultimo instante: las N particulas de las M
+realizaciones en t = 30 s, en un solo histograma) se ajusta con la
+distribucion de Maxwell-Boltzmann en dos dimensiones
 
     f(v) = (m v / kT) exp(-m v^2 / 2 kT),
 
@@ -133,7 +131,9 @@ def main() -> None:
                              "es lo que el item pide mostrar ('desde t = 0 hasta "
                              "alcanzar el estado estacionario')")
     parser.add_argument("--estacionario", type=float, default=20.0,
-                        help="instante desde el cual se promedia para el ajuste")
+                        help="instante desde el cual se considera estacionario: fija "
+                             "el promedio de la rapidez media y el ajuste de respaldo "
+                             "sobre todos los cuadros (solo por consola)")
     parser.add_argument("--bins", type=int, default=40)
     parser.add_argument("--ventana", type=float, default=2.0,
                         help="hasta que instante (s) se dibuja la rapidez media contra t: "
@@ -154,17 +154,14 @@ def main() -> None:
     # que es justamente lo que hay que ver.
     ceiling = 0.0
     last = None
-    per_instant = 0
     instants = []
     targets = [float(v) for v in arguments.instantes.split(",")] + [times[-1]]
     for target, color in zip(targets, COLORS):
         frame = int(np.searchsorted(times, target, side="right") - 1)
-        centers, density, per_instant = pooled(speeds[:, frame, :], edges)
+        centers, density, _ = pooled(speeds[:, frame, :], edges)
         if frame > 0:
             ceiling = max(ceiling, density.max())
             last = density
-            instant_density = density
-            instant_spread = spread_between_runs(speeds[:, frame, :], edges)
         instants.append((float(times[frame]), density, color))
     # El tope del eje, el mismo en las dos figuras de instantes: cuatro veces
     # el maximo del estacionario. Los primeros instantes, que todavia son casi
@@ -227,18 +224,26 @@ def main() -> None:
     common.save(figure, grid_figure)
     plt.close(figure)
 
-    # LA GRAN BOLSA: para el ajuste se juntan todos los cuadros con
-    # t >= --estacionario de todas las realizaciones en un solo histograma
-    # (runs x cuadros x N muestras), que es lo que le da la estadistica que un
-    # instante suelto no tiene.
-    per_run = speeds[:, times >= arguments.estacionario, :].reshape(runs, -1)
+    # LA ESTACIONARIA QUE SE AJUSTA: el ultimo cuadro guardado (t = 30 s), con
+    # las N particulas de las M realizaciones en una sola bolsa (runs x N
+    # muestras). Un instante, como las demas curvas de f(v).
+    per_run = speeds[:, -1, :]
     stationary = per_run.ravel()
-    frames = int((times >= arguments.estacionario).sum())
     centers, density, per_pool = pooled(per_run, edges)
     spread = spread_between_runs(per_run, edges)
 
     thermal, grid, error = common.fit_thermal_energy(centers, density, mass)
     reference = 0.5 * mass * float((stationary ** 2).mean())
+    # Respaldo, solo por consola: el mismo ajuste sobre todos los cuadros con
+    # t >= --estacionario (runs x cuadros x N muestras), para decir cuanto se
+    # mueve kT con 400 veces mas estadistica si lo preguntan.
+    window = times >= arguments.estacionario
+    pooled_runs = speeds[:, window, :].reshape(runs, -1)
+    frames = int(window.sum())
+    _, pooled_density, pooled_count = pooled(pooled_runs, edges)
+    pooled_thermal, pooled_grid, pooled_error = common.fit_thermal_energy(
+        centers, pooled_density, mass)
+    pooled_spread = spread_between_runs(pooled_runs, edges)
     initial = 0.5 * mass * static["v0"] ** 2
     # Rapidez media que predice Maxwell-Boltzmann en 2D con el kT ajustado:
     # <|v|> = sqrt(pi kT / 2m). Es una verificacion independiente del ajuste,
@@ -280,15 +285,15 @@ def main() -> None:
     # nombre de cada una. El valor de kT no, porque es EL resultado del item y
     # se dice en la diapositiva, no escondido en un rotulo de la figura.
     figure, axes = plt.subplots()
-    # La leyenda dice de donde salen las muestras, no el apodo de la bolsa:
-    # el tramo del estacionario que entra y cuantas realizaciones se juntan.
+    # La leyenda dice de donde salen las muestras: el instante y cuantas
+    # realizaciones se juntan.
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
              edgecolor=common.FRESH,
-             label=f"simulación, $t \\geq {arguments.estacionario:g}$ s, {runs} realizaciones")
+             label=f"simulación, $t$ = {common.decimal(float(times[-1]))} s, {runs} realizaciones")
     # SIN barra de error, que es el sentido de juntar todas las realizaciones
     # en una sola bolsa: el histograma no es el promedio de M curvas con su
     # dispersion, es UNA medicion con M veces mas muestras. El desvio entre
-    # realizaciones se sigue midiendo y se imprime (4,8 % por intervalo), que
+    # realizaciones se sigue midiendo y se imprime (51 % por intervalo), que
     # es la respuesta si preguntan cuanto dispersa una realizacion sola, pero
     # dibujarlo encima de la bolsa mezcla las dos lecturas.
     fine = np.linspace(edges[0], edges[-1], 400)
@@ -328,21 +333,23 @@ def main() -> None:
 
     print(f"N = {count}, sin obstáculos, {runs} realizaciones, "
           f"{len(times)} cuadros hasta t = {times[-1]:.1f} s")
-    print(f"bolsa de un instante: {runs} realizaciones x {count} partículas = "
-          f"{per_instant} muestras")
-    print(f"bolsa del estacionario (t ≥ {arguments.estacionario:g} s): {runs} x {frames} "
-          f"cuadros x {count} partículas = {per_pool} muestras "
-          f"({per_run.shape[1]} por realización)")
-    # Ninguna de las dos figuras lo dibuja (las bolsas reemplazan al promedio
-    # de M histogramas con su dispersion): se mide y se imprime, que es la
-    # respuesta si preguntan cuanto dispersa una realizacion sola.
+    print(f"bolsa de cada instante (también la estacionaria que se ajusta, t = {times[-1]:g} s): "
+          f"{runs} realizaciones x {count} partículas = {per_pool} muestras")
+    # Ninguna figura lo dibuja (la bolsa reemplaza al promedio de M histogramas
+    # con su dispersion): se mide y se imprime, que es la respuesta si
+    # preguntan cuanto dispersa una realizacion sola.
     print(f"desvío entre realizaciones (intervalos con f(v) > 10 % del máximo), "
-          f"medido pero no dibujado: instante suelto "
-          f"{relative(instant_density, instant_spread):.1%}, "
-          f"gran bolsa {relative(density, spread):.1%}")
+          f"medido pero no dibujado: {relative(density, spread):.1%} en t = {times[-1]:g} s")
     doubling = grid[error <= 2.0 * error.min()]
     print(f"kT ajustado        = {thermal:.6f} J  (el error cuadrático medio del ajuste se "
           f"duplica en {1000 * doubling.min():.2f} y {1000 * doubling.max():.2f} mJ)")
+    pooled_doubling = pooled_grid[pooled_error <= 2.0 * pooled_error.min()]
+    print(f"respaldo, no dibujado: el mismo ajuste sobre todos los cuadros con "
+          f"t ≥ {arguments.estacionario:g} s ({runs} x {frames} cuadros x {count} = "
+          f"{pooled_count} muestras) da kT = {pooled_thermal:.6f} J "
+          f"(se duplica en {1000 * pooled_doubling.min():.2f} y "
+          f"{1000 * pooled_doubling.max():.2f} mJ), desvío entre realizaciones "
+          f"{relative(pooled_density, pooled_spread):.1%}")
     print(f"m <v^2> / 2        = {reference:.6f} J  (diferencia "
           f"{100 * (thermal - reference) / reference:+.1f} %)")
     print(f"m v0^2 / 2         = {initial:.6f} J  (diferencia "

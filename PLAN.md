@@ -394,15 +394,17 @@ es el cambio de color de una partícula, que es parte del estado.
 ### Ítem 2.3 — Distribución de velocidades
 
 - `N = 100`, sin obstáculos, `tmax = 30 s`, `dt2 = 0,05 s`, 30 realizaciones.
-- `f(v)` en varios instantes desde `t = 0` y la estacionaria (todos los
-  cuadros con `t ≥ 10 s` de todas las realizaciones).
-- Cada histograma es **uno solo sobre la bolsa** de `N × M` muestras (y
-  `× cuadros` en el estacionario), una sola bolsa (la cátedra, 19/10): el
+- `f(v)` en varios instantes desde `t = 0` y la estacionaria, que es la del
+  último instante (`t = 30 s`) y es la que se ajusta. El promedio sobre todos
+  los cuadros con `t ≥ 10 s` se calcula sólo como respaldo por consola.
+- Cada histograma es **uno solo sobre la bolsa** de `N × M` muestras, una
+  sola bolsa (la cátedra, 19/10): el
   histograma de una realización sola es ruido y promediar `M` curvas ruidosas
   tapa la forma de `f(v)`. **Ninguno de los dos lleva barras**: la bolsa es
   una medición con `M` veces más muestras, no el promedio de `M` mediciones
   (es el sentido de juntarlas). El desvío entre realizaciones se mide y se
-  imprime igual: 51 % en un instante suelto, 4,8 % en la gran bolsa.
+  imprime igual: 51 % por intervalo en un instante (4,8 % en el promedio de
+  respaldo sobre todos los cuadros).
 - Los instantes van en dos figuras: superpuestos y uno por panel, con el
   estacionario de fondo en gris (la cátedra viene pidiendo los paneles).
 - Ajuste de `kT` por el mínimo del error cuadrático medio (Teórica 0) y
