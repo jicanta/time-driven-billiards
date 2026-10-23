@@ -152,10 +152,10 @@ def main() -> None:
     # particulas tienen el mismo modulo v0, asi que f(v) es una delta: el eje
     # se escala con el resto de las curvas y esa barra se sale de la figura,
     # que es justamente lo que hay que ver.
-    figure, axes = plt.subplots()
     ceiling = 0.0
     last = None
     per_instant = 0
+    instants = []
     targets = [float(v) for v in arguments.instantes.split(",")] + [times[-1]]
     for target, color in zip(targets, COLORS):
         frame = int(np.searchsorted(times, target, side="right") - 1)
@@ -165,9 +165,18 @@ def main() -> None:
             last = density
             instant_density = density
             instant_spread = spread_between_runs(speeds[:, frame, :], edges)
+        instants.append((float(times[frame]), density, color))
+    # El tope del eje, el mismo en las dos figuras de instantes: cuatro veces
+    # el maximo del estacionario. Los primeros instantes, que todavia son casi
+    # la delta inicial, se salen de la figura, que es justamente lo que hay
+    # que ver.
+    top = min(1.3 * max(ceiling, last.max()), 4.0 * last.max())
+
+    figure, axes = plt.subplots()
+    for instant, density, color in instants:
         axes.step(centers, density, where="mid", color=color,
-                  linewidth=2.4 if target == targets[-1] else 1.6,
-                  label=f"$t$ = {common.decimal(times[frame], 2)} s")
+                  linewidth=2.4 if density is instants[-1][1] else 1.6,
+                  label=f"$t$ = {common.decimal(instant, 2)} s")
     # De donde sale cada curva (M realizaciones x N particulas de ese cuadro) va
     # en la linea de condiciones de la diapositiva y no escrito dentro de la
     # figura, que es la convencion del resto del trabajo: los parametros al
@@ -175,13 +184,56 @@ def main() -> None:
     axes.set_xlabel(common.AXIS_SPEED)
     axes.set_ylabel(common.AXIS_PDF)
     axes.set_xlim(0.0, 2.8 * static["v0"])
-    # El eje se corta en cuatro veces el maximo del ultimo instante: los
-    # primeros, que todavia son casi la delta inicial, se salen de la figura y
-    # asi se ve como el pico se derrumba y la curva se ensancha.
-    axes.set_ylim(0.0, min(1.3 * max(ceiling, last.max()), 4.0 * last.max()))
-    axes.legend(loc="upper right")
+    axes.set_ylim(0.0, top)
+    common.legend_inside(axes)
     evolution = out_dir / f"f_v_vs_t_N{count}_M{runs}.png"
     common.save(figure, evolution)
+    plt.close(figure)
+
+    # Los mismos instantes, uno por panel: la superposicion de arriba compara
+    # y los paneles dejan ver cada histograma solo, sin que las curvas se
+    # pisen. En cada panel va ademas el estacionario de fondo, en gris, para
+    # que se vea a que se esta acercando sin ir y venir entre paneles. La
+    # delta del arranque se sale del eje (es el mismo tope en todos los
+    # paneles, que es lo que los hace comparables) y lleva escrito cuanto mide.
+    columns = 2
+    rows = int(np.ceil(len(instants) / columns))
+    figure, panels = plt.subplots(rows, columns, figsize=(3.4 * columns, 2.6 * rows),
+                                  sharex=True, sharey=True, squeeze=False,
+                                  layout="constrained")
+    flat = panels.ravel()
+    width = np.diff(edges)
+    for position, (axes, (instant, density, color)) in enumerate(zip(flat, instants)):
+        if density is not instants[-1][1]:
+            # El gris se nombra una sola vez, en el primer panel: en los otros
+            # ya se entiende que es la misma curva de referencia.
+            axes.step(centers, instants[-1][1], where="mid", color="#9a9a9a",
+                      linewidth=1.3, zorder=2,
+                      label="estacionario" if position == 0 else None)
+            if position == 0:
+                # Sin leyenda: el nombre va al lado de la curva, en su gris,
+                # en el hueco que deja arriba del lomo del estacionario.
+                axes.text(0.04, 0.42, "estacionario", transform=axes.transAxes,
+                          color="#8a8a8a", va="bottom",
+                          fontsize=0.75 * plt.rcParams["font.size"])
+        axes.bar(centers, density, width=width, color=color, alpha=0.45,
+                 edgecolor=color, linewidth=0.9, zorder=3)
+        axes.set_title(f"$t$ = {common.decimal(instant, 2)} s",
+                       fontsize=0.9 * plt.rcParams["font.size"])
+        if density.max() > top:
+            peak = centers[int(np.argmax(density))]
+            axes.annotate(f"{common.decimal(density.max(), 1)} s/m",
+                          xy=(peak, top), xytext=(6, -4), textcoords="offset points",
+                          fontsize=0.75 * plt.rcParams["font.size"], va="top")
+    for axes in flat[len(instants):]:
+        axes.set_axis_off()
+    for axes in flat[:len(instants)]:
+        axes.set_xlim(0.0, 2.2 * static["v0"])
+        axes.set_ylim(0.0, top)
+    figure.supxlabel(common.AXIS_SPEED, fontsize=plt.rcParams["axes.labelsize"])
+    figure.supylabel(common.AXIS_PDF, fontsize=plt.rcParams["axes.labelsize"])
+    grid_figure = out_dir / f"f_v_paneles_N{count}_M{runs}.png"
+    common.save(figure, grid_figure)
     plt.close(figure)
 
     # LA GRAN BOLSA: para el ajuste se juntan todos los cuadros con
@@ -309,6 +361,7 @@ def main() -> None:
           f"Maxwell-Boltzmann con el kT ajustado predice sqrt(pi kT / 2m) = {predicted_mean:.4f} m/s; "
           f"entra en la banda del estacionario desde t = {first_flat:.2f} s")
     print(evolution)
+    print(grid_figure)
     print(mean_figure)
     print(fit)
     print(error_figure)

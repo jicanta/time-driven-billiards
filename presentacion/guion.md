@@ -136,7 +136,11 @@ cierra dice las conclusiones.
 > de tiempo, desde t = 0 hasta alcanzar el estado estacionario**", o sea los
 > **histogramas**. Hoy la diapositiva muestra la rapidez media contra el
 > tiempo, que es un observable de apoyo y no lo que el ítem pide. Va
-> `slides-images/slide-26-f-v-vs-t.png`, que tiene f(v) en cuatro instantes.
+> `slides-images/slide-26-f-v-vs-t.png` (los cuatro instantes superpuestos) o
+> `slides-images/slide-26b-f-v-paneles.png` (los mismos cuatro, uno por panel,
+> con el estacionario de fondo en gris). Las dos están hechas: la superpuesta
+> compara de un vistazo, la de paneles deja ver cada histograma solo y es el
+> formato que la cátedra viene pidiendo.
 > La rapidez media conviene dejarla como diapositiva de respaldo, después del
 > "Muchas gracias": contesta "¿desde cuándo es estacionario?".
 
@@ -145,7 +149,7 @@ cierra dice las conclusiones.
 - A los **0,15 s** el pico ya se derrumbó a 2,45 s/m —2,7 veces el del estacionario— y apareció la **cola de velocidades bajas**.
 - A los **0,5 s** la curva ya cae **sobre la de 30 s**: el transitorio dura medio segundo y de ahí en adelante todas se superponen. Por eso son cuatro instantes y no más.
 - f(v) se **ensancha sin que cambie E**: el sistema es conservativo, lo que se redistribuye entre partículas es la energía, no se pierde.
-- Cada curva es **un solo histograma de la bolsa** del instante, no el promedio de 30 histogramas: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y el desvío entre realizaciones en un instante suelto es del 41 %, que taparía la forma. En la gran bolsa baja al 4,8 % y ahí sí va dibujado como barra.
+- Cada curva es **un solo histograma de la bolsa** del instante —todas las partículas de todas las realizaciones juntas, como si fuera una única realización grande—, no el promedio de 30 histogramas: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y el desvío entre realizaciones en un instante suelto es del 41 %, que taparía la forma. En la gran bolsa baja al 4,8 % y ahí sí va dibujado como barra.
 
 ## Rapidez media según t — **pasarla a respaldo**
 

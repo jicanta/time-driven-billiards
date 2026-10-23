@@ -520,6 +520,7 @@ slides-images:
 	cp $(SLIDES)/animaciones/cuadro_sin_obstaculos_t$(CUADRO).png                   $(FIGS)/slide-24-animacion-sin-obstaculos.png
 	cp $(SLIDES)/2.3_velocidades/v_medio_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png            $(FIGS)/slide-25-v-medio-vs-t.png
 	cp $(SLIDES)/2.3_velocidades/f_v_vs_t_N$(N_VEL)_M$(SEEDS_VEL).png               $(FIGS)/slide-26-f-v-vs-t.png
+	cp $(SLIDES)/2.3_velocidades/f_v_paneles_N$(N_VEL)_M$(SEEDS_VEL).png            $(FIGS)/slide-26b-f-v-paneles.png
 	cp $(SLIDES)/2.3_velocidades/f_v_gran_bolsa_ajuste_N$(N_VEL)_M$(SEEDS_VEL).png  $(FIGS)/slide-27-f-v-gran-bolsa-ajuste.png
 	cp $(SLIDES)/2.3_velocidades/E_vs_kT_N$(N_VEL)_M$(SEEDS_VEL).png                $(FIGS)/slide-28-E-vs-kT.png
 	cp $(SLIDES)/2.4_densidad/t90_t100_vs_densidad_M$(SEEDS_DENSIDAD).png           $(FIGS)/slide-29-t90-t100-vs-densidad.png
