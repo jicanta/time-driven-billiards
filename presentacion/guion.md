@@ -111,7 +111,7 @@ ordenado por diapositiva.
 
 ## Ajuste Maxwell-Boltzmann (21) — 1:00
 
-- La estacionaria es **la de t = 30 s**, el último instante: las 100 partículas de las 30 realizaciones en un solo histograma, 3000 muestras. Lo dice la leyenda.
+- La estacionaria es **la de t = 30 s**, el último instante: las 100 partículas de las 30 realizaciones en un solo histograma, 3000 muestras.
 - Encima, Maxwell-Boltzmann en 2D, f(v) = (mv/k_BT)·exp(−mv²/2k_BT), con **k_BT como único parámetro libre**.
 - Ajuste a la manera de la Teórica 0: se recorre k_BT en una grilla y se toma el **mínimo del error cuadrático medio** E(k_BT), la figura de la izquierda. Da **k_BT = 12,45 mJ**; el ancho del mínimo es el error: ± 1,04 mJ, un 8 %.
 - La comparación que pide el ítem: ½mv0² = **12,50 mJ**, un 0,4 % más. El ½m⟨v²⟩ medido es 12,35 mJ, un poco menos: E se conserva, pero el 1,2 % está en promedio en los resortes de los contactos abiertos. El ajuste cae entre las dos, y las dos dentro de su error.
@@ -198,7 +198,7 @@ ordenado por diapositiva.
 
 Las imágenes estaban todas al día en esa exportación, salvo las dos del
 ajuste, que **hoy cambiaron**: el ajuste es ahora sobre el instante t = 30 s
-(leyenda "simulación, t = 30 s, 30 realizaciones") y E(k_BT) con él. Volver a
+(leyenda "simulación", sin más) y E(k_BT) con él. Volver a
 pegar `slides-images/slide-27-f-v-gran-bolsa-ajuste.png` y
 `slides-images/slide-28-E-vs-kT.png`, y los números: k_BT = 12,45 ± 1,04 mJ.
 

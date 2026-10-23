@@ -285,11 +285,10 @@ def main() -> None:
     # nombre de cada una. El valor de kT no, porque es EL resultado del item y
     # se dice en la diapositiva, no escondido en un rotulo de la figura.
     figure, axes = plt.subplots()
-    # La leyenda dice de donde salen las muestras: el instante y cuantas
-    # realizaciones se juntan.
+    # La leyenda nombra solo la serie; el instante y las realizaciones van en
+    # la linea de condiciones de la diapositiva, como en el resto del trabajo.
     axes.bar(centers, density, width=np.diff(edges), color=common.FRESH, alpha=0.45,
-             edgecolor=common.FRESH,
-             label=f"simulación, $t$ = {common.decimal(float(times[-1]))} s, {runs} realizaciones")
+             edgecolor=common.FRESH, label="simulación")
     # SIN barra de error, que es el sentido de juntar todas las realizaciones
     # en una sola bolsa: el histograma no es el promedio de M curvas con su
     # dispersion, es UNA medicion con M veces mas muestras. El desvio entre
