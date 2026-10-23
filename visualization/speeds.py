@@ -257,17 +257,28 @@ def main() -> None:
     plt.close(figure)
 
     figure, axes = plt.subplots()
-    axes.plot(1000 * grid, error, color=common.FRESH)
+    # El ajuste es un BARRIDO: se evalua el error en cada valor de kT de la
+    # grilla y se toma el menor. La grilla tiene tantos valores (4001, uno
+    # cada 7 uJ) que dibujada entera es una banda maciza -- entran casi cuatro
+    # puntos por pixel del eje --, asi que va la linea con un marcador cada
+    # tantos, y la leyenda dice cuantos son y cuantos se dibujan: sin eso la
+    # curva se lee como una funcion continua ajustada, que es justo lo que no
+    # es.
+    every = max(1, len(grid) // 60)
+    axes.plot(1000 * grid, error, color=common.FRESH, zorder=2)
+    axes.plot(1000 * grid[::every], error[::every], color=common.FRESH, marker="o",
+              markersize=4, linestyle="none", zorder=3,
+              label=f"grilla de {len(grid)} valores de $k_BT$ "
+                    f"(se dibuja 1 de cada {every})")
     axes.plot([1000 * thermal], [error.min()], marker="o", color=common.USED, markersize=9,
-              linestyle="none",
+              linestyle="none", zorder=4,
               label=f"mínimo en $k_BT$ = {common.decimal(1000 * thermal, 2)} mJ")
     # Los ejes llevan el simbolo y la unidad, como el resto de las figuras:
     # "energia termica" y "error cuadratico medio" estan definidos en la
     # diapositiva, no hace falta repetirlos en el rotulo.
     axes.set_xlabel(common.AXIS_THERMAL)
     axes.set_ylabel(common.AXIS_FIT_ERROR)
-    common.headroom(axes, 0.22)
-    axes.legend(loc="upper center")
+    common.legend_inside(axes, loc="upper center")
     error_figure = out_dir / f"E_vs_kT_N{count}_M{runs}.png"
     common.save(figure, error_figure)
     plt.close(figure)
