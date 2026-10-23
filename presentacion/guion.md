@@ -138,7 +138,7 @@ cierra dice las conclusiones.
 > tiempo, que es un observable de apoyo y no lo que el ítem pide. Va
 > `slides-images/slide-26-f-v-vs-t.png` (los cuatro instantes superpuestos) o
 > `slides-images/slide-26b-f-v-paneles.png` (los mismos cuatro, uno por panel,
-> con el estacionario de fondo en gris). Las dos están hechas: la superpuesta
+> con el mismo eje en los cuatro). Las dos están hechas: la superpuesta
 > compara de un vistazo, la de paneles deja ver cada histograma solo y es el
 > formato que la cátedra viene pidiendo.
 > La rapidez media conviene dejarla como diapositiva de respaldo, después del
@@ -149,6 +149,7 @@ cierra dice las conclusiones.
 - A los **0,15 s** el pico ya se derrumbó a 2,45 s/m —2,7 veces el del estacionario— y apareció la **cola de velocidades bajas**.
 - A los **0,5 s** la curva ya cae **sobre la de 30 s**: el transitorio dura medio segundo y de ahí en adelante todas se superponen. Por eso son cuatro instantes y no más.
 - f(v) se **ensancha sin que cambie E**: el sistema es conservativo, lo que se redistribuye entre partículas es la energía, no se pierde.
+- **Si preguntan por qué se simula hasta 30 s si el estacionario llega en medio segundo**: no se espera 30 s para llegar, se usan para tener de dónde sacar estadística. El ajuste de la diapositiva siguiente se hace sobre la **gran bolsa** del tramo estacionario (t ≥ 10 s): 401 cuadros × 30 realizaciones × 100 partículas = 1,2·10⁶ muestras, y de ahí sale que el histograma salga suave y el ajuste dé ±0,9 %. Y que f(v) a los 30 s sea la misma que a los 0,5 s es **la prueba de que es estacionario** y no una deriva lenta. Con N = 100, esos 30 s son segundos de cómputo.
 - Cada curva es **un solo histograma de la bolsa** del instante —todas las partículas de todas las realizaciones juntas, como si fuera una única realización grande—, no el promedio de 30 histogramas: el histograma de una realización sola (100 partículas en 40 intervalos) es ruido, y el desvío entre realizaciones en un instante suelto es del 41 %, que taparía la forma. En la gran bolsa baja al 4,8 % y ahí sí va dibujado como barra.
 
 ## Rapidez media según t — **pasarla a respaldo**
@@ -221,6 +222,7 @@ texto, para pegar:
 - **¿Por qué la velocidad de Velocity Verlet es la de medio paso?** Ver la viñeta larga de "ECM vs dt". Consulta validada por la cátedra el 19/10.
 - **¿Las barras son el error de la media?** No, son el **desvío estándar entre realizaciones** en todas las figuras del trabajo.
 - **¿Por qué la gran bolsa junta cuadros de la misma corrida, que están correlacionados?** Porque lo que hace falta es la **forma** de f(v) en el estacionario, y el promedio temporal de un estado estacionario es el mismo promedio de ensamble. Para los escalares con error (t₉₀, tiempos de ejecución) el promedio es sobre realizaciones independientes.
+- **¿Por qué 30 s de simulación si el estacionario se alcanza en medio segundo?** Ver la viñeta de la diapositiva de f(v): los 30 s son para la estadística de la gran bolsa (1,2·10⁶ muestras) y para mostrar que a los 30 s sigue siendo la misma distribución. El corte en t ≥ 10 s es un margen conservador: el estacionario empieza en 0,4 s.
 - **¿Cuántas realizaciones hay en cada figura?** 15 en el barrido de x_o, 30 en velocidades, 20 en densidad y en el mapa, 10 en los tiempos de ejecución.
 - **¿Cuánto tarda todo?** El mapa son 3200 corridas; se corrió en paralelo. El resto está en `make todo`.
 

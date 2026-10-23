@@ -176,7 +176,7 @@ def main() -> None:
     for instant, density, color in instants:
         axes.step(centers, density, where="mid", color=color,
                   linewidth=2.4 if density is instants[-1][1] else 1.6,
-                  label=f"$t$ = {common.decimal(instant, 2)} s")
+                  label=f"$t$ = {common.decimal(instant)} s")
     # De donde sale cada curva (M realizaciones x N particulas de ese cuadro) va
     # en la linea de condiciones de la diapositiva y no escrito dentro de la
     # figura, que es la convencion del resto del trabajo: los parametros al
@@ -185,17 +185,20 @@ def main() -> None:
     axes.set_ylabel(common.AXIS_PDF)
     axes.set_xlim(0.0, 2.8 * static["v0"])
     axes.set_ylim(0.0, top)
-    common.legend_inside(axes)
+    # Leyenda sin estirar el eje: las cuatro entradas son cortas y entran en
+    # el hueco de arriba a la derecha, donde no hay nada dibujado. Con
+    # headroom el eje se iba a 5,5 s/m y las curvas quedaban aplastadas abajo.
+    axes.legend(loc="upper right")
     evolution = out_dir / f"f_v_vs_t_N{count}_M{runs}.png"
     common.save(figure, evolution)
     plt.close(figure)
 
     # Los mismos instantes, uno por panel: la superposicion de arriba compara
     # y los paneles dejan ver cada histograma solo, sin que las curvas se
-    # pisen. En cada panel va ademas el estacionario de fondo, en gris, para
-    # que se vea a que se esta acercando sin ir y venir entre paneles. La
-    # delta del arranque se sale del eje (es el mismo tope en todos los
-    # paneles, que es lo que los hace comparables) y lleva escrito cuanto mide.
+    # pisen. Cada panel lleva SOLO su histograma; el eje es el mismo en los
+    # cuatro, que es lo que los hace comparables de un vistazo sin repetir el
+    # ultimo de fondo en todos. La delta del arranque se sale del eje y lleva
+    # escrito cuanto mide.
     columns = 2
     rows = int(np.ceil(len(instants) / columns))
     figure, panels = plt.subplots(rows, columns, figsize=(3.4 * columns, 2.6 * rows),
@@ -203,22 +206,10 @@ def main() -> None:
                                   layout="constrained")
     flat = panels.ravel()
     width = np.diff(edges)
-    for position, (axes, (instant, density, color)) in enumerate(zip(flat, instants)):
-        if density is not instants[-1][1]:
-            # El gris se nombra una sola vez, en el primer panel: en los otros
-            # ya se entiende que es la misma curva de referencia.
-            axes.step(centers, instants[-1][1], where="mid", color="#9a9a9a",
-                      linewidth=1.3, zorder=2,
-                      label="estacionario" if position == 0 else None)
-            if position == 0:
-                # Sin leyenda: el nombre va al lado de la curva, en su gris,
-                # en el hueco que deja arriba del lomo del estacionario.
-                axes.text(0.04, 0.42, "estacionario", transform=axes.transAxes,
-                          color="#8a8a8a", va="bottom",
-                          fontsize=0.75 * plt.rcParams["font.size"])
+    for axes, (instant, density, color) in zip(flat, instants):
         axes.bar(centers, density, width=width, color=color, alpha=0.45,
                  edgecolor=color, linewidth=0.9, zorder=3)
-        axes.set_title(f"$t$ = {common.decimal(instant, 2)} s",
+        axes.set_title(f"$t$ = {common.decimal(instant)} s",
                        fontsize=0.9 * plt.rcParams["font.size"])
         if density.max() > top:
             peak = centers[int(np.argmax(density))]
