@@ -11,8 +11,9 @@ tiene más diapositivas (una animación por configuración, la energía en Joule
 los mismos scripts, y cada uno se puede reproducir con el `make` que se
 nombra al lado.
 
-**Antes de exponer**, ver "Revisión del mazo" al final: hay un reordenamiento
-recomendado y seis correcciones chicas de texto.
+**Antes de exponer**, ver "Revisión del mazo" al final: **falta la diapositiva
+de uso de agentes de IA que pide el ítem 2.5 del enunciado**, hay un
+reordenamiento recomendado y seis correcciones chicas de texto.
 
 Reparto sugerido (tres expositores, ~12 min): Introducción + Implementación,
 Simulaciones + sistema 1 + paso y costo, y de obstáculos en adelante. El que
@@ -167,6 +168,25 @@ cierra dice las conclusiones.
 3. Hay **posición óptima** de los obstáculos y **densidad óptima**. El x_o óptimo está siempre entre 0,20 y 0,30 m —nunca en el centro ni contra la pared— y es el mismo para todas las densidades de N = 20 en adelante (0,24 m); poner mal los obstáculos cuesta hasta 4,6 veces más tiempo.
 4. (Si se pregunta por el sistema 1) Beeman es el esquema con menor ECM en 8 de los 9 pasos; Verlet original lo iguala en pendiente y se usó en el billar porque ahí la fuerza depende sólo de las posiciones y la diferencia desaparece.
 
+## Uso de agentes de IA — **falta en el mazo**
+
+El ítem **2.5 del enunciado** la pide textual: *"Al finalizar las
+presentaciones orales, exponer una diapositiva extra que sirva de base para
+explicitar qué agente y modelo se utilizó y de qué manera"*. Va **después de
+Conclusiones**, antes del "Muchas gracias". En la beamer está (página 34 de
+`SdS_TP4_2026Q2G10S2_Presentación.pdf`); en este mazo hay que agregarla. El
+texto, para pegar:
+
+> **Uso de agentes de IA**
+>
+> - **Agente y modelo**: Claude Code (Anthropic), modelos Claude Opus 5 y Claude Fable 5.1.
+> - **En qué se usó**: asistencia en la programación del motor en C++, de los scripts de post-procesamiento en Python y del código de las diapositivas, y revisión de código.
+> - **En qué no se usó**: las decisiones de modelado (esquemas, elección de Δt, observables, criterios de ajuste), el análisis de los resultados y las conclusiones son del grupo, a partir de la Teórica 4 y la Teórica 0.
+> - Todo lo generado se revisó y se verificó contra las figuras mostradas.
+
+- Al decirlo, que quede claro el límite: **herramienta de programación**, no de análisis. El enunciado lo subraya ("los agentes de IA no pueden reemplazar al proceso de aprendizaje").
+- Si preguntan por algo puntual que haya salido del asistente, contestarlo con el número y el `make` que lo reproduce: todo lo que está en las figuras se corrió y se verificó.
+
 ## Muchas gracias (26)
 
 ---
@@ -188,11 +208,12 @@ Las imágenes **están todas al día**: las 13 figuras que salen del repositorio
 son idénticas a las de `slides-images/`, y los tres GIF son idénticos a
 `gif/02`, `gif/05` y `gif/06` (los dos últimos, con las correcciones de hoy).
 
-1. **Orden** (lo único importante): "Evolución del sistema" y "ECM vs dt" están hoy **antes de Introducción**, y las dos llevan el rótulo *Resultados* arriba a la derecha. Van después del separador **Resultados**, delante de "Conservación de la energía": así Resultados sigue el orden del enunciado (sistema 1 → paso → costo → obstáculos → velocidades → densidad).
-2. **"Distribución de f(v)" (20)**: el título no es lo que muestra la figura, que es la rapidez media ⟨|v|⟩ contra el tiempo. O se cambia el título, o se agrega al lado `slides-images/slide-26-f-v-vs-t.png`, que es f(v) en tres instantes y es lo que el ítem 2.3 pide ver.
-3. **Falta la figura con la que se elige el paso**: la conclusión 1 ("hace falta Δt = 5·10⁻⁵ s") se apoya en ε_máx contra Δt, que es `slides-images/slide-17-error-maximo-vs-dt.png` y no está en el mazo. Con la de la 15 sola se puede decir igual, pero esa figura es la evidencia directa.
-4. **"Animación" (17)**: dice `t_max = 100 s`, pero el GIF es de **20 s** de simulación (los 100 s son el t_max del barrido de x_o). Poner `t_f = 20 s`.
-5. **"t₉₀ en función de x₀" (19)**: dice `N = 100`, pero la figura tiene **N = 20 y N = 100**.
-6. **Conclusión 3**: "a mayor N, un menor x₀" está sobredicho. Lo medido es −1,8 ± 0,7 cm por década de N, y de N = 20 en adelante el óptimo es el mismo dentro del error (0,237 ± 0,011 m); sólo N = 5 y N = 10 se corren hacia afuera. Conviene la redacción de la conclusión 3 de este guion.
-7. **Detalles de formato** (la cátedra los marca): coma decimal y unidades en el texto de las diapositivas — `0.1%` → `0,1 %`, `5x10-5` → `5·10⁻⁵ s`, `12.5mJ` → `12,5 mJ`; `K_bT` → `k_BT`; "Tiempo ejecución" → "Tiempo de ejecución".
-8. **Opcional**: los dos GIF de la 17 tienen los ejes con distinto estilo, `x (m)` el del barrido y `posición x (m)` el del billar. Se pueden unificar regenerando las animaciones del billar (`make animations`), pero hay que volver a insertar los GIF en las diapositivas.
+1. **Falta la diapositiva de uso de agentes de IA**, que el **ítem 2.5 del enunciado pide explícitamente** como diapositiva extra al final. Va después de Conclusiones; el texto está más arriba, en su sección del guion.
+2. **Orden**: "Evolución del sistema" y "ECM vs dt" están hoy **antes de Introducción**, y las dos llevan el rótulo *Resultados* arriba a la derecha. Van después del separador **Resultados**, delante de "Conservación de la energía": así Resultados sigue el orden del enunciado (sistema 1 → paso → costo → obstáculos → velocidades → densidad).
+3. **"Distribución de f(v)" (20)**: el título no es lo que muestra la figura, que es la rapidez media ⟨|v|⟩ contra el tiempo. O se cambia el título, o se agrega al lado `slides-images/slide-26-f-v-vs-t.png`, que es f(v) en tres instantes y es lo que el ítem 2.3 pide ver.
+4. **Falta la figura con la que se elige el paso**: la conclusión 1 ("hace falta Δt = 5·10⁻⁵ s") se apoya en ε_máx contra Δt, que es `slides-images/slide-17-error-maximo-vs-dt.png` y no está en el mazo. Con la de la 15 sola se puede decir igual, pero esa figura es la evidencia directa.
+5. **"Animación" (17)**: dice `t_max = 100 s`, pero el GIF es de **20 s** de simulación (los 100 s son el t_max del barrido de x_o). Poner `t_f = 20 s`.
+6. **"t₉₀ en función de x₀" (19)**: dice `N = 100`, pero la figura tiene **N = 20 y N = 100**.
+7. **Conclusión 3**: "a mayor N, un menor x₀" está sobredicho. Lo medido es −1,8 ± 0,7 cm por década de N, y de N = 20 en adelante el óptimo es el mismo dentro del error (0,237 ± 0,011 m); sólo N = 5 y N = 10 se corren hacia afuera. Conviene la redacción de la conclusión 3 de este guion.
+8. **Detalles de formato** (la cátedra los marca): coma decimal y unidades en el texto de las diapositivas — `0.1%` → `0,1 %`, `5x10-5` → `5·10⁻⁵ s`, `12.5mJ` → `12,5 mJ`; `K_bT` → `k_BT`; "Tiempo ejecución" → "Tiempo de ejecución".
+9. **Opcional**: los dos GIF de la 17 tienen los ejes con distinto estilo, `x (m)` el del barrido y `posición x (m)` el del billar. Se pueden unificar regenerando las animaciones del billar (`make animations`), pero hay que volver a insertar los GIF en las diapositivas.
